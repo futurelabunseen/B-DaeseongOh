@@ -15,13 +15,6 @@ UMDInputData::UMDInputData()
 		DefaultMappingContext = DefaultMappingContextRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionMouseMoveRef(
-		TEXT("/Script/EnhancedInput.InputAction'/Game/MakeDungeon/Input/Actions/IA_SetDestination_Click.IA_SetDestination_Click'"));
-	if (nullptr != InputActionMouseMoveRef.Object)
-	{
-		MouseMoveAction = InputActionMouseMoveRef.Object;
-	}
-
 	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionKeyboardMoveRef(
 		TEXT("/Script/EnhancedInput.InputAction'/Game/MakeDungeon/Input/Actions/IA_KeyboardMove.IA_KeyboardMove'"));
 	if (nullptr != InputActionKeyboardMoveRef.Object)
@@ -29,4 +22,17 @@ UMDInputData::UMDInputData()
 		KeyboardMoveAction = InputActionKeyboardMoveRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionMouseMoveRef(
+		TEXT("/Script/EnhancedInput.InputAction'/Game/MakeDungeon/Input/Actions/IA_SetDestination_Click.IA_SetDestination_Click'"));
+	if (nullptr != InputActionMouseMoveRef.Object)
+	{
+		MouseMoveAction = InputActionMouseMoveRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionAttackRef(
+		TEXT("/Script/EnhancedInput.InputAction'/Game/MakeDungeon/Input/Actions/IA_Attack.IA_Attack'"));
+	if (nullptr != InputActionAttackRef.Object)
+	{
+		KeyboardMoveAction = InputActionAttackRef.Object;
+	}
 }

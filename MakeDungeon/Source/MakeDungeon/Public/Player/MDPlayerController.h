@@ -31,10 +31,10 @@ public:
 protected:
 	virtual void SetupInputComponent() override;
 
+	void KeyboardMove(const FInputActionValue& Value);
 	void OnMouseMoveTriggered();
 	void OnMouseMoveReleased();
-
-	void KeyboardMove(const FInputActionValue& Value);
+	void OnAttackTriggered();
 
 	uint32 bMoveToMouseCursor : 1;
 
