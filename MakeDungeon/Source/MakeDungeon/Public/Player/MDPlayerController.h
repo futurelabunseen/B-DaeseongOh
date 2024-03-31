@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "InputActionValue.h"
 #include "MDPlayerController.generated.h"
+
+struct FInputActionValue;
+class UMDInputData;
 
 /**
  * 
@@ -26,18 +28,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	class UNiagaraSystem* FXCursor;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	class UInputMappingContext* DefaultMappingContext;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> MouseMoveAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> KeyboardMoveAction;
-
 protected:
-	uint32 bMoveToMouseCursor : 1;
-
 	virtual void SetupInputComponent() override;
 
 	void OnMouseMoveTriggered();
@@ -45,9 +36,14 @@ protected:
 
 	void KeyboardMove(const FInputActionValue& Value);
 
-private:
+	uint32 bMoveToMouseCursor : 1;
+
 	FVector CachedDestination;
 
 	float FollowTime;
+
+private:
+	UPROPERTY(EditAnywhere, Category = "Data")
+	TObjectPtr<UMDInputData> InputData;
 
 };

@@ -4,7 +4,6 @@
 #include "Character/MDCharacterBase.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Data/MDCharacterControlData.h"
 
 // Sets default values
 AMDCharacterBase::AMDCharacterBase()
