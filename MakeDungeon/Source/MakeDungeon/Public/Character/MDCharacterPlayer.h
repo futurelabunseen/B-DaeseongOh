@@ -19,7 +19,6 @@ public:
 	AMDCharacterPlayer();
 
 	virtual void PossessedBy(AController* NewController) override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -42,12 +41,7 @@ protected:
 // Input Section
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> KeyboardMoveAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> JumpAction;
-
-	void KeyboardMove(const FInputActionValue& Value);
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")

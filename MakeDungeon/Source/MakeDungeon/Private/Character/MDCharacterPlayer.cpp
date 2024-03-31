@@ -30,12 +30,7 @@ AMDCharacterPlayer::AMDCharacterPlayer()
 	
 	//PrimaryActorTick.bCanEverTick = true;
 	//PrimaryActorTick.bStartWithTickEnabled = true;
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionKeyboardMoveRef(TEXT("/Script/EnhancedInput.InputAction'/Game/MakeDungeon/Input/Actions/IA_KeyboardMove.IA_KeyboardMove'"));
-	if (nullptr != InputActionKeyboardMoveRef.Object)
-	{
-		KeyboardMoveAction = InputActionKeyboardMoveRef.Object;
-	}
+	
 }
 
 void AMDCharacterPlayer::PossessedBy(AController* NewController)
@@ -63,18 +58,6 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));*/
 	}
 
-}
-
-void AMDCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
-
-	//EnhancedInputComponent->BindAction(MouseMoveAction, ETriggerEvent::Triggered, this, &AMDCharacterPlayer::MouseMove);
-	EnhancedInputComponent->BindAction(KeyboardMoveAction, ETriggerEvent::Triggered, this, &AMDCharacterPlayer::KeyboardMove);
-
-	//SetupGASInputComponent();
 }
 
 void AMDCharacterPlayer::BeginPlay()
@@ -130,26 +113,4 @@ void AMDCharacterPlayer::GASInputReleased(int32 InputId)
 			MD_LOG(LogMD, Log, TEXT("GASInputReleased_IsActive"));
 		}
 	}
-}
-
-void AMDCharacterPlayer::KeyboardMove(const FInputActionValue& Value)
-{
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	float InputSizeSquared = MovementVector.SquaredLength();
-	float MovementVectorSize = 1.f;
-	float MovementVectorSizeSquared = MovementVector.SquaredLength();
-	if (MovementVectorSizeSquared > 1.f)
-	{
-		MovementVector.Normalize();
-		MovementVectorSizeSquared = 1.f;
-	}
-	else
-	{
-		MovementVectorSize = FMath::Sqrt(MovementVectorSizeSquared);
-	}
-
-	FVector MoveDirection = FVector(MovementVector.X, MovementVector.Y, 0.f);
-	GetController()->SetControlRotation(FRotationMatrix::MakeFromX(MoveDirection).Rotator());
-	AddMovementInput(MoveDirection, MovementVectorSize);
 }

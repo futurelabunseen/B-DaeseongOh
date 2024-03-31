@@ -23,6 +23,12 @@ AMDPlayerController::AMDPlayerController()
 	{
 		MouseMoveAction = InputActionMouseMoveRef.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionKeyboardMoveRef(TEXT("/Script/EnhancedInput.InputAction'/Game/MakeDungeon/Input/Actions/IA_KeyboardMove.IA_KeyboardMove'"));
+	if (nullptr != InputActionKeyboardMoveRef.Object)
+	{
+		KeyboardMoveAction = InputActionKeyboardMoveRef.Object;
+	}
 }
 
 void AMDPlayerController::BeginPlay()
@@ -44,6 +50,7 @@ void AMDPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(MouseMoveAction, ETriggerEvent::Triggered, this, &AMDPlayerController::OnMouseMoveTriggered);
 		EnhancedInputComponent->BindAction(MouseMoveAction, ETriggerEvent::Canceled, this, &AMDPlayerController::OnMouseMoveReleased);
 		EnhancedInputComponent->BindAction(MouseMoveAction, ETriggerEvent::Completed, this, &AMDPlayerController::OnMouseMoveReleased);
+		EnhancedInputComponent->BindAction(KeyboardMoveAction, ETriggerEvent::Triggered, this, &AMDPlayerController::KeyboardMove);
 	}
 }
 
@@ -76,4 +83,26 @@ void AMDPlayerController::OnMouseMoveReleased()
 	}
 
 	FollowTime = 0.f;
+}
+
+void AMDPlayerController::KeyboardMove(const FInputActionValue& Value)
+{
+	FVector2D MovementVector = Value.Get<FVector2D>();
+
+	float InputSizeSquared = MovementVector.SquaredLength();
+	float MovementVectorSize = 1.f;
+	float MovementVectorSizeSquared = MovementVector.SquaredLength();
+	if (MovementVectorSizeSquared > 1.f)
+	{
+		MovementVector.Normalize();
+		MovementVectorSizeSquared = 1.f;
+	}
+	else
+	{
+		MovementVectorSize = FMath::Sqrt(MovementVectorSizeSquared);
+	}
+
+	FVector MoveDirection = FVector(MovementVector.X, MovementVector.Y, 0.f);
+	SetControlRotation(FRotationMatrix::MakeFromX(MoveDirection).Rotator());
+	GetPawn()->AddMovementInput(MoveDirection, MovementVectorSize);
 }

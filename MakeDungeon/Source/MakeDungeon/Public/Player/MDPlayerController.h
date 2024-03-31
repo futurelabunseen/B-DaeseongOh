@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "InputActionValue.h"
 #include "MDPlayerController.generated.h"
 
 /**
@@ -30,6 +31,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> MouseMoveAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> KeyboardMoveAction;
+
 protected:
 	uint32 bMoveToMouseCursor : 1;
 
@@ -37,6 +42,8 @@ protected:
 
 	void OnMouseMoveTriggered();
 	void OnMouseMoveReleased();
+
+	void KeyboardMove(const FInputActionValue& Value);
 
 private:
 	FVector CachedDestination;
