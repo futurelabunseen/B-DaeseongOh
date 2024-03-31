@@ -10,6 +10,8 @@
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "../MakeDungeon.h"
+#include "AIController.h"
+#include "Navigation/PathFollowingComponent.h"
 
 AMDPlayerController::AMDPlayerController()
 {
@@ -87,6 +89,8 @@ void AMDPlayerController::OnMouseMoveReleased()
 
 void AMDPlayerController::KeyboardMove(const FInputActionValue& Value)
 {
+	StopMovement();
+
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	float InputSizeSquared = MovementVector.SquaredLength();
