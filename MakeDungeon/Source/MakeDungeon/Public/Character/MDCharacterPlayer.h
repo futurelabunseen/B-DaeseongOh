@@ -23,13 +23,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-// Character Control Section
-protected:
-	void SetupGASInputComponent();
-	void GASInputPressed(int32 InputId);
-	void GASInputReleased(int32 InputId);
-	
-
 // Camera Section
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))

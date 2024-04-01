@@ -50,11 +50,9 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 
 			MD_LOG(LogMD, Log, TEXT("%d, %s"), StartInputAbility.Key, *(StartInputAbility.Value)->GetAuthoredName());
 		}
-
-		//SetupGASInputComponent();
-
-		/*APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
-		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));*/
+	
+		APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
+		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 	}
 
 }
@@ -62,54 +60,4 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 void AMDCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void AMDCharacterPlayer::SetupGASInputComponent()
-{
-	if (IsValid(AbilitySystemComponent) && IsValid(InputComponent))
-	{
-		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-
-		//EnhancedInputComponent->BindAction(MouseMoveAction, ETriggerEvent::Triggered, this, &AMDCharacterPlayer::GASInputPressed, 0);
-		//EnhancedInputComponent->BindAction(MouseMoveAction, ETriggerEvent::Canceled, this, &AMDCharacterPlayer::GASInputReleased, 0);
-		//EnhancedInputComponent->BindAction(MouseMoveAction, ETriggerEvent::Completed, this, &AMDCharacterPlayer::GASInputReleased, 0);
-		//EnhancedInputComponent->BindAction(KeyboardMoveAction, ETriggerEvent::Triggered, this, &AMDCharacterPlayer::KeyboardMove);
-
-		MD_LOG(LogMD, Log, TEXT("Begin"));
-	}
-}
-
-void AMDCharacterPlayer::GASInputPressed(int32 InputId)
-{
-	FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromInputID(InputId);
-	if (Spec)
-	{
-		Spec->InputPressed = true;
-		if (Spec->IsActive())
-		{
-			AbilitySystemComponent->AbilitySpecInputPressed(*Spec);
-
-			MD_LOG(LogMD, Log, TEXT("GASInputPressed_IsActive"));
-		}
-		else
-		{
-			AbilitySystemComponent->TryActivateAbility(Spec->Handle);
-			MD_LOG(LogMD, Log, TEXT("GASInputPressed_IsNotActive"));
-		}
-	}
-}
-
-void AMDCharacterPlayer::GASInputReleased(int32 InputId)
-{
-	FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromInputID(InputId);
-	if (Spec)
-	{
-		Spec->InputPressed = false;
-		if (Spec->IsActive())
-		{
-			AbilitySystemComponent->AbilitySpecInputReleased(*Spec);
-
-			MD_LOG(LogMD, Log, TEXT("GASInputReleased_IsActive"));
-		}
-	}
 }

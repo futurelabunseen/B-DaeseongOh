@@ -33,6 +33,6 @@ UMDInputData::UMDInputData()
 		TEXT("/Script/EnhancedInput.InputAction'/Game/MakeDungeon/Input/Actions/IA_Attack.IA_Attack'"));
 	if (nullptr != InputActionAttackRef.Object)
 	{
-		KeyboardMoveAction = InputActionAttackRef.Object;
+		AttackAction = InputActionAttackRef.Object;
 	}
 }

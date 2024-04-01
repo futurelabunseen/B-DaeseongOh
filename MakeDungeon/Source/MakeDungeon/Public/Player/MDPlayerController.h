@@ -36,6 +36,9 @@ protected:
 	void OnMouseMoveReleased();
 	void OnAttackTriggered();
 
+	void GASInputPressed(int32 InputId);
+	void GASInputReleased(int32 InputId);
+
 	uint32 bMoveToMouseCursor : 1;
 
 	FVector CachedDestination;
