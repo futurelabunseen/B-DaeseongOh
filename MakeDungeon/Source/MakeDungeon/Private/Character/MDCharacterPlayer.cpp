@@ -51,8 +51,8 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 			MD_LOG(LogMD, Log, TEXT("%d, %s"), StartInputAbility.Key, *(StartInputAbility.Value)->GetAuthoredName());
 		}
 	
-		APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
-		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
+		/*APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
+		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));*/
 	}
 
 }

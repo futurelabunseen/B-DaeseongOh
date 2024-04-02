@@ -31,14 +31,8 @@ protected:
 
 	FName GetNextSection();
 	void StartComboTimer();
-	void CheckComboInput();
+	void CheckComboInput();	
 
 protected:
-	UPROPERTY()
-	TObjectPtr<class UMDComboActionData> CurrentComboData;
-
-	uint8 CurrentCombo = 0;
-	FTimerHandle ComboTimerHandle;
-	bool HasNextComboInput = false;
 
 };

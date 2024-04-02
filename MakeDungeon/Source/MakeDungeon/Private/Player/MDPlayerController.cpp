@@ -13,6 +13,7 @@
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "../MakeDungeon.h"
+#include "Tags/MDGameplayTag.h"
 
 AMDPlayerController::AMDPlayerController()
 {
@@ -44,9 +45,35 @@ void AMDPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Triggered, this, &AMDPlayerController::OnMouseMoveTriggered);
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Canceled, this, &AMDPlayerController::OnMouseMoveReleased);
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Completed, this, &AMDPlayerController::OnMouseMoveReleased);
+
 		EnhancedInputComponent->BindAction(InputData->AttackAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, 0);
 	}
 }
+
+void AMDPlayerController::KeyboardMove(const FInputActionValue& Value)
+{
+	StopMovement();
+
+	FVector2D MovementVector = Value.Get<FVector2D>();
+
+	float InputSizeSquared = MovementVector.SquaredLength();
+	float MovementVectorSize = 1.f;
+	float MovementVectorSizeSquared = MovementVector.SquaredLength();
+	if (MovementVectorSizeSquared > 1.f)
+	{
+		MovementVector.Normalize();
+		MovementVectorSizeSquared = 1.f;
+	}
+	else
+	{
+		MovementVectorSize = FMath::Sqrt(MovementVectorSizeSquared);
+	}
+
+	FVector MoveDirection = FVector(MovementVector.X, MovementVector.Y, 0.f);
+	SetControlRotation(FRotationMatrix::MakeFromX(MoveDirection).Rotator());
+	GetPawn()->AddMovementInput(MoveDirection, MovementVectorSize);
+}
+
 
 void AMDPlayerController::OnMouseMoveTriggered()
 {
@@ -117,28 +144,4 @@ void AMDPlayerController::GASInputReleased(int32 InputId)
 			MD_LOG(LogMD, Log, TEXT("GASInputReleased_IsActive"));
 		}
 	}
-}
-
-void AMDPlayerController::KeyboardMove(const FInputActionValue& Value)
-{
-	StopMovement();
-
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	float InputSizeSquared = MovementVector.SquaredLength();
-	float MovementVectorSize = 1.f;
-	float MovementVectorSizeSquared = MovementVector.SquaredLength();
-	if (MovementVectorSizeSquared > 1.f)
-	{
-		MovementVector.Normalize();
-		MovementVectorSizeSquared = 1.f;
-	}
-	else
-	{
-		MovementVectorSize = FMath::Sqrt(MovementVectorSizeSquared);
-	}
-
-	FVector MoveDirection = FVector(MovementVector.X, MovementVector.Y, 0.f);
-	SetControlRotation(FRotationMatrix::MakeFromX(MoveDirection).Rotator());
-	GetPawn()->AddMovementInput(MoveDirection, MovementVectorSize);
 }

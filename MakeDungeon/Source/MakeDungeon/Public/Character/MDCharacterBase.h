@@ -7,6 +7,9 @@
 #include "AbilitySystemInterface.h"
 #include "MDCharacterBase.generated.h"
 
+class UAbilitySystemComponent;
+class UGameplayAbility;
+
 UCLASS()
 class MAKEDUNGEON_API AMDCharacterBase : public ACharacter, public IAbilitySystemInterface
 {
@@ -16,14 +19,19 @@ public:
 	// Sets default values for this character's properties
 	AMDCharacterBase();
 
-	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	FORCEINLINE virtual UAnimMontage* GetAttackMontage() const { return AttackMontage; }
+
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "GAS")
-	TObjectPtr<class UAbilitySystemComponent> AbilitySystemComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	TObjectPtr<UAnimMontage> AttackMontage;
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
-	TArray<TSubclassOf<class UGameplayAbility>> CharacterAbilities;
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	TArray<TSubclassOf<UGameplayAbility>> CharacterAbilities;
 
 
 };
