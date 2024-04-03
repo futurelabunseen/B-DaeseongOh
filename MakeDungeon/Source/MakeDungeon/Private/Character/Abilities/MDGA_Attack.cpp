@@ -85,17 +85,8 @@ void UMDGA_Attack::OnInterruptedCallback()
 FName UMDGA_Attack::GetNextSection(bool bIsSecondary)
 {
 	FName NextSection;
-	if (bIsSecondary)
-	{
-		CurrentCombo = FMath::Clamp(CurrentCombo, 1, CurrentAttackMontageData->MaxComboCount - 1);
-		NextSection = *FString::Printf(TEXT("%s%d"), *CurrentAttackMontageData->MontageSectionSecondaryNamePrefix, CurrentCombo);
-	}
-	else
-	{
-		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, CurrentAttackMontageData->MaxComboCount);
-		NextSection = *FString::Printf(TEXT("%s%d"), *CurrentAttackMontageData->MontageSectionNamePrefix, CurrentCombo);
-	}
-		
+	CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, CurrentAttackMontageData->MaxComboCount);
+	NextSection = *FString::Printf(TEXT("%s%d"), *CurrentAttackMontageData->MontageSectionNamePrefix, CurrentCombo);
 	return NextSection;
 }
 
@@ -121,9 +112,5 @@ void UMDGA_Attack::CheckComboInput()
 		MontageJumpToSection(GetNextSection());
 		StartComboTimer();
 		HasNextAttackInput = false;
-	}
-	else
-	{
-		MontageJumpToSection(GetNextSection(true));
 	}
 }
