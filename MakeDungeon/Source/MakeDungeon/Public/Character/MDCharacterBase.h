@@ -20,12 +20,15 @@ public:
 	AMDCharacterBase();
 
 	FORCEINLINE virtual UAnimMontage* GetAttackMontage() const { return AttackMontage; }
-
+	FORCEINLINE class UMDAttackMontageData* GetAttackMontageData() const { return AttackMontageData; }
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	TObjectPtr<UAnimMontage> AttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	TObjectPtr<class UMDAttackMontageData> AttackMontageData;
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;

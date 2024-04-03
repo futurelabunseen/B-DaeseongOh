@@ -36,6 +36,7 @@ protected:
 	void OnMouseMoveReleased();
 	void OnAttackTriggered();
 
+	void GASInputStarted(int32 InputId);
 	void GASInputPressed(int32 InputId);
 	void GASInputReleased(int32 InputId);
 

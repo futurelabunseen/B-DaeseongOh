@@ -34,5 +34,5 @@ protected:
 // Input Section
 protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
-	TMap<int32, TSubclassOf<class UGameplayAbility>> InputAbilities;
+	TMap<int32, TSubclassOf<UGameplayAbility>> InputAbilities;
 };

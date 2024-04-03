@@ -29,10 +29,15 @@ protected:
 	UFUNCTION()
 	void OnInterruptedCallback();
 
-	FName GetNextSection();
+	FName GetNextSection(bool bIsSecondary = false);
 	void StartComboTimer();
 	void CheckComboInput();	
 
 protected:
+	UPROPERTY()
+	TObjectPtr<class UMDAttackMontageData> CurrentAttackMontageData;
 
+	uint8 CurrentCombo = 0;
+	FTimerHandle ComboTimerHandle;
+	bool HasNextAttackInput = false;
 };
