@@ -31,7 +31,7 @@ protected:
 	TObjectPtr<class UMDAttackMontageData> AttackMontageData;
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UAbilitySystemComponent> ASC;
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TArray<TSubclassOf<UGameplayAbility>> CharacterAbilities;

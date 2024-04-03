@@ -34,7 +34,6 @@ protected:
 	void KeyboardMove(const FInputActionValue& Value);
 	void OnMouseMoveTriggered();
 	void OnMouseMoveReleased();
-	void OnAttackTriggered();
 
 	void GASInputStarted(int32 InputId);
 	void GASInputPressed(int32 InputId);

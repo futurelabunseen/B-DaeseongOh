@@ -6,11 +6,11 @@
 
 AMDPlayerState::AMDPlayerState()
 {
-	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	//AbilitySystemComponent->SetIsReplicated(true);
 }
 
 UAbilitySystemComponent* AMDPlayerState::GetAbilitySystemComponent() const
 {
-	return AbilitySystemComponent;
+	return ASC;
 }

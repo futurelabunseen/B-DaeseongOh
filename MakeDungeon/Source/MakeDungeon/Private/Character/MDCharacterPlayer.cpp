@@ -13,7 +13,7 @@
 
 AMDCharacterPlayer::AMDCharacterPlayer()
 {
-	AbilitySystemComponent = nullptr;
+	ASC = nullptr;
 
 	// Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -39,20 +39,26 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 	AMDPlayerState* PS = GetPlayerState<AMDPlayerState>();
 	if (PS)
 	{
-		AbilitySystemComponent = PS->GetAbilitySystemComponent();
-		AbilitySystemComponent->InitAbilityActorInfo(PS, this);
+		ASC = PS->GetAbilitySystemComponent();
+		ASC->InitAbilityActorInfo(PS, this);
+
+		for (const auto& StartAbility : CharacterAbilities)
+		{
+			FGameplayAbilitySpec StartSpec(StartAbility);
+			ASC->GiveAbility(StartSpec);
+		}
 
 		for (const auto& StartInputAbility : InputAbilities)
 		{
 			FGameplayAbilitySpec StartSpec(StartInputAbility.Value);
 			StartSpec.InputID = StartInputAbility.Key;
-			AbilitySystemComponent->GiveAbility(StartSpec);
+			ASC->GiveAbility(StartSpec);
 
 			MD_LOG(LogMD, Log, TEXT("%d, %s"), StartInputAbility.Key, *(StartInputAbility.Value)->GetAuthoredName());
 		}
 	
-		/*APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
-		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));*/
+		APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
+		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 	}
 
 }

@@ -37,9 +37,9 @@ void AMDPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
+	if (IsValid(InputComponent))
 	{
-		FGameplayTag Tag = FGameplayTag();
+		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 
 		EnhancedInputComponent->BindAction(InputData->KeyboardMoveAction, ETriggerEvent::Triggered, this, &AMDPlayerController::KeyboardMove);
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Triggered, this, &AMDPlayerController::OnMouseMoveTriggered);
@@ -106,19 +106,15 @@ void AMDPlayerController::OnMouseMoveReleased()
 	FollowTime = 0.f;
 }
 
-void AMDPlayerController::OnAttackTriggered()
-{
-}
-
 void AMDPlayerController::GASInputStarted(int32 InputId)
 {
-	UAbilitySystemComponent* AbilitySystemComponent = GetPlayerState<AMDPlayerState>()->GetAbilitySystemComponent();
-	FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromInputID(InputId);
+	UAbilitySystemComponent* ASC = GetPlayerState<AMDPlayerState>()->GetAbilitySystemComponent();
+	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
 	if (Spec)
 	{
 		if(!Spec->IsActive())
 		{
-			AbilitySystemComponent->TryActivateAbility(Spec->Handle);
+			ASC->TryActivateAbility(Spec->Handle);
 			MD_LOG(LogMD, Log, TEXT("GASInputStarted"));
 		}
 	}
@@ -126,19 +122,19 @@ void AMDPlayerController::GASInputStarted(int32 InputId)
 
 void AMDPlayerController::GASInputPressed(int32 InputId)
 {
-	UAbilitySystemComponent* AbilitySystemComponent = GetPlayerState<AMDPlayerState>()->GetAbilitySystemComponent();
-	FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromInputID(InputId);
+	UAbilitySystemComponent* ASC = GetPlayerState<AMDPlayerState>()->GetAbilitySystemComponent();
+	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
 	if (Spec)
 	{
 		Spec->InputPressed = true;
 		if (Spec->IsActive())
 		{
-			AbilitySystemComponent->AbilitySpecInputPressed(*Spec);
+			ASC->AbilitySpecInputPressed(*Spec);
 			MD_LOG(LogMD, Log, TEXT("GASInputPressed"));
 		}
 		else
 		{
-			AbilitySystemComponent->TryActivateAbility(Spec->Handle);
+			ASC->TryActivateAbility(Spec->Handle);
 			MD_LOG(LogMD, Log, TEXT("GASInputPressed_IsNotActive"));
 		}
 	}
@@ -146,14 +142,14 @@ void AMDPlayerController::GASInputPressed(int32 InputId)
 
 void AMDPlayerController::GASInputReleased(int32 InputId)
 {
-	UAbilitySystemComponent* AbilitySystemComponent = GetPlayerState<AMDPlayerState>()->GetAbilitySystemComponent();
-	FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromInputID(InputId);
+	UAbilitySystemComponent* ASC = GetPlayerState<AMDPlayerState>()->GetAbilitySystemComponent();
+	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
 	if (Spec)
 	{
 		Spec->InputPressed = false;
 		if (Spec->IsActive())
 		{
-			AbilitySystemComponent->AbilitySpecInputReleased(*Spec);
+			ASC->AbilitySpecInputReleased(*Spec);
 			MD_LOG(LogMD, Log, TEXT("GASInputReleased"));
 		}
 	}

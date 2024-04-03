@@ -22,6 +22,6 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "GAS");
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UAbilitySystemComponent> ASC;
 
 };

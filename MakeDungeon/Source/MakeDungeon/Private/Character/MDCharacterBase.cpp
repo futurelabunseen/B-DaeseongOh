@@ -47,5 +47,5 @@ AMDCharacterBase::AMDCharacterBase()
 
 UAbilitySystemComponent* AMDCharacterBase::GetAbilitySystemComponent() const
 {
-	return AbilitySystemComponent;
+	return ASC;
 }
