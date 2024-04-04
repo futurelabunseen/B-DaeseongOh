@@ -9,6 +9,7 @@
 
 class UAbilitySystemComponent;
 class UGameplayAbility;
+class UMDCharacterAttributeSet;
 
 UCLASS()
 class MAKEDUNGEON_API AMDCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -36,5 +37,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TArray<TSubclassOf<UGameplayAbility>> CharacterAbilities;
 
-
+	UPROPERTY()
+	TObjectPtr<UMDCharacterAttributeSet> AttributeSet;
 };

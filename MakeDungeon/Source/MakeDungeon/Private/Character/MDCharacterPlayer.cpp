@@ -14,6 +14,7 @@
 AMDCharacterPlayer::AMDCharacterPlayer()
 {
 	ASC = nullptr;
+	AttributeSet = nullptr;
 
 	// Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -40,6 +41,7 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 	if (PS)
 	{
 		ASC = PS->GetAbilitySystemComponent();
+		AttributeSet = PS->GetAttributeSet();
 		ASC->InitAbilityActorInfo(PS, this);
 
 		for (const auto& StartAbility : CharacterAbilities)
