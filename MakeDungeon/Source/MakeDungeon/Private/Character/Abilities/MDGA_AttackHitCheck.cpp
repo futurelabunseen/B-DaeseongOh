@@ -5,6 +5,7 @@
 #include "Character/Abilities/Tasks/MDAT_Trace.h"
 #include "Character/Abilities/TargetActors/MDTA_Trace.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "Character/Abilities/AttributeSets/MDCharacterAttributeSet.h"
 #include "../MakeDungeon.h"
 
 UMDGA_AttackHitCheck::UMDGA_AttackHitCheck()
@@ -28,6 +29,26 @@ void UMDGA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 	{
 		FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, 0);
 		MD_LOG(LogMD, Log, TEXT("Target %s Detected"), *(HitResult.GetActor()->GetName()));
+
+		UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo_Checked();
+		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor());
+
+		if (!SourceASC || !TargetASC)
+		{
+			MD_LOG(LogMD, Log, TEXT("ASC not fount"));
+			return;
+		}
+
+		const UMDCharacterAttributeSet* SourceAttribute = SourceASC->GetSet<UMDCharacterAttributeSet>();
+		UMDCharacterAttributeSet* TargetAttribute = const_cast<UMDCharacterAttributeSet*>(TargetASC->GetSet<UMDCharacterAttributeSet>());
+		if (!SourceAttribute || !TargetAttribute)
+		{
+			MD_LOG(LogMD, Log, TEXT("Attribute not fount"));
+			return;
+		}
+
+		const float AttackDamage = SourceAttribute->GetAttackRate();
+		TargetAttribute->SetHealth(TargetAttribute->GetHealth() - AttackDamage);
 	}
 
 	bool bReplicatedEndAbility = true;

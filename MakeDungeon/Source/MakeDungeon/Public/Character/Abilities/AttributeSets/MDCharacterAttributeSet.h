@@ -26,36 +26,37 @@ public:
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 
+	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, AttackRange);
+	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, MaxAttackRange);
+	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, AttackRadius);
+	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, MaxAttackRadius);
+	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, AttackRate);
+	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, MaxAttackRate);
+	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, Health);
+	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, MaxHealth);
+
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData AttackRange;
-	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, AttackRange);
 
 	UPROPERTY(BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData MaxAttackRange;
-	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, MaxAttackRange);
 
 	UPROPERTY(BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData AttackRadius;
-	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, AttackRadius);
 
 	UPROPERTY(BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData MaxAttackRadius;
-	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, MaxAttackRadius);
 
 	UPROPERTY(BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData AttackRate;
-	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, AttackRate);
 
 	UPROPERTY(BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData MaxAttackRate;
-	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, MaxAttackRate);
 
 	UPROPERTY(BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData Health;
-	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, Health);
 
 	UPROPERTY(BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData MaxHealth;
-	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, MaxHealth);
 };
