@@ -8,6 +8,7 @@
 
 struct FInputActionValue;
 class UMDInputData;
+struct FGameplayTag;
 
 /**
  * 
@@ -35,9 +36,9 @@ protected:
 	void OnMouseMoveTriggered();
 	void OnMouseMoveReleased();
 
-	void GASInputStarted(int32 InputId);
-	void GASInputPressed(int32 InputId);
-	void GASInputReleased(int32 InputId);
+	void GASInputStarted(FGameplayTag Tag);
+	void GASInputPressed(FGameplayTag Tag);
+	void GASInputReleased(FGameplayTag Tag);
 
 	uint32 bMoveToMouseCursor : 1;
 

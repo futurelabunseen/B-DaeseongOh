@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MDCharacterBase.h"
-#include "InputActionValue.h"
+#include "GameplayTagContainer.h"
 #include "MDCharacterPlayer.generated.h"
 
 /**
@@ -34,5 +34,5 @@ protected:
 // Input Section
 protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
-	TMap<int32, TSubclassOf<UGameplayAbility>> InputAbilities;
+	TMap<FGameplayTag, TSubclassOf<UGameplayAbility>> InputAbilities;
 };

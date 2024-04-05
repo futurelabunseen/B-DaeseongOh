@@ -5,6 +5,7 @@
 #include "Character/MDCharacterBase.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Data/MDAttackMontageData.h"
+#include "../MakeDungeon.h"
 
 
 UMDGA_Attack::UMDGA_Attack()
@@ -31,15 +32,19 @@ void UMDGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 
 		StartComboTimer();
 	}
+
+	MD_LOG(LogMD, Log, TEXT("Activate"));
 }
 
 void UMDGA_Attack::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
+	MD_LOG(LogMD, Log, TEXT("InputPressed"));
 	if (HasNextAttackInput && CurrentCombo < CurrentAttackMontageData->MaxComboCount)
 	{
 		MontageJumpToSection(GetNextSection());
 		StartComboTimer();
 		HasNextAttackInput = false;
+		MD_LOG(LogMD, Log, TEXT("NextAnim"));
 	}
 }
 

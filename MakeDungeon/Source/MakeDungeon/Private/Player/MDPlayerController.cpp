@@ -13,6 +13,7 @@
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Tags/MDGameplayTag.h"
+#include "GameplayTagContainer.h"
 
 AMDPlayerController::AMDPlayerController()
 {
@@ -45,7 +46,7 @@ void AMDPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Canceled, this, &AMDPlayerController::OnMouseMoveReleased);
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Completed, this, &AMDPlayerController::OnMouseMoveReleased);
 
-		EnhancedInputComponent->BindAction(InputData->AttackAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, 0);
+		EnhancedInputComponent->BindAction(InputData->AttackAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_Attack);
 	}
 }
 
@@ -103,47 +104,51 @@ void AMDPlayerController::OnMouseMoveReleased()
 	FollowTime = 0.f;
 }
 
-void AMDPlayerController::GASInputStarted(int32 InputId)
+void AMDPlayerController::GASInputStarted(FGameplayTag Tag)
 {
 	UAbilitySystemComponent* ASC = GetPlayerState<AMDPlayerState>()->GetAbilitySystemComponent();
-	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
-	if (Spec)
-	{
-		if(!Spec->IsActive())
-		{
-			ASC->TryActivateAbility(Spec->Handle);
-		}
-	}
+
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(Tag);
+
+	ASC->TryActivateAbilitiesByTag(TagContainer);
 }
 
-void AMDPlayerController::GASInputPressed(int32 InputId)
+void AMDPlayerController::GASInputPressed(FGameplayTag Tag)
 {
 	UAbilitySystemComponent* ASC = GetPlayerState<AMDPlayerState>()->GetAbilitySystemComponent();
-	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
-	if (Spec)
+
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(Tag);
+
+	TArray<FGameplayAbilitySpec*> AbilitiesToActivate;
+	ASC->GetActivatableGameplayAbilitySpecsByAllMatchingTags(TagContainer, AbilitiesToActivate);
+
+	for (auto GameplayAbilitySpec : AbilitiesToActivate)
 	{
-		Spec->InputPressed = true;
-		if (Spec->IsActive())
+		if(GameplayAbilitySpec->IsActive())
 		{
-			ASC->AbilitySpecInputPressed(*Spec);
+			ASC->AbilitySpecInputPressed(*GameplayAbilitySpec);
 		}
 		else
 		{
-			ASC->TryActivateAbility(Spec->Handle);
+			ASC->TryActivateAbility(GameplayAbilitySpec->Handle);
 		}
 	}
 }
 
-void AMDPlayerController::GASInputReleased(int32 InputId)
+void AMDPlayerController::GASInputReleased(FGameplayTag Tag)
 {
 	UAbilitySystemComponent* ASC = GetPlayerState<AMDPlayerState>()->GetAbilitySystemComponent();
-	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
-	if (Spec)
+
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(Tag);
+
+	TArray<FGameplayAbilitySpec*> AbilitiesToActivate;
+	ASC->GetActivatableGameplayAbilitySpecsByAllMatchingTags(TagContainer, AbilitiesToActivate);
+
+	for (auto GameplayAbilitySpec : AbilitiesToActivate)
 	{
-		Spec->InputPressed = false;
-		if (Spec->IsActive())
-		{
-			ASC->AbilitySpecInputReleased(*Spec);
-		}
+		ASC->AbilitySpecInputReleased(*GameplayAbilitySpec);
 	}
 }

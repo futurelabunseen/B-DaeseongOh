@@ -11,6 +11,7 @@
 #include "AbilitySystemComponent.h"
 #include "../MakeDungeon.h"
 
+
 AMDCharacterPlayer::AMDCharacterPlayer()
 {
 	ASC = nullptr;
@@ -53,7 +54,6 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 		for (const auto& StartInputAbility : InputAbilities)
 		{
 			FGameplayAbilitySpec StartSpec(StartInputAbility.Value);
-			StartSpec.InputID = StartInputAbility.Key;
 			ASC->GiveAbility(StartSpec);
 		}
 	
