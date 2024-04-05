@@ -19,9 +19,12 @@ public:
 	AMDPlayerState();
 
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	class UMDCharacterAttributeSet* GetAttributeSet() const;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "GAS");
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UAbilitySystemComponent> ASC;
 
+	UPROPERTY()
+	TObjectPtr<class UMDCharacterAttributeSet> AttributeSet;
 };

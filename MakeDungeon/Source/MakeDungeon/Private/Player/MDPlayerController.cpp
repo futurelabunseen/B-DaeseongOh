@@ -6,12 +6,14 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Player/MDPlayerState.h"
+#include "AbilitySystemComponent.h"
+#include "Data/MDInputData.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
-#include "../MakeDungeon.h"
-#include "AIController.h"
-#include "Navigation/PathFollowingComponent.h"
+#include "Tags/MDGameplayTag.h"
+#include "GameplayTagContainer.h"
 
 AMDPlayerController::AMDPlayerController()
 {
@@ -19,27 +21,15 @@ AMDPlayerController::AMDPlayerController()
 	DefaultMouseCursor = EMouseCursor::Default;
 	CachedDestination = FVector::ZeroVector;
 	FollowTime = 0.f;
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionMouseMoveRef(TEXT("/Script/EnhancedInput.InputAction'/Game/MakeDungeon/Input/Actions/IA_SetDestination_Click.IA_SetDestination_Click'"));
-	if (nullptr != InputActionMouseMoveRef.Object)
-	{
-		MouseMoveAction = InputActionMouseMoveRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionKeyboardMoveRef(TEXT("/Script/EnhancedInput.InputAction'/Game/MakeDungeon/Input/Actions/IA_KeyboardMove.IA_KeyboardMove'"));
-	if (nullptr != InputActionKeyboardMoveRef.Object)
-	{
-		KeyboardMoveAction = InputActionKeyboardMoveRef.Object;
-	}
 }
 
 void AMDPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	if (SubSystem)
 	{
-		SubSystem->AddMappingContext(DefaultMappingContext, 0);
+		SubSystem->AddMappingContext(InputData->DefaultMappingContext, 0);
 	}
 }
 
@@ -47,44 +37,17 @@ void AMDPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
+	if (IsValid(InputComponent))
 	{
-		EnhancedInputComponent->BindAction(MouseMoveAction, ETriggerEvent::Triggered, this, &AMDPlayerController::OnMouseMoveTriggered);
-		EnhancedInputComponent->BindAction(MouseMoveAction, ETriggerEvent::Canceled, this, &AMDPlayerController::OnMouseMoveReleased);
-		EnhancedInputComponent->BindAction(MouseMoveAction, ETriggerEvent::Completed, this, &AMDPlayerController::OnMouseMoveReleased);
-		EnhancedInputComponent->BindAction(KeyboardMoveAction, ETriggerEvent::Triggered, this, &AMDPlayerController::KeyboardMove);
+		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+
+		EnhancedInputComponent->BindAction(InputData->KeyboardMoveAction, ETriggerEvent::Triggered, this, &AMDPlayerController::KeyboardMove);
+		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Triggered, this, &AMDPlayerController::OnMouseMoveTriggered);
+		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Canceled, this, &AMDPlayerController::OnMouseMoveReleased);
+		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Completed, this, &AMDPlayerController::OnMouseMoveReleased);
+
+		EnhancedInputComponent->BindAction(InputData->AttackAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_Attack);
 	}
-}
-
-void AMDPlayerController::OnMouseMoveTriggered()
-{
-	FollowTime += GetWorld()->GetDeltaSeconds();
-
-	FHitResult HitResult;
-	if (GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, HitResult))
-	{
-		CachedDestination = HitResult.Location;
-	}
-
-	APawn* ControlledPawn = GetPawn();
-	if (ControlledPawn != nullptr)
-	{
-		FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
-		ControlledPawn->AddMovementInput(WorldDirection, 1.0, false);
-	}
-
-	MD_LOG(LogMD, Log, TEXT("MouseMove Triggered"));
-}
-
-void AMDPlayerController::OnMouseMoveReleased()
-{
-	if (FollowTime <= ShortPressThreshold)
-	{
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CachedDestination);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
-	}
-
-	FollowTime = 0.f;
 }
 
 void AMDPlayerController::KeyboardMove(const FInputActionValue& Value)
@@ -109,4 +72,83 @@ void AMDPlayerController::KeyboardMove(const FInputActionValue& Value)
 	FVector MoveDirection = FVector(MovementVector.X, MovementVector.Y, 0.f);
 	SetControlRotation(FRotationMatrix::MakeFromX(MoveDirection).Rotator());
 	GetPawn()->AddMovementInput(MoveDirection, MovementVectorSize);
+}
+
+
+void AMDPlayerController::OnMouseMoveTriggered()
+{
+	FollowTime += GetWorld()->GetDeltaSeconds();
+
+	FHitResult HitResult;
+	if (GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, HitResult))
+	{
+		CachedDestination = HitResult.Location;
+	}
+
+	APawn* ControlledPawn = GetPawn();
+	if (ControlledPawn != nullptr)
+	{
+		FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
+		ControlledPawn->AddMovementInput(WorldDirection, 1.0, false);
+	}
+}
+
+void AMDPlayerController::OnMouseMoveReleased()
+{
+	if (FollowTime <= ShortPressThreshold)
+	{
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CachedDestination);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+	}
+
+	FollowTime = 0.f;
+}
+
+void AMDPlayerController::GASInputStarted(FGameplayTag Tag)
+{
+	UAbilitySystemComponent* ASC = GetPlayerState<AMDPlayerState>()->GetAbilitySystemComponent();
+
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(Tag);
+
+	ASC->TryActivateAbilitiesByTag(TagContainer);
+}
+
+void AMDPlayerController::GASInputPressed(FGameplayTag Tag)
+{
+	UAbilitySystemComponent* ASC = GetPlayerState<AMDPlayerState>()->GetAbilitySystemComponent();
+
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(Tag);
+
+	TArray<FGameplayAbilitySpec*> AbilitiesToActivate;
+	ASC->GetActivatableGameplayAbilitySpecsByAllMatchingTags(TagContainer, AbilitiesToActivate);
+
+	for (auto GameplayAbilitySpec : AbilitiesToActivate)
+	{
+		if(GameplayAbilitySpec->IsActive())
+		{
+			ASC->AbilitySpecInputPressed(*GameplayAbilitySpec);
+		}
+		else
+		{
+			ASC->TryActivateAbility(GameplayAbilitySpec->Handle);
+		}
+	}
+}
+
+void AMDPlayerController::GASInputReleased(FGameplayTag Tag)
+{
+	UAbilitySystemComponent* ASC = GetPlayerState<AMDPlayerState>()->GetAbilitySystemComponent();
+
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(Tag);
+
+	TArray<FGameplayAbilitySpec*> AbilitiesToActivate;
+	ASC->GetActivatableGameplayAbilitySpecsByAllMatchingTags(TagContainer, AbilitiesToActivate);
+
+	for (auto GameplayAbilitySpec : AbilitiesToActivate)
+	{
+		ASC->AbilitySpecInputReleased(*GameplayAbilitySpec);
+	}
 }

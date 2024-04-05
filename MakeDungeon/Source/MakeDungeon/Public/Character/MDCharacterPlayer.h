@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MDCharacterBase.h"
-#include "InputActionValue.h"
+#include "GameplayTagContainer.h"
 #include "MDCharacterPlayer.generated.h"
 
 /**
@@ -23,13 +23,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-// Character Control Section
-protected:
-	void SetupGASInputComponent();
-	void GASInputPressed(int32 InputId);
-	void GASInputReleased(int32 InputId);
-	
-
 // Camera Section
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
@@ -40,10 +33,6 @@ protected:
 
 // Input Section
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> JumpAction;
-	
-protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
-	TMap<int32, TSubclassOf<class UGameplayAbility>> InputAbilities;
+	TMap<FGameplayTag, TSubclassOf<UGameplayAbility>> InputAbilities;
 };
