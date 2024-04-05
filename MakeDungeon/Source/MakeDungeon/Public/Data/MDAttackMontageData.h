@@ -16,18 +16,15 @@ class MAKEDUNGEON_API UMDAttackMontageData : public UPrimaryDataAsset
 public:
 	UMDAttackMontageData();
 
-	UPROPERTY(EditAnywhere, Category = Name)
+	UPROPERTY(EditAnywhere, Category = "Name")
 	FString MontageSectionNamePrefix;
 
-	UPROPERTY(EditAnywhere, Category = Name)
-	FString MontageSectionSecondaryNamePrefix;
-
-	UPROPERTY(EditAnywhere, Category = Name)
+	UPROPERTY(EditAnywhere, Category = "Name")
 	uint8 MaxComboCount;
 
-	UPROPERTY(EditAnywhere, Category = Name)
+	UPROPERTY(EditAnywhere, Category = "Name")
 	float FrameRate;
 
-	UPROPERTY(EditAnywhere, Category = ComboData)
-	TArray<float> EffectiveFrameCount;
+	UPROPERTY(EditAnywhere, Category = "InputThreshold")
+	float InputThreshold;
 };

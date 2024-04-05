@@ -12,7 +12,6 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
-#include "../MakeDungeon.h"
 #include "Tags/MDGameplayTag.h"
 
 AMDPlayerController::AMDPlayerController()
@@ -113,7 +112,6 @@ void AMDPlayerController::GASInputStarted(int32 InputId)
 		if(!Spec->IsActive())
 		{
 			ASC->TryActivateAbility(Spec->Handle);
-			MD_LOG(LogMD, Log, TEXT("GASInputStarted"));
 		}
 	}
 }
@@ -128,12 +126,10 @@ void AMDPlayerController::GASInputPressed(int32 InputId)
 		if (Spec->IsActive())
 		{
 			ASC->AbilitySpecInputPressed(*Spec);
-			MD_LOG(LogMD, Log, TEXT("GASInputPressed"));
 		}
 		else
 		{
 			ASC->TryActivateAbility(Spec->Handle);
-			MD_LOG(LogMD, Log, TEXT("GASInputPressed_IsNotActive"));
 		}
 	}
 }
@@ -148,7 +144,6 @@ void AMDPlayerController::GASInputReleased(int32 InputId)
 		if (Spec->IsActive())
 		{
 			ASC->AbilitySpecInputReleased(*Spec);
-			MD_LOG(LogMD, Log, TEXT("GASInputReleased"));
 		}
 	}
 }

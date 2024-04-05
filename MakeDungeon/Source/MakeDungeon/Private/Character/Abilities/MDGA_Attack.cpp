@@ -5,7 +5,6 @@
 #include "Character/MDCharacterBase.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Data/MDAttackMontageData.h"
-#include "../MakeDungeon.h"
 
 
 UMDGA_Attack::UMDGA_Attack()
@@ -17,8 +16,6 @@ void UMDGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	MD_LOG(LogMD, Log, TEXT("ActivateAbility"));
-
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
 	
 	CurrentAttackMontageData = MDCharacter->GetAttackMontageData();
@@ -27,7 +24,6 @@ void UMDGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 
 	if (AttackMontage)
 	{
-		MD_LOG(LogMD, Log, TEXT("PlayMontage"));
 		UAbilityTask_PlayMontageAndWait* PlayAttackMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayAttack"), AttackMontage, 1.f, GetNextSection());
 		PlayAttackMontageTask->OnCompleted.AddDynamic(this, &UMDGA_Attack::OnCompletedCallback);
 		PlayAttackMontageTask->OnInterrupted.AddDynamic(this, &UMDGA_Attack::OnInterruptedCallback);
@@ -39,7 +35,12 @@ void UMDGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 
 void UMDGA_Attack::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
-	MontageJumpToSection(GetNextSection());
+	if (HasNextAttackInput && CurrentCombo < CurrentAttackMontageData->MaxComboCount)
+	{
+		MontageJumpToSection(GetNextSection());
+		StartComboTimer();
+		HasNextAttackInput = false;
+	}
 }
 
 void UMDGA_Attack::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
@@ -54,7 +55,6 @@ void UMDGA_Attack::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGa
 	CurrentAttackMontageData = nullptr;
 	CurrentCombo = 0;
 	HasNextAttackInput = false;
-	MD_LOG(LogMD, Log, TEXT("EndAbility"));
 }
 
 void UMDGA_Attack::OnCompletedCallback()
@@ -81,25 +81,15 @@ FName UMDGA_Attack::GetNextSection(bool bIsSecondary)
 
 void UMDGA_Attack::StartComboTimer()
 {
-	int32 ComboIndex = CurrentCombo - 1;
-	ensure(CurrentAttackMontageData->EffectiveFrameCount.IsValidIndex(ComboIndex));
-
-	float ComboEffectiveTime = CurrentAttackMontageData->EffectiveFrameCount[ComboIndex] / CurrentAttackMontageData->FrameRate;
-
-	if (ComboEffectiveTime > 0.f)
+	if (ComboTimerHandle.IsValid())
 	{
-		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &UMDGA_Attack::CheckComboInput, ComboEffectiveTime, false);
+		ComboTimerHandle.Invalidate();
 	}
+
+	GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &UMDGA_Attack::CheckComboInput, CurrentAttackMontageData->InputThreshold, false);
 }
 
 void UMDGA_Attack::CheckComboInput()
 {
-	ComboTimerHandle.Invalidate();
-
-	if (HasNextAttackInput)
-	{
-		MontageJumpToSection(GetNextSection());
-		StartComboTimer();
-		HasNextAttackInput = false;
-	}
+	HasNextAttackInput = true;
 }

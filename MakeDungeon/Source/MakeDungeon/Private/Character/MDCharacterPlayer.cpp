@@ -55,8 +55,6 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 			FGameplayAbilitySpec StartSpec(StartInputAbility.Value);
 			StartSpec.InputID = StartInputAbility.Key;
 			ASC->GiveAbility(StartSpec);
-
-			MD_LOG(LogMD, Log, TEXT("%d, %s"), StartInputAbility.Key, *(StartInputAbility.Value)->GetAuthoredName());
 		}
 	
 		APlayerController* PlayerController = CastChecked<APlayerController>(NewController);

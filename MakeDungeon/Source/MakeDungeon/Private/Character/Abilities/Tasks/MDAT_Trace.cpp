@@ -4,7 +4,6 @@
 #include "Character/Abilities/Tasks/MDAT_Trace.h"
 #include "Character/Abilities/TargetActors/MDTA_Trace.h"
 #include "AbilitySystemComponent.h"
-#include "../MakeDungeon.h"
 
 UMDAT_Trace::UMDAT_Trace()
 {
@@ -25,7 +24,6 @@ void UMDAT_Trace::Activate()
 	FinalizeTargetActor();
 
 	SetWaitingOnAvatar();
-	MD_LOG(LogMD, Log, TEXT("Activate"));
 }
 
 void UMDAT_Trace::OnDestroy(bool AbilityEnded)
