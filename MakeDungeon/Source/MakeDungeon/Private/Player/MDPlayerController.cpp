@@ -91,8 +91,6 @@ void AMDPlayerController::OnMouseMoveTriggered()
 		FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
 		ControlledPawn->AddMovementInput(WorldDirection, 1.0, false);
 	}
-
-	MD_LOG(LogMD, Log, TEXT("MouseMove Triggered"));
 }
 
 void AMDPlayerController::OnMouseMoveReleased()

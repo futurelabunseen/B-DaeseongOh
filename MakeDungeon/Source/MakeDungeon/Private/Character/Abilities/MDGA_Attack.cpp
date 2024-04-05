@@ -39,7 +39,7 @@ void UMDGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 
 void UMDGA_Attack::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
-	HasNextAttackInput = ComboTimerHandle.IsValid();
+	MontageJumpToSection(GetNextSection());
 }
 
 void UMDGA_Attack::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
