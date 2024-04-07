@@ -7,6 +7,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Character/Abilities/AttributeSets/MDCharacterAttributeSet.h"
 #include "../MakeDungeon.h"
+#include "Tags/MDGameplayTag.h"
 
 UMDGA_AttackHitCheck::UMDGA_AttackHitCheck()
 {
@@ -16,6 +17,8 @@ UMDGA_AttackHitCheck::UMDGA_AttackHitCheck()
 void UMDGA_AttackHitCheck::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	CurrentLevel = TriggerEventData->EventMagnitude;
 
 	UMDAT_Trace* AttackTraceTask = UMDAT_Trace::CreateTask(this, AMDTA_Trace::StaticClass());
 	AttackTraceTask->OnComplete.AddDynamic(this, &UMDGA_AttackHitCheck::OnTraceResultCallback);
@@ -31,24 +34,15 @@ void UMDGA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 		MD_LOG(LogMD, Log, TEXT("Target %s Detected"), *(HitResult.GetActor()->GetName()));
 
 		UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo_Checked();
-		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor());
-
-		if (!SourceASC || !TargetASC)
-		{
-			MD_LOG(LogMD, Log, TEXT("ASC not fount"));
-			return;
-		}
 
 		const UMDCharacterAttributeSet* SourceAttribute = SourceASC->GetSet<UMDCharacterAttributeSet>();
-		UMDCharacterAttributeSet* TargetAttribute = const_cast<UMDCharacterAttributeSet*>(TargetASC->GetSet<UMDCharacterAttributeSet>());
-		if (!SourceAttribute || !TargetAttribute)
-		{
-			MD_LOG(LogMD, Log, TEXT("Attribute not fount"));
-			return;
-		}
 
-		const float AttackDamage = SourceAttribute->GetAttackRate();
-		TargetAttribute->SetHealth(TargetAttribute->GetHealth() - AttackDamage);
+		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(AttackDamageEffect, CurrentLevel);
+		if (EffectSpecHandle.IsValid())
+		{
+			EffectSpecHandle.Data->SetSetByCallerMagnitude(MDTAG_DATA_DAMAGE, -SourceAttribute->GetAttackRate());
+			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
+		}
 	}
 
 	bool bReplicatedEndAbility = true;

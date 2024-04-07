@@ -18,5 +18,9 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	TSubclassOf<class UGameplayEffect> InitStatEffect;
 
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	float Level;
 };
