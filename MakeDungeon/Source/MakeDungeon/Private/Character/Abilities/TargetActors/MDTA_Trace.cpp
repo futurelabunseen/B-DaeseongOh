@@ -7,6 +7,10 @@
 #include "Components/CapsuleComponent.h"
 #include "Physics/MDCollision.h"
 #include "DrawDebugHelpers.h"
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "Character/Abilities/AttributeSets/MDCharacterAttributeSet.h"
+#include "../MakeDungeon.h"
 
 AMDTA_Trace::AMDTA_Trace()
 {
@@ -32,9 +36,24 @@ FGameplayAbilityTargetDataHandle AMDTA_Trace::MakeTargetData() const
 {
 	ACharacter* Character = CastChecked<ACharacter>(SourceActor);
 
+	UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(SourceActor);
+
+	if (!ASC)
+	{
+		MD_LOG(LogMD, Log, TEXT("ASC not found"));
+		return FGameplayAbilityTargetDataHandle();
+	}
+
+	const UMDCharacterAttributeSet* AttributeSet = ASC->GetSet<UMDCharacterAttributeSet>();
+	if (!AttributeSet)
+	{
+		MD_LOG(LogMD, Log, TEXT("MDCharacterAttributeSet not found"));
+		return FGameplayAbilityTargetDataHandle();
+	}
+
 	FHitResult OutHitResult;
-	const float AttackRange = 100.f;
-	const float AttackRadius = 50.f;
+	const float AttackRange = AttributeSet->GetAttackRange();
+	const float AttackRadius = AttributeSet->GetAttackRadius();
 
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(UDTTA_Trace), false, Character);
 	const FVector Forward = Character->GetActorForwardVector();

@@ -46,7 +46,7 @@ void AMDPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Canceled, this, &AMDPlayerController::OnMouseMoveReleased);
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Completed, this, &AMDPlayerController::OnMouseMoveReleased);
 
-		EnhancedInputComponent->BindAction(InputData->AttackAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_Attack);
+		EnhancedInputComponent->BindAction(InputData->AttackAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_INPUT_ATTACK);
 	}
 }
 
