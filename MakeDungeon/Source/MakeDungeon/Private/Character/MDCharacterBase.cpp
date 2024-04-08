@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Physics/MDCollision.h"
+#include "Tags/MDGameplayTag.h"
 
 // Sets default values
 AMDCharacterBase::AMDCharacterBase()
@@ -44,6 +45,7 @@ AMDCharacterBase::AMDCharacterBase()
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
 
+	CurrentWeaponType = MDTAG_WEAPON_NONE;
 }
 
 UAbilitySystemComponent* AMDCharacterBase::GetAbilitySystemComponent() const

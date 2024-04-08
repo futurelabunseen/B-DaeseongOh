@@ -9,6 +9,7 @@
 struct FInputActionValue;
 class UMDInputData;
 struct FGameplayTag;
+class UAbilitySystemComponent;
 
 /**
  * 
@@ -33,8 +34,11 @@ protected:
 	virtual void SetupInputComponent() override;
 
 	void KeyboardMove(const FInputActionValue& Value);
+	void OnMouseMoveStarted();
 	void OnMouseMoveTriggered();
 	void OnMouseMoveReleased();
+
+	void SwapWeapon();
 
 	void GASInputStarted(FGameplayTag Tag);
 	void GASInputPressed(FGameplayTag Tag);

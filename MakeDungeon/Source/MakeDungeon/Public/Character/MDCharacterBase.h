@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayTagContainer.h"
 #include "MDCharacterBase.generated.h"
 
 class UAbilitySystemComponent;
@@ -20,16 +21,19 @@ public:
 	// Sets default values for this character's properties
 	AMDCharacterBase();
 
-	FORCEINLINE virtual UAnimMontage* GetAttackMontage() const { return AttackMontage; }
-	FORCEINLINE class UMDAttackMontageData* GetAttackMontageData() const { return AttackMontageData; }
+	//FORCEINLINE virtual UAnimMontage* GetAttackMontage() const { return AttackMontage; }
+	//FORCEINLINE class UMDAttackMontageData* GetAttackMontageData() const { return AttackMontageData; }
+	FORCEINLINE FGameplayTag GetWeaponType() const { return CurrentWeaponType; }
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	FORCEINLINE void SetWeaponType(FGameplayTag Tag) { CurrentWeaponType = Tag; }
+
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	TObjectPtr<UAnimMontage> AttackMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<class UMDAttackMontageData> AttackMontageData;
+	TObjectPtr<class UMDWeaponAttackData> AttackMontageData;*/
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TObjectPtr<UAbilitySystemComponent> ASC;
@@ -39,4 +43,7 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<UMDCharacterAttributeSet> AttributeSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
+	FGameplayTag CurrentWeaponType;
 };

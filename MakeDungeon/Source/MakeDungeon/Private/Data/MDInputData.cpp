@@ -15,6 +15,13 @@ UMDInputData::UMDInputData()
 		DefaultMappingContext = DefaultMappingContextRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> WeaponMappingContextRef(
+		TEXT("/Script/EnhancedInput.InputMappingContext'/Game/MakeDungeon/Input/IMC_Weapon.IMC_Weapon'"));
+	if (nullptr != WeaponMappingContextRef.Object)
+	{
+		WeaponMappingContext = WeaponMappingContextRef.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionKeyboardMoveRef(
 		TEXT("/Script/EnhancedInput.InputAction'/Game/MakeDungeon/Input/Actions/IA_KeyboardMove.IA_KeyboardMove'"));
 	if (nullptr != InputActionKeyboardMoveRef.Object)
@@ -27,6 +34,13 @@ UMDInputData::UMDInputData()
 	if (nullptr != InputActionMouseMoveRef.Object)
 	{
 		MouseMoveAction = InputActionMouseMoveRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionWeaponSwapRef(
+		TEXT("/Script/EnhancedInput.InputAction'/Game/MakeDungeon/Input/Actions/IA_WeaponSwap'"));
+	if (nullptr != InputActionWeaponSwapRef.Object)
+	{
+		WeaponSwapAction = InputActionWeaponSwapRef.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionAttackRef(

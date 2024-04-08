@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MDCharacterBase.h"
-#include "GameplayTagContainer.h"
+//#include "GameplayTagContainer.h"
 #include "MDCharacterPlayer.generated.h"
 
 /**

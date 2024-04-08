@@ -14,6 +14,8 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Tags/MDGameplayTag.h"
 #include "GameplayTagContainer.h"
+#include "Character/MDCharacterBase.h"
+#include "Item/MDWeaponSword.h"
 
 AMDPlayerController::AMDPlayerController()
 {
@@ -42,11 +44,16 @@ void AMDPlayerController::SetupInputComponent()
 		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 
 		EnhancedInputComponent->BindAction(InputData->KeyboardMoveAction, ETriggerEvent::Triggered, this, &AMDPlayerController::KeyboardMove);
+		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Started, this, &AMDPlayerController::OnMouseMoveStarted);
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Triggered, this, &AMDPlayerController::OnMouseMoveTriggered);
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Canceled, this, &AMDPlayerController::OnMouseMoveReleased);
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Completed, this, &AMDPlayerController::OnMouseMoveReleased);
 
+		EnhancedInputComponent->BindAction(InputData->WeaponSwapAction, ETriggerEvent::Started, this, &AMDPlayerController::SwapWeapon);
+
 		EnhancedInputComponent->BindAction(InputData->AttackAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_INPUT_ATTACK);
+		EnhancedInputComponent->BindAction(InputData->SkillAction_01, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_INPUT_SKILL01);
+
 	}
 }
 
@@ -72,6 +79,11 @@ void AMDPlayerController::KeyboardMove(const FInputActionValue& Value)
 	FVector MoveDirection = FVector(MovementVector.X, MovementVector.Y, 0.f);
 	SetControlRotation(FRotationMatrix::MakeFromX(MoveDirection).Rotator());
 	GetPawn()->AddMovementInput(MoveDirection, MovementVectorSize);
+}
+
+void AMDPlayerController::OnMouseMoveStarted()
+{
+	StopMovement();
 }
 
 
@@ -102,6 +114,36 @@ void AMDPlayerController::OnMouseMoveReleased()
 	}
 
 	FollowTime = 0.f;
+}
+
+void AMDPlayerController::SwapWeapon()
+{
+	AMDCharacterBase* MDChatacter = CastChecked<AMDCharacterBase>(GetPawn());
+
+	UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+
+	if(SubSystem)
+	{
+		if (MDTAG_WEAPON_NONE == MDChatacter->GetWeaponType())
+		{
+			SubSystem->AddMappingContext(InputData->WeaponMappingContext, 1);
+
+			UMDWeaponSword* WeaponSword = Cast<UMDWeaponSword>(MDChatacter->FindComponentByTag(UMDWeaponSword::StaticClass(), MDTAG_WEAPON_TWOHANDEDSWORD.GetTagName()));
+
+			if(!WeaponSword)
+			{
+				WeaponSword = Cast<UMDWeaponSword>(MDChatacter->AddComponentByClass(UMDWeaponSword::StaticClass(), true, FTransform::Identity, true));
+				WeaponSword->ComponentTags.Add(MDTAG_WEAPON_TWOHANDEDSWORD.GetTagName());
+			}
+			WeaponSword->EquipWeapon();
+			MDChatacter->SetWeaponType(WeaponSword->GetWeaponAttackData()->WeaponType);
+		}
+		else
+		{
+			SubSystem->RemoveMappingContext(InputData->WeaponMappingContext);
+			MDChatacter->SetWeaponType(MDTAG_WEAPON_NONE);
+		}
+	}
 }
 
 void AMDPlayerController::GASInputStarted(FGameplayTag Tag)
