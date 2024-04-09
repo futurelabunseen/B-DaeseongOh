@@ -11,6 +11,7 @@
 class UAbilitySystemComponent;
 class UGameplayAbility;
 class UMDCharacterAttributeSet;
+class UMDWeaponBase;
 
 UCLASS()
 class MAKEDUNGEON_API AMDCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -21,12 +22,14 @@ public:
 	// Sets default values for this character's properties
 	AMDCharacterBase();
 
+	virtual void BeginPlay() override;
+
 	//FORCEINLINE virtual UAnimMontage* GetAttackMontage() const { return AttackMontage; }
 	//FORCEINLINE class UMDAttackMontageData* GetAttackMontageData() const { return AttackMontageData; }
-	FORCEINLINE FGameplayTag GetWeaponType() const { return CurrentWeaponType; }
+	FORCEINLINE UMDWeaponBase* GetWeapon() const { return Weapon; }
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
-	FORCEINLINE void SetWeaponType(FGameplayTag Tag) { CurrentWeaponType = Tag; }
+	
+	void SwapWeapon(FGameplayTag Tag);
 
 protected:
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
@@ -45,5 +48,5 @@ protected:
 	TObjectPtr<UMDCharacterAttributeSet> AttributeSet;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
-	FGameplayTag CurrentWeaponType;
+	TObjectPtr<UMDWeaponBase> Weapon;
 };

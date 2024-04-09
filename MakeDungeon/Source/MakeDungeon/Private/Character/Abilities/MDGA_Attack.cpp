@@ -6,6 +6,7 @@
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Data/MDWeaponAttackData.h"
 #include "Item/MDWeaponBase.h"
+#include "Tags/MDGameplayTag.h"
 #include "../MakeDungeon.h"
 
 
@@ -20,14 +21,14 @@ void UMDGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
 	
-	UMDWeaponBase* Weapon = Cast<UMDWeaponBase>(MDCharacter->FindComponentByTag(UMDWeaponBase::StaticClass(), MDCharacter->GetWeaponType().GetTagName()));
+	UMDWeaponBase* Weapon = MDCharacter->GetWeapon();
 
-	if (!Weapon)
+	if (!Weapon->GetWeaponAttackData())
 	{
 		bool bReplicatedEndAbility = true;
 		bool bWasCancelled = true;
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
-		MD_LOG(LogMD, Log, TEXT("No Weapon %s"), *(MDCharacter->GetWeaponType().GetTagName().ToString()));
+		MD_LOG(LogMD, Log, TEXT("No Weapon"));
 		return;
 	}
 

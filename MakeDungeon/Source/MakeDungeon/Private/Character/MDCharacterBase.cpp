@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Physics/MDCollision.h"
 #include "Tags/MDGameplayTag.h"
+#include "Item/MDWeaponBase.h"
 
 // Sets default values
 AMDCharacterBase::AMDCharacterBase()
@@ -45,10 +46,28 @@ AMDCharacterBase::AMDCharacterBase()
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
 
-	CurrentWeaponType = MDTAG_WEAPON_NONE;
+	Weapon = CreateDefaultSubobject<UMDWeaponBase>(TEXT("Weapon"));
+}
+
+void AMDCharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+
 }
 
 UAbilitySystemComponent* AMDCharacterBase::GetAbilitySystemComponent() const
 {
 	return ASC;
+}
+
+void AMDCharacterBase::SwapWeapon(FGameplayTag Tag)
+{
+	if (MDTAG_WEAPON_TWOHANDEDSWORD == Tag)
+	{
+		Weapon->SetWeaponAttackData(LoadObject<UMDWeaponAttackData>(NULL, TEXT("/Script/MakeDungeon.MDWeaponAttackData'/Game/MakeDungeon/Data/MD_Attack_TwoHandedSword.MD_Attack_TwoHandedSword'")));
+	}
+	else if (MDTAG_WEAPON_BOW == Tag)
+	{
+		Weapon->SetWeaponAttackData(LoadObject<UMDWeaponAttackData>(NULL, TEXT("/Script/MakeDungeon.MDWeaponAttackData'/Game/MakeDungeon/Data/MD_Attack_Bow.MD_Attack_Bow'")));
+	}
 }

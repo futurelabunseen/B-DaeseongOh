@@ -20,6 +20,10 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	void GASInputStarted(FGameplayTag Tag);
+	void GASInputPressed(FGameplayTag Tag);
+	void GASInputReleased(FGameplayTag Tag);
+	
 protected:
 	virtual void BeginPlay() override;
 
