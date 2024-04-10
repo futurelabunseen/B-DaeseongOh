@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "MDInputData.generated.h"
+#include "MDWeaponInputData.generated.h"
 
 class UInputMappingContext;
 class UInputAction;
@@ -13,25 +13,29 @@ class UInputAction;
  * 
  */
 UCLASS()
-class MAKEDUNGEON_API UMDInputData : public UPrimaryDataAsset
+class MAKEDUNGEON_API UMDWeaponInputData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
-
+	
 public:
-	UMDInputData();
+	UMDWeaponInputData();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UInputMappingContext> DefaultMappingContext;
-		
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UInputAction> KeyboardMoveAction;
+	TObjectPtr<UInputMappingContext> WeaponMappingContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UInputAction> MouseMoveAction;
+	TObjectPtr<UInputAction> AttackAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UInputAction> WeaponSwapAction;
+	TObjectPtr<UInputAction> SkillAction_01;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UInputAction> JumpAction;
+	TObjectPtr<UInputAction> SkillAction_02;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> SkillAction_03;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> SkillAction_04;
+
 };

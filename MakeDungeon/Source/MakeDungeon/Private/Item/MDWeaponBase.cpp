@@ -3,7 +3,7 @@
 
 #include "Item/MDWeaponBase.h"
 #include "AbilitySystemComponent.h"
-#include "Data/MDInputData.h"
+#include "Data/MDWeaponInputData.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Character/MDCharacterPlayer.h"
@@ -17,9 +17,9 @@ void UMDWeaponBase::EquipWeapon(AMDCharacterBase* InCharacter)
 {
 	UAbilitySystemComponent* ASC = InCharacter->GetAbilitySystemComponent();
 
-	for (const auto& WeaponAbility : WeaponAbilities)
+	for (const auto& WeaponAbility : WeaponInputAbilities)
 	{
-		FGameplayAbilitySpec AbilitySpec(WeaponAbility);
+		FGameplayAbilitySpec AbilitySpec(WeaponAbility.Value);
 		ASC->GiveAbility(AbilitySpec);
 	}
 
@@ -46,9 +46,9 @@ void UMDWeaponBase::UnequipWeapon(AMDCharacterBase* InCharacter)
 {
 	UAbilitySystemComponent* ASC = InCharacter->GetAbilitySystemComponent();
 
-	for (const auto& WeaponAbility : WeaponAbilities)
+	for (const auto& WeaponAbility : WeaponInputAbilities)
 	{
-		FGameplayAbilitySpec AbilitySpec(WeaponAbility);
+		FGameplayAbilitySpec AbilitySpec(WeaponAbility.Value);
 		ASC->ClearAbility(AbilitySpec.Handle);
 	}
 }

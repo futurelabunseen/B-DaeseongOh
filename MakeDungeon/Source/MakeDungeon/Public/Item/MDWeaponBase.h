@@ -10,7 +10,7 @@
 
 class UGameplayAbility;
 class AMDCharacterBase;
-class UMDInputData;
+class UMDWeaponInputData;
 
 /**
  * 
@@ -35,9 +35,9 @@ protected:
 	TObjectPtr<UMDWeaponAttackData> WeaponAttackData;
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
-	TArray<TSubclassOf<UGameplayAbility>> WeaponAbilities;
+	TMap<FGameplayTag, TSubclassOf<UGameplayAbility>> WeaponInputAbilities;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Data")
-	TObjectPtr<UMDInputData> InputData;
+	TObjectPtr<UMDWeaponInputData> InputData;
 };
