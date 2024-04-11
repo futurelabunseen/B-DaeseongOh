@@ -20,6 +20,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	TObjectPtr<UAnimMontage> AttackMontage;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USkeletalMesh> WeaponMesh;
+
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	FString MontageSectionNamePrefix;
 

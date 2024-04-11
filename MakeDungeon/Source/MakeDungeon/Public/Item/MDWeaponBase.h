@@ -25,7 +25,7 @@ public:
 
 	FORCEINLINE UAnimMontage* GetAttackMontage() const { return WeaponAttackData->AttackMontage; }
 	FORCEINLINE UMDWeaponAttackData* GetWeaponAttackData() const { return WeaponAttackData; }
-	FORCEINLINE void SetWeaponAttackData(UMDWeaponAttackData* WeaponData) { WeaponAttackData = WeaponData; }
+	void SetWeaponAttackData(AMDCharacterBase* InCharacter, UMDWeaponAttackData* WeaponData);
 
 	void EquipWeapon(AMDCharacterBase* InCharacter);
 	void UnequipWeapon(AMDCharacterBase* InCharacter);

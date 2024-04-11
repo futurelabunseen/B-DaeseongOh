@@ -3,9 +3,11 @@
 
 #include "Character/Abilities/MDGA_AttackHitCheck.h"
 #include "Character/Abilities/Tasks/MDAT_Trace.h"
+#include "Character/Abilities/Tasks/MDAT_Projectile.h"
 #include "Character/Abilities/TargetActors/MDTA_Trace.h"
-#include "AbilitySystemBlueprintLibrary.h"
+#include "Character/Abilities/TargetActors/MDTA_Projectile.h"
 #include "Character/Abilities/AttributeSets/MDCharacterAttributeSet.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include "../MakeDungeon.h"
 #include "Tags/MDGameplayTag.h"
 
@@ -20,10 +22,27 @@ void UMDGA_AttackHitCheck::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 
 	CurrentLevel = TriggerEventData->EventMagnitude;
 
-	UMDAT_Trace* AttackTraceTask = UMDAT_Trace::CreateTask(this, AMDTA_Trace::StaticClass());
-	AttackTraceTask->OnComplete.AddDynamic(this, &UMDGA_AttackHitCheck::OnTraceResultCallback);
-	AttackTraceTask->ReadyForActivation();
-	MD_LOG(LogMD, Log, TEXT("Activate"));
+	if (MDTAG_HITCHECK_TRACE == TriggerEventData->EventTag)
+	{
+		UMDAT_Trace* AttackTraceTask = UMDAT_Trace::CreateTask(this, AMDTA_Trace::StaticClass());
+		AttackTraceTask->OnComplete.AddDynamic(this, &UMDGA_AttackHitCheck::OnTraceResultCallback);
+		AttackTraceTask->ReadyForActivation();
+		MD_LOG(LogMD, Log, TEXT("Activate"));
+	}
+	else if (MDTAG_HITCHECK_PROJECTILE == TriggerEventData->EventTag)
+	{
+		/*UMDAT_Projectile* AttackProjectileTask = UMDAT_Projectile::CreateTask(this, AMDTA_Projectile::StaticClass());
+		AttackProjectileTask->OnComplete.AddDynamic(this, &UMDGA_AttackHitCheck::OnTraceResultCallback);
+		AttackProjectileTask->ReadyForActivation();
+		MD_LOG(LogMD, Log, TEXT("Activate"));*/
+	}
+	else
+	{
+		bool bReplicatedEndAbility = true;
+		bool bWasCancelled = false;
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
+	}
+	
 }
 
 void UMDGA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDataHandle& TargetDataHandle)

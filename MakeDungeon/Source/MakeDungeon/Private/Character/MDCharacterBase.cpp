@@ -64,10 +64,10 @@ void AMDCharacterBase::SwapWeapon(FGameplayTag Tag)
 {
 	if (MDTAG_WEAPON_TWOHANDEDSWORD == Tag)
 	{
-		Weapon->SetWeaponAttackData(LoadObject<UMDWeaponAttackData>(NULL, TEXT("/Script/MakeDungeon.MDWeaponAttackData'/Game/MakeDungeon/Data/MD_Attack_TwoHandedSword.MD_Attack_TwoHandedSword'")));
+		Weapon->SetWeaponAttackData(this, LoadObject<UMDWeaponAttackData>(NULL, TEXT("/Script/MakeDungeon.MDWeaponAttackData'/Game/MakeDungeon/Data/MD_Attack_TwoHandedSword.MD_Attack_TwoHandedSword'")));
 	}
 	else if (MDTAG_WEAPON_BOW == Tag)
 	{
-		Weapon->SetWeaponAttackData(LoadObject<UMDWeaponAttackData>(NULL, TEXT("/Script/MakeDungeon.MDWeaponAttackData'/Game/MakeDungeon/Data/MD_Attack_Bow.MD_Attack_Bow'")));
+		Weapon->SetWeaponAttackData(this, LoadObject<UMDWeaponAttackData>(NULL, TEXT("/Script/MakeDungeon.MDWeaponAttackData'/Game/MakeDungeon/Data/MD_Attack_Bow.MD_Attack_Bow'")));
 	}
 }

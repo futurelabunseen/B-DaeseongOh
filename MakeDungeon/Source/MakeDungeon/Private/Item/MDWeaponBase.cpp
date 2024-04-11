@@ -13,6 +13,14 @@ UMDWeaponBase::UMDWeaponBase()
 {
 }
 
+void UMDWeaponBase::SetWeaponAttackData(AMDCharacterBase* InCharacter, UMDWeaponAttackData* WeaponData)
+{
+	WeaponAttackData = WeaponData;
+	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+	AttachToComponent(InCharacter->GetMesh(), AttachmentRules, FName(TEXT("Weapon_R")));
+	SetSkeletalMesh(WeaponAttackData->WeaponMesh);
+}
+
 void UMDWeaponBase::EquipWeapon(AMDCharacterBase* InCharacter)
 {
 	UAbilitySystemComponent* ASC = InCharacter->GetAbilitySystemComponent();

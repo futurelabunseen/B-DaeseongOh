@@ -13,3 +13,6 @@
 #define MDTAG_WEAPON_BOW FGameplayTag::RequestGameplayTag(FName("Weapon.Type.Bow"))
 #define MDTAG_WEAPON_ONEHANDEDSWORD FGameplayTag::RequestGameplayTag(FName("Weapon.Type.OneHandedSword"))
 #define MDTAG_WEAPON_TWOHANDEDSWORD FGameplayTag::RequestGameplayTag(FName("Weapon.Type.TwoHandedSword"))
+
+#define MDTAG_HITCHECK_TRACE FGameplayTag::RequestGameplayTag(FName("Character.AttackHitCheck.Trace"))
+#define MDTAG_HITCHECK_PROJECTILE FGameplayTag::RequestGameplayTag(FName("Character.AttackHitCheck.Projectile"))
