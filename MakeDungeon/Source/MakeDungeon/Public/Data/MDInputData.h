@@ -16,14 +16,13 @@ UCLASS()
 class MAKEDUNGEON_API UMDInputData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
-	friend class AMDPlayerController;
+
 public:
 	UMDInputData();
 
-private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
-
+		
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> KeyboardMoveAction;
 
@@ -31,7 +30,7 @@ private:
 	TObjectPtr<UInputAction> MouseMoveAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UInputAction> AttackAction;
+	TObjectPtr<UInputAction> WeaponSwapAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> JumpAction;

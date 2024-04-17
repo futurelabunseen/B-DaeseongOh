@@ -9,6 +9,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Player/MDPlayerState.h"
 #include "AbilitySystemComponent.h"
+#include "Item/MDWeaponBase.h"
 #include "../MakeDungeon.h"
 
 
@@ -61,9 +62,53 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 	}
 
+	Weapon->EquipWeapon(this);
+}
+
+void AMDCharacterPlayer::GASInputStarted(FGameplayTag Tag)
+{
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(Tag);
+
+	ASC->TryActivateAbilitiesByTag(TagContainer);
+}
+
+void AMDCharacterPlayer::GASInputPressed(FGameplayTag Tag)
+{
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(Tag);
+
+	TArray<FGameplayAbilitySpec*> AbilitiesToActivate;
+	ASC->GetActivatableGameplayAbilitySpecsByAllMatchingTags(TagContainer, AbilitiesToActivate);
+
+	for (auto GameplayAbilitySpec : AbilitiesToActivate)
+	{
+		if (GameplayAbilitySpec->IsActive())
+		{
+			ASC->AbilitySpecInputPressed(*GameplayAbilitySpec);
+		}
+		else
+		{
+			ASC->TryActivateAbility(GameplayAbilitySpec->Handle);
+		}
+	}
+}
+
+void AMDCharacterPlayer::GASInputReleased(FGameplayTag Tag)
+{
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(Tag);
+
+	TArray<FGameplayAbilitySpec*> AbilitiesToActivate;
+	ASC->GetActivatableGameplayAbilitySpecsByAllMatchingTags(TagContainer, AbilitiesToActivate);
+
+	for (auto GameplayAbilitySpec : AbilitiesToActivate)
+	{
+		ASC->AbilitySpecInputReleased(*GameplayAbilitySpec);
+	}
 }
 
 void AMDCharacterPlayer::BeginPlay()
 {
-	Super::BeginPlay();
+	Super::BeginPlay();	
 }

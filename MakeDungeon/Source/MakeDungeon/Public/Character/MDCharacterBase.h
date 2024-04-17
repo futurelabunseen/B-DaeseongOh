@@ -5,11 +5,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayTagContainer.h"
 #include "MDCharacterBase.generated.h"
 
 class UAbilitySystemComponent;
 class UGameplayAbility;
 class UMDCharacterAttributeSet;
+class UMDWeaponBase;
 
 UCLASS()
 class MAKEDUNGEON_API AMDCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -20,16 +22,21 @@ public:
 	// Sets default values for this character's properties
 	AMDCharacterBase();
 
-	FORCEINLINE virtual UAnimMontage* GetAttackMontage() const { return AttackMontage; }
-	FORCEINLINE class UMDAttackMontageData* GetAttackMontageData() const { return AttackMontageData; }
+	virtual void BeginPlay() override;
+
+	//FORCEINLINE virtual UAnimMontage* GetAttackMontage() const { return AttackMontage; }
+	//FORCEINLINE class UMDAttackMontageData* GetAttackMontageData() const { return AttackMontageData; }
+	FORCEINLINE UMDWeaponBase* GetWeapon() const { return Weapon; }
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	
+	void SwapWeapon(FGameplayTag Tag);
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	TObjectPtr<UAnimMontage> AttackMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<class UMDAttackMontageData> AttackMontageData;
+	TObjectPtr<class UMDWeaponAttackData> AttackMontageData;*/
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TObjectPtr<UAbilitySystemComponent> ASC;
@@ -39,4 +46,7 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<UMDCharacterAttributeSet> AttributeSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
+	TObjectPtr<UMDWeaponBase> Weapon;
 };
