@@ -19,6 +19,14 @@ void UMDWeaponBase::SetWeaponAttackData(AMDCharacterBase* InCharacter, UMDWeapon
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	AttachToComponent(InCharacter->GetMesh(), AttachmentRules, FName(TEXT("Weapon_R")));
 	SetSkeletalMesh(WeaponAttackData->WeaponMesh);
+
+	UAbilitySystemComponent* ASC = InCharacter->GetAbilitySystemComponent();
+
+	for (const auto& WeaponAbility : WeaponAttackData->WeaponAbilities)
+	{
+		FGameplayAbilitySpec StartSpec(WeaponAbility);
+		ASC->GiveAbility(StartSpec);
+	}
 }
 
 void UMDWeaponBase::EquipWeapon(AMDCharacterBase* InCharacter)
@@ -58,5 +66,11 @@ void UMDWeaponBase::UnequipWeapon(AMDCharacterBase* InCharacter)
 	{
 		FGameplayAbilitySpec AbilitySpec(WeaponAbility.Value);
 		ASC->ClearAbility(AbilitySpec.Handle);
+	}
+
+	for (const auto& WeaponAbility : WeaponAttackData->WeaponAbilities)
+	{
+		FGameplayAbilitySpec StartSpec(WeaponAbility);
+		ASC->ClearAbility(StartSpec.Handle);
 	}
 }

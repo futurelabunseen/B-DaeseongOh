@@ -5,18 +5,18 @@
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "GameplayTagContainer.h"
-#include "AnimNotify_EventbyTag.generated.h"
+#include "AnimNotify_EventByTag.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MAKEDUNGEON_API UAnimNotify_EventbyTag : public UAnimNotify
+class MAKEDUNGEON_API UAnimNotify_EventByTag : public UAnimNotify
 {
 	GENERATED_BODY()
 	
 public:
-	UAnimNotify_EventbyTag();
+	UAnimNotify_EventByTag();
 
 protected:
 	virtual FString GetNotifyName_Implementation() const override;

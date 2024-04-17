@@ -1,19 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Animation/AnimNotify_EventbyTag.h"
+#include "Animation/AnimNotify_EventByTag.h"
 #include "AbilitySystemBlueprintLibrary.h"
 
-UAnimNotify_EventbyTag::UAnimNotify_EventbyTag()
+UAnimNotify_EventByTag::UAnimNotify_EventByTag()
 {
 }
 
-FString UAnimNotify_EventbyTag::GetNotifyName_Implementation() const
+FString UAnimNotify_EventByTag::GetNotifyName_Implementation() const
 {
-	return TEXT("EventbyTag");
+	return TEXT("EventByTag");
 }
 
-void UAnimNotify_EventbyTag::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
+void UAnimNotify_EventByTag::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 

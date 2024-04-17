@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "GameplayTagContainer.h"
+#include "AbilitySystemComponent.h"
 #include "MDWeaponAttackData.generated.h"
 
 /**
@@ -38,5 +39,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Tag")
 	FGameplayTag WeaponType;
 
-
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	TArray<TSubclassOf<UGameplayAbility>> WeaponAbilities;
 };
