@@ -21,6 +21,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	TObjectPtr<UAnimMontage> AttackMontage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	TArray<TObjectPtr<UAnimMontage>> SkillMontage;
+
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USkeletalMesh> WeaponMesh;
 

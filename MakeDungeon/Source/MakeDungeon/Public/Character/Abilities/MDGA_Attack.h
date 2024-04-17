@@ -29,7 +29,7 @@ protected:
 	UFUNCTION()
 	void OnInterruptedCallback();
 
-	FName GetNextSection(bool bIsSecondary = false);
+	FName GetNextSection();
 	void StartComboTimer();
 	void CheckComboInput();	
 

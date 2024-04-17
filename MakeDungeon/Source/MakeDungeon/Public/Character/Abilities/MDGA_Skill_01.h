@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
-#include "MDGA_PlayMontage.generated.h"
+#include "MDGA_Skill_01.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MAKEDUNGEON_API UMDGA_PlayMontage : public UGameplayAbility
+class MAKEDUNGEON_API UMDGA_Skill_01 : public UGameplayAbility
 {
 	GENERATED_BODY()
 	
 public:
-	UMDGA_PlayMontage();
+	UMDGA_Skill_01();
 
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	virtual void InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
@@ -29,15 +29,8 @@ protected:
 	UFUNCTION()
 	void OnInterruptedCallback();
 
-	FName GetNextSection(bool bIsSecondary = false);
-	void StartComboTimer();
-	void CheckComboInput();
-
 protected:
 	UPROPERTY()
 	TObjectPtr<class UMDWeaponAttackData> CurrentWeaponAttackData;
 
-	uint8 CurrentCombo = 0;
-	FTimerHandle ComboTimerHandle;
-	bool HasNextAttackInput = false;
 };

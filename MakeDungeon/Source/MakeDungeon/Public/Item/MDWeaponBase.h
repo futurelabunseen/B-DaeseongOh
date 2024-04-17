@@ -12,6 +12,11 @@ class UGameplayAbility;
 class AMDCharacterBase;
 class UMDWeaponInputData;
 
+enum class EMDSkillMontage : uint8
+{
+	Skill_01, Skill_02, Skill_03, Skill_04
+};
+
 /**
  * 
  */
@@ -25,6 +30,7 @@ public:
 
 	FORCEINLINE UAnimMontage* GetAttackMontage() const { return WeaponAttackData->AttackMontage; }
 	FORCEINLINE UMDWeaponAttackData* GetWeaponAttackData() const { return WeaponAttackData; }
+	FORCEINLINE UAnimMontage* GetSkillMontage(EMDSkillMontage MontageIndex = EMDSkillMontage::Skill_01) const { return WeaponAttackData->SkillMontage[static_cast<uint8>(MontageIndex)]; }
 	void SetWeaponAttackData(AMDCharacterBase* InCharacter, UMDWeaponAttackData* WeaponData);
 
 	void EquipWeapon(AMDCharacterBase* InCharacter);
