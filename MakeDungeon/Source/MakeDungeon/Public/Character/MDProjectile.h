@@ -17,7 +17,7 @@ class MAKEDUNGEON_API AMDProjectile : public AActor
 public:	
 	AMDProjectile();
 
-	//FORCEINLINE USphereComponent* GetCollisionComp() const { return CollisionComponent; }
+	FORCEINLINE USphereComponent* GetCollisionComp() const { return CollisionComponent; }
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
@@ -29,10 +29,12 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	/*UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Projectile")
-	USphereComponent* CollisionComponent;*/
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Projectile")
+	USphereComponent* CollisionComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
+
+	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 private:
 };
