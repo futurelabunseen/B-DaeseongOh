@@ -17,10 +17,10 @@ void UMDGA_Bow_MultiShot::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	ShootBullet(CurrentEventData, FVector(0.0, 0.0, 0.0));
+	ShootBullet(CurrentEventData, FVector(0.0, 20.0, 0.0));
 	ShootBullet(CurrentEventData, FVector(0.0, 40.0, 0.0));
-	ShootBullet(CurrentEventData, FVector(0.0, 80.0, 0.0));
-	ShootBullet(CurrentEventData, FVector(0.0, 120.0, 0.0));
-	ShootBullet(CurrentEventData, FVector(0.0, 160.0, 0.0));
+	ShootBullet(CurrentEventData, FVector(0.0, -20.0, 0.0));
+	ShootBullet(CurrentEventData, FVector(0.0, -40.0, 0.0));
 
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 }
@@ -51,7 +51,8 @@ void UMDGA_Bow_MultiShot::ShootBullet(FGameplayEventData EventData, const FVecto
 	
 	//AMDProjectile* Projectile = GetWorld()->SpawnActor<AMDProjectile>(ProjectileClass, MuzzleTransform, SpawnParameters);
 	//AMDProjectile* Projectile = GetWorld()->SpawnActorAbsolute<AMDProjectile>(ProjectileClass, MuzzleTransform, SpawnParameters);
-	AMDProjectile* Projectile = GetWorld()->SpawnActorDeferred<AMDProjectile>(ProjectileClass, MuzzleTransform, GetOwningActorFromActorInfo(), MDCharacter, SpawnParameters.SpawnCollisionHandlingOverride);
+	AMDProjectile* Projectile = GetWorld()->SpawnActorDeferred<AMDProjectile>(ProjectileClass, MuzzleTransform, 
+						GetOwningActorFromActorInfo(), MDCharacter, SpawnParameters.SpawnCollisionHandlingOverride);
 	Projectile->Range = Range;
 	Projectile->FinishSpawning(MuzzleTransform);
 }
