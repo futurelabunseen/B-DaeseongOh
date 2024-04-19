@@ -6,7 +6,7 @@
 //#include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Kismet/KismetMathLibrary.h"
 //#include "Tags/MDGameplayTag.h"
-
+#include "Game/ObjectPoolWorldSubsystem.h"
 
 UMDGA_AttackRanged::UMDGA_AttackRanged()
 {
@@ -47,7 +47,13 @@ void UMDGA_AttackRanged::ShootBullet(FGameplayEventData EventData)
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	AMDProjectile* Projectile = GetWorld()->SpawnActorDeferred<AMDProjectile>(ProjectileClass, MuzzleTransform, GetOwningActorFromActorInfo(), MDCharacter, SpawnParameters.SpawnCollisionHandlingOverride);
+	UObjectPoolWorldSubsystem* ObjectPool = UWorld::GetSubsystem<UObjectPoolWorldSubsystem>(GetWorld());
+
+	//AMDProjectile* Projectile = GetWorld()->SpawnActorDeferred<AMDProjectile>(ProjectileClass, MuzzleTransform, GetOwningActorFromActorInfo(), MDCharacter, SpawnParameters.SpawnCollisionHandlingOverride);
+	//AMDProjectile* Projectile = GetWorld()->SpawnActor<AMDProjectile>(ProjectileClass, MuzzleTransform, SpawnParameters);
+	AMDProjectile* Projectile = ObjectPool->ReuseObject(MuzzleTransform);
+	Projectile->SetOwner(GetOwningActorFromActorInfo());
+	Projectile->SetInstigator(MDCharacter);
 	Projectile->Range = Range;
-	Projectile->FinishSpawning(MuzzleTransform);
+	//Projectile->FinishSpawning(MuzzleTransform);
 }

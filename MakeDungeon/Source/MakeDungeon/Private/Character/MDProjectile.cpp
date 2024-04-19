@@ -7,6 +7,7 @@
 #include "AbilitySystemComponent.h"
 #include "Character/MDCharacterBase.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Game/ObjectPoolWorldSubsystem.h"
 
 AMDProjectile::AMDProjectile()
 {
@@ -22,14 +23,23 @@ AMDProjectile::AMDProjectile()
 
 	RootComponent = CollisionComponent;
 
+	BulletMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BulletMeshComponent"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> BulletMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/LevelPrototyping/Meshes/SM_ChamferCube.SM_ChamferCube'"));
+	if (BulletMeshRef.Object)
+	{
+		BulletMeshComponent->SetStaticMesh(BulletMeshRef.Object);
+	}
+	//BulletMeshComponent->SetStaticMesh(BulletMesh.GetDefaultObject());
+	BulletMeshComponent->SetRelativeScale3D(FVector(0.4, 0.05, 0.05));
+
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComponent"));
-	/*ProjectileMovement->UpdatedComponent = CollisionComponent;
-	ProjectileMovement->InitialSpeed = 3000.f;
-	ProjectileMovement->MaxSpeed = 3000.f;
+	ProjectileMovement->UpdatedComponent = CollisionComponent;
+	/*ProjectileMovement->InitialSpeed = 1000.f;
+	ProjectileMovement->MaxSpeed = 1000.f;*/
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
 
-	InitialLifeSpan = 3.0f;*/
+	//InitialLifeSpan = 3.0f;
 }
 
 void AMDProjectile::BeginPlay()
