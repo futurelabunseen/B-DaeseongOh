@@ -51,9 +51,14 @@ void UMDGA_AttackRanged::ShootBullet(FGameplayEventData EventData)
 
 	//AMDProjectile* Projectile = GetWorld()->SpawnActorDeferred<AMDProjectile>(ProjectileClass, MuzzleTransform, GetOwningActorFromActorInfo(), MDCharacter, SpawnParameters.SpawnCollisionHandlingOverride);
 	//AMDProjectile* Projectile = GetWorld()->SpawnActor<AMDProjectile>(ProjectileClass, MuzzleTransform, SpawnParameters);
-	AMDProjectile* Projectile = ObjectPool->ReuseObject(MuzzleTransform);
-	Projectile->SetOwner(GetOwningActorFromActorInfo());
-	Projectile->SetInstigator(MDCharacter);
-	Projectile->Range = Range;
+	AMDProjectile* Projectile = ObjectPool->ReuseObject(AMDProjectile::StaticClass(), Start, Rotation);
+	//AMDProjectile* Projectile = ObjectPool->ReuseObject(ProjectileClass, MuzzleTransform);
+	if(Projectile)
+	{
+		Projectile->SetOwner(GetOwningActorFromActorInfo());
+		Projectile->SetInstigator(MDCharacter);
+		Projectile->Range = Range;
+		Projectile->Restart(MDCharacter->GetActorForwardVector());
+	}
 	//Projectile->FinishSpawning(MuzzleTransform);
 }

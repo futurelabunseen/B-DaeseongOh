@@ -3,27 +3,28 @@
 
 #include "Game/ObjectPoolWorldSubsystem.h"
 #include "Character/MDProjectile.h"
+#include "../MakeDungeon.h"
 
 UObjectPoolWorldSubsystem::UObjectPoolWorldSubsystem()
-	: ObjectCount(0)
 {
 
 }
 
 void UObjectPoolWorldSubsystem::OnWorldBeginPlay(UWorld& InWorld)
 {
-	/*if (ObjectPool.IsEmpty())
-	{
-		ObjectCount = 0;
-	}
-
-	FActorSpawnParameters SpawnParam;
+	/*FActorSpawnParameters SpawnParam;
 	SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	FTransform Transform(FTransform::Identity);
+	UClass* ProjectileDefaultClass = AMDProjectile::StaticClass();
+	
+	ObjectPool.Reserve(200);
 
-	for (ObjectCount; ObjectCount < 500; ++ObjectCount)
+	int32 PoolNum = ObjectPool.Num();
+
+	for (PoolNum; PoolNum < 200; ++PoolNum)
 	{
-		ObjectPool.Enqueue(GetWorld()->SpawnActor<AMDProjectile>(AMDProjectile::StaticClass(), Transform, SpawnParam));
+		AMDProjectile* MDProjectile = GetWorld()->SpawnActor<AMDProjectile>(ProjectileDefaultClass, Transform, SpawnParam);
+		ObjectPool.Add(MDProjectile);
 	}*/
 }
 
@@ -32,26 +33,31 @@ void UObjectPoolWorldSubsystem::Deinitialize()
 	if(!ObjectPool.IsEmpty())
 	{
 		ObjectPool.Empty();
-		ObjectCount = 0;
 	}
 }
 
-AMDProjectile* UObjectPoolWorldSubsystem::ReuseObject(const FTransform& Transform)
+AMDProjectile* UObjectPoolWorldSubsystem::ReuseObject(UClass* Class, const FVector& Location, const FRotator& Rotation)
 {
-	TObjectPtr<AMDProjectile> ReusedObject = nullptr;
+	AMDProjectile* ReusedObject = nullptr;
 
 	if (ObjectPool.IsEmpty())
 	{
 		FActorSpawnParameters SpawnParam;
 		SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		ReusedObject = GetWorld()->SpawnActor<AMDProjectile>(AMDProjectile::StaticClass(), Transform, SpawnParam);
+		ReusedObject = GetWorld()->SpawnActor<AMDProjectile>(Class, Location, Rotation, SpawnParam);
+
+		MD_LOG(LogMD, Warning, TEXT("Spawn, Current Count : %d"), ObjectPool.Num());
 	}
 	else
 	{
-		if(ObjectPool.Dequeue(ReusedObject))
+		ReusedObject = ObjectPool.Pop(false);
+		if (!ReusedObject)
 		{
-			ReusedObject->SetActorTransform(Transform);
+			MD_LOG(LogMD, Warning, TEXT("Null, Current Count : %d"), ObjectPool.Num());
+			return ReusedObject;
 		}
+		ReusedObject->SetActorLocationAndRotation(Location, Rotation);
+		MD_LOG(LogMD, Warning, TEXT("Pool, Current Count : %d"), ObjectPool.Num());
 	}
 
 	return ReusedObject;
@@ -60,6 +66,6 @@ AMDProjectile* UObjectPoolWorldSubsystem::ReuseObject(const FTransform& Transfor
 void UObjectPoolWorldSubsystem::CollectObject(AMDProjectile* CollectObject)
 {
 	check(CollectObject);
-
-	ObjectPool.Enqueue(CollectObject);
+	CollectObject->SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
+	ObjectPool.Add(CollectObject);
 }

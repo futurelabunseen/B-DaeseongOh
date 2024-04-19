@@ -22,13 +22,11 @@ public:
 	virtual void Deinitialize() override;
 
 	UFUNCTION(BlueprintCallable)
-	AMDProjectile* ReuseObject(const FTransform& Transform);
+	AMDProjectile* ReuseObject(UClass* Class, const FVector& Location, const FRotator& Rotation);
 	UFUNCTION(BlueprintCallable)
 	void CollectObject(AMDProjectile* CollectObject);
 
 protected:
-	TQueue<TObjectPtr<AMDProjectile>> ObjectPool;
-
 	UPROPERTY()
-	uint32 ObjectCount;
+	TArray<TObjectPtr<AMDProjectile>> ObjectPool;
 };
