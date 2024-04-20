@@ -36,14 +36,16 @@ void UObjectPoolWorldSubsystem::Deinitialize()
 	}
 }
 
-AMDProjectile* UObjectPoolWorldSubsystem::ReuseObject(UClass* Class, const FVector& Location, const FRotator& Rotation)
+AMDProjectile* UObjectPoolWorldSubsystem::ReuseObject(UClass* Class, const FVector& Location, const FRotator& Rotation, AActor* OwnerActor, APawn* InstigatorPawn)
 {
 	AMDProjectile* ReusedObject = nullptr;
 
 	if (ObjectPool.IsEmpty())
 	{
 		FActorSpawnParameters SpawnParam;
-		SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParam.Owner = OwnerActor;
+		SpawnParam.Instigator = InstigatorPawn;
 		ReusedObject = GetWorld()->SpawnActor<AMDProjectile>(Class, Location, Rotation, SpawnParam);
 
 		MD_LOG(LogMD, Warning, TEXT("Spawn, Current Count : %d"), ObjectPool.Num());
@@ -56,7 +58,10 @@ AMDProjectile* UObjectPoolWorldSubsystem::ReuseObject(UClass* Class, const FVect
 			MD_LOG(LogMD, Warning, TEXT("Null, Current Count : %d"), ObjectPool.Num());
 			return ReusedObject;
 		}
+		ReusedObject->Reset();
 		ReusedObject->SetActorLocationAndRotation(Location, Rotation);
+		ReusedObject->SetOwner(OwnerActor);
+		ReusedObject->SetInstigator(InstigatorPawn);
 		MD_LOG(LogMD, Warning, TEXT("Pool, Current Count : %d"), ObjectPool.Num());
 	}
 

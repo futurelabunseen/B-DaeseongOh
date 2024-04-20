@@ -22,6 +22,8 @@ public:
 
 	FORCEINLINE USphereComponent* GetCollisionComp() const { return CollisionComponent; }
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+	void CollisionEnable();
+	void CollisionDisable();
 
 	void Restart(const FVector& Direction);
 
@@ -45,6 +47,9 @@ protected:
 
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnDestroyedCallBack(AActor* DestroyedActor);
 
 private:
 };

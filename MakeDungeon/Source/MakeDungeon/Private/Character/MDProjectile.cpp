@@ -33,6 +33,7 @@ AMDProjectile::AMDProjectile()
 	//BulletMeshComponent->SetStaticMesh(BulletMesh.GetDefaultObject());
 	BulletMeshComponent->SetRelativeScale3D(FVector(0.5, 0.5, 0.5));
 	BulletMeshComponent->SetupAttachment(RootComponent);
+	BulletMeshComponent->CanCharacterStepUpOn = ECB_No;
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComponent"));
 	ProjectileMovement->UpdatedComponent = CollisionComponent;
@@ -41,14 +42,25 @@ AMDProjectile::AMDProjectile()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
 
+	OnDestroyed.AddDynamic(this, &AMDProjectile::OnDestroyedCallBack);
+
 	//InitialLifeSpan = 3.0f;
+}
+
+void AMDProjectile::CollisionEnable()
+{
+	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void AMDProjectile::CollisionDisable()
+{
+	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AMDProjectile::Restart(const FVector& Direction)
 {
 	ProjectileMovement->Velocity = Direction * ProjectileMovement->GetMaxSpeed();
 	ProjectileMovement->Activate(true);
-	//BulletMeshComponent->Activate(true);
 }
 
 void AMDProjectile::BeginPlay()
@@ -59,19 +71,16 @@ void AMDProjectile::BeginPlay()
 void AMDProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	
-	if (OtherActor != GetInstigator())
+	if ((OtherActor != GetOwner()) && (OtherActor != GetInstigator()))
 	{
 		AMDCharacterBase* MDCharacter = Cast<AMDCharacterBase>(OtherActor);
 		if (!MDCharacter)
 		{
 			
-			UObjectPoolWorldSubsystem* ObjectPool = UWorld::GetSubsystem<UObjectPoolWorldSubsystem>(GetWorld());
-			ObjectPool->CollectObject(this);
+			
 
-			MD_LOG(LogMD, Log, TEXT("Collect"));
 
-			//(OtherActor)
+
 		}
 
 		//UAbilitySystemComponent* ASC = MDCharacter->GetAbilitySystemComponent();
@@ -82,5 +91,21 @@ void AMDProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 		//	//UKismetSystemLibrary::SphereOverlapActors()
 		//	//UKismetSystemLibrary::SphereTraceSingle()
 		//}
+
+		CollisionDisable();
+
+		UObjectPoolWorldSubsystem* ObjectPool = UWorld::GetSubsystem<UObjectPoolWorldSubsystem>(GetWorld());
+		ObjectPool->CollectObject(this);
+
+		MD_LOG(LogMD, Log, TEXT("Collect_Overlap"));
 	}
+}
+
+void AMDProjectile::OnDestroyedCallBack(AActor* DestroyedActor)
+{
+	AMDProjectile* CollectActor = CastChecked<AMDProjectile>(DestroyedActor);
+	UObjectPoolWorldSubsystem* ObjectPool = UWorld::GetSubsystem<UObjectPoolWorldSubsystem>(GetWorld());
+	ObjectPool->CollectObject(CollectActor);
+
+	MD_LOG(LogMD, Log, TEXT("Collect_Destroy"));
 }

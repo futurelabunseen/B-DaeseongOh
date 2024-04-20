@@ -22,7 +22,7 @@ public:
 	virtual void Deinitialize() override;
 
 	UFUNCTION(BlueprintCallable)
-	AMDProjectile* ReuseObject(UClass* Class, const FVector& Location, const FRotator& Rotation);
+	AMDProjectile* ReuseObject(UClass* Class, const FVector& Location, const FRotator& Rotation, AActor* OwnerActor = nullptr, APawn* InstigatorPawn = nullptr);
 	UFUNCTION(BlueprintCallable)
 	void CollectObject(AMDProjectile* CollectObject);
 
