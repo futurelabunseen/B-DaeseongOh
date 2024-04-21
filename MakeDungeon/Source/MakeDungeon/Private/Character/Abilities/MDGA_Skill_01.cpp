@@ -45,6 +45,8 @@ void UMDGA_Skill_01::ActivateAbility(const FGameplayAbilitySpecHandle Handle, co
 		PlayAttackMontageTask->OnCompleted.AddDynamic(this, &UMDGA_Skill_01::OnCompletedCallback);
 		PlayAttackMontageTask->OnInterrupted.AddDynamic(this, &UMDGA_Skill_01::OnInterruptedCallback);
 		PlayAttackMontageTask->ReadyForActivation();
+
+		MDCharacter->StopMovement();
 	}
 	else
 	{

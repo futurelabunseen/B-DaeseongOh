@@ -58,10 +58,12 @@ AMDProjectile* UObjectPoolWorldSubsystem::ReuseObject(UClass* Class, const FVect
 			MD_LOG(LogMD, Warning, TEXT("Null, Current Count : %d"), ObjectPool.Num());
 			return ReusedObject;
 		}
-		ReusedObject->Reset();
+		//ReusedObject->Reset();
 		ReusedObject->SetActorLocationAndRotation(Location, Rotation);
 		ReusedObject->SetOwner(OwnerActor);
 		ReusedObject->SetInstigator(InstigatorPawn);
+		ReusedObject->SetActorEnableCollision(true);
+		ReusedObject->SetActorHiddenInGame(false);
 		MD_LOG(LogMD, Warning, TEXT("Pool, Current Count : %d"), ObjectPool.Num());
 	}
 
@@ -72,5 +74,7 @@ void UObjectPoolWorldSubsystem::CollectObject(AMDProjectile* CollectObject)
 {
 	check(CollectObject);
 	CollectObject->SetActorLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
+	CollectObject->SetActorEnableCollision(false);
+	CollectObject->SetActorHiddenInGame(true);
 	ObjectPool.Add(CollectObject);
 }

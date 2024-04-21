@@ -44,18 +44,19 @@ void UMDGA_AttackRanged::ShootBullet(FGameplayEventData EventData)
 	MuzzleTransform.SetRotation(Rotation.Quaternion());
 	MuzzleTransform.SetScale3D(FVector(1.f));
 
-	//AMDProjectile* Projectile = GetWorld()->SpawnActorDeferred<AMDProjectile>(ProjectileClass, MuzzleTransform, GetOwningActorFromActorInfo(), MDCharacter, SpawnParameters.SpawnCollisionHandlingOverride);
-	//AMDProjectile* Projectile = GetWorld()->SpawnActor<AMDProjectile>(ProjectileClass, MuzzleTransform, SpawnParameters);
+#pragma region ObjectPool Hold
 	//AMDProjectile* Projectile = ObjectPool->ReuseObject(ProjectileClass, MuzzleTransform);
 
-	UObjectPoolWorldSubsystem* ObjectPool = UWorld::GetSubsystem<UObjectPoolWorldSubsystem>(GetWorld());
+	//UObjectPoolWorldSubsystem* ObjectPool = UWorld::GetSubsystem<UObjectPoolWorldSubsystem>(GetWorld());
 
-	AMDProjectile* Projectile = ObjectPool->ReuseObject(AMDProjectile::StaticClass(), Start, Rotation, GetOwningActorFromActorInfo(), MDCharacter);
+	//AMDProjectile* Projectile = ObjectPool->ReuseObject(AMDProjectile::StaticClass(), Start, Rotation, GetOwningActorFromActorInfo(), MDCharacter);
 	//Projectile->Restart(MDCharacter->GetActorForwardVector());
-	if(Projectile)
-	{
-		//Projectile->CollisionEnable();
-		Projectile->Range = Range;
-	}
+#pragma endregion
 
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AMDProjectile* Projectile = GetWorld()->SpawnActorDeferred<AMDProjectile>(ProjectileClass, MuzzleTransform, GetOwningActorFromActorInfo(), MDCharacter, SpawnParameters.SpawnCollisionHandlingOverride);
+	Projectile->Range = Range;
+	Projectile->FinishSpawning(MuzzleTransform);
 }

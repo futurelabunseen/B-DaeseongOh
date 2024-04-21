@@ -40,6 +40,8 @@ void UMDGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 		PlayAttackMontageTask->ReadyForActivation();
 
 		StartComboTimer();
+		
+		MDCharacter->StopMovement();
 	}
 
 

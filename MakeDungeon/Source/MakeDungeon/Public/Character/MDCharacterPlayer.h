@@ -24,6 +24,8 @@ public:
 	void GASInputPressed(FGameplayTag Tag);
 	void GASInputReleased(FGameplayTag Tag);
 	
+	virtual void StopMovement() override;
+
 protected:
 	virtual void BeginPlay() override;
 

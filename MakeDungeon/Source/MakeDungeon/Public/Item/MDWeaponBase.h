@@ -35,7 +35,7 @@ public:
 
 	void EquipWeapon(AMDCharacterBase* InCharacter);
 	void UnequipWeapon(AMDCharacterBase* InCharacter);
-
+	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	TObjectPtr<UMDWeaponAttackData> WeaponAttackData;

@@ -16,6 +16,16 @@ void UMDGA_Bow_MultiShot::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
+	
+}
+
+void UMDGA_Bow_MultiShot::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
+{
+
+}
+
+void UMDGA_Bow_MultiShot::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
+{
 	ShootBullet(CurrentEventData, FVector(0.0, 0.0, 0.0));
 	ShootBullet(CurrentEventData, FVector(0.0, 20.0, 0.0));
 	ShootBullet(CurrentEventData, FVector(0.0, 40.0, 0.0));

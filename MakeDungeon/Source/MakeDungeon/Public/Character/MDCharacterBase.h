@@ -31,6 +31,8 @@ public:
 	
 	void SwapWeapon(FGameplayTag Tag);
 
+	virtual void StopMovement() {}
+
 protected:
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	TObjectPtr<UAnimMontage> AttackMontage;

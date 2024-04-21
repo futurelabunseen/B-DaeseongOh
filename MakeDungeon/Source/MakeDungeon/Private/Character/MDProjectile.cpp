@@ -42,7 +42,8 @@ AMDProjectile::AMDProjectile()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
 
-	OnDestroyed.AddDynamic(this, &AMDProjectile::OnDestroyedCallBack);
+	//ObjectPool Hold
+	//OnDestroyed.AddDynamic(this, &AMDProjectile::OnDestroyedCallBack);
 
 	//InitialLifeSpan = 3.0f;
 }
@@ -76,10 +77,6 @@ void AMDProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 		AMDCharacterBase* MDCharacter = Cast<AMDCharacterBase>(OtherActor);
 		if (!MDCharacter)
 		{
-			
-			
-
-
 
 		}
 
@@ -92,10 +89,10 @@ void AMDProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 		//	//UKismetSystemLibrary::SphereTraceSingle()
 		//}
 
-		CollisionDisable();
+		/*CollisionDisable();
 
 		UObjectPoolWorldSubsystem* ObjectPool = UWorld::GetSubsystem<UObjectPoolWorldSubsystem>(GetWorld());
-		ObjectPool->CollectObject(this);
+		ObjectPool->CollectObject(this);*/
 
 		MD_LOG(LogMD, Log, TEXT("Collect_Overlap"));
 	}
@@ -104,6 +101,10 @@ void AMDProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 void AMDProjectile::OnDestroyedCallBack(AActor* DestroyedActor)
 {
 	AMDProjectile* CollectActor = CastChecked<AMDProjectile>(DestroyedActor);
+	
+	DestroyedActor->SetActorEnableCollision(false);
+	DestroyedActor->SetActorHiddenInGame(true);
+
 	UObjectPoolWorldSubsystem* ObjectPool = UWorld::GetSubsystem<UObjectPoolWorldSubsystem>(GetWorld());
 	ObjectPool->CollectObject(CollectActor);
 
