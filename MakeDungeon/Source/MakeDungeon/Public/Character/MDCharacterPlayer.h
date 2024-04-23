@@ -20,6 +20,8 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	virtual FRotator GetAttackDirection() const override;
+
 	void GASInputStarted(FGameplayTag Tag);
 	void GASInputPressed(FGameplayTag Tag);
 	void GASInputReleased(FGameplayTag Tag);

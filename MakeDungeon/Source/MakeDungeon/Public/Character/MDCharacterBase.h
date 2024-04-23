@@ -27,8 +27,16 @@ public:
 	//FORCEINLINE virtual UAnimMontage* GetAttackMontage() const { return AttackMontage; }
 	//FORCEINLINE class UMDAttackMontageData* GetAttackMontageData() const { return AttackMontageData; }
 	FORCEINLINE UMDWeaponBase* GetWeapon() const { return Weapon; }
+	FGameplayTag GetWeaponType() const;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	
+	virtual FRotator GetAttackDirection() const;
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE bool IsCharged() { return bIsCharged; }
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void SetIsCharged(bool IsCharged) { bIsCharged = IsCharged; }
+
 	void SwapWeapon(FGameplayTag Tag);
 
 	virtual void StopMovement() {}
@@ -51,4 +59,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
 	TObjectPtr<UMDWeaponBase> Weapon;
+
+	uint8 bIsCharged : 1;
 };

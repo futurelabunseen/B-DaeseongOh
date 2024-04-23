@@ -3,6 +3,7 @@
 
 #include "Character/Abilities/MDGA_AttackRanged.h"
 #include "Character/MDCharacterBase.h"
+#include "Character/MDProjectile.h"
 //#include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Kismet/KismetMathLibrary.h"
 //#include "Tags/MDGameplayTag.h"
@@ -23,40 +24,13 @@ void UMDGA_AttackRanged::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	Task->EventReceived.AddDynamic(this, &UMDGA_AttackRanged::ShootBullet);
 	Task->ReadyForActivation();*/
 
-	ShootBullet(CurrentEventData);
+	//ShootBullet(CurrentEventData);
+	AMDCharacterBase* SpawnInstigator = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
+
+	FRotator Direction = SpawnInstigator->GetAttackDirection();
+
+	AMDProjectile::ShootProjectile(GetWorld(), ProjectileClass, GetOwningActorFromActorInfo(),
+		SpawnInstigator, SpawnInstigator->GetActorLocation(), Direction, 1000.f, EProjectileType::Normal);
 
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-}
-
-void UMDGA_AttackRanged::ShootBullet(FGameplayEventData EventData)
-{
-	AMDCharacterBase* MDCharacter = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
-	if (!MDCharacter)
-	{
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
-	}
-
-	FVector Start = MDCharacter->GetMesh()->GetSocketLocation(SocketName);
-	FVector End = MDCharacter->GetActorLocation() + MDCharacter->GetActorForwardVector() * Range;
-	FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(Start, End);
-
-	FTransform MuzzleTransform = MDCharacter->GetMesh()->GetSocketTransform(SocketName);
-	MuzzleTransform.SetRotation(Rotation.Quaternion());
-	MuzzleTransform.SetScale3D(FVector(1.f));
-
-#pragma region ObjectPool Hold
-	//AMDProjectile* Projectile = ObjectPool->ReuseObject(ProjectileClass, MuzzleTransform);
-
-	//UObjectPoolWorldSubsystem* ObjectPool = UWorld::GetSubsystem<UObjectPoolWorldSubsystem>(GetWorld());
-
-	//AMDProjectile* Projectile = ObjectPool->ReuseObject(AMDProjectile::StaticClass(), Start, Rotation, GetOwningActorFromActorInfo(), MDCharacter);
-	//Projectile->Restart(MDCharacter->GetActorForwardVector());
-#pragma endregion
-
-	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	AMDProjectile* Projectile = GetWorld()->SpawnActorDeferred<AMDProjectile>(ProjectileClass, MuzzleTransform, GetOwningActorFromActorInfo(), MDCharacter, SpawnParameters.SpawnCollisionHandlingOverride);
-	Projectile->Range = Range;
-	Projectile->FinishSpawning(MuzzleTransform);
 }

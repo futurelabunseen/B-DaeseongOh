@@ -61,8 +61,21 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 		APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
 		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 	}
-
 	Weapon->EquipWeapon(this);
+}
+
+FRotator AMDCharacterPlayer::GetAttackDirection() const
+{
+	FHitResult HitResult;
+	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, HitResult);
+	FVector MouseLocation = HitResult.Location;
+	MouseLocation.Z = 0.0;
+
+	FVector StartPoint = GetActorLocation();
+	StartPoint.Z = 0.0;
+
+	return FRotationMatrix::MakeFromX(MouseLocation - StartPoint).Rotator();
 }
 
 void AMDCharacterPlayer::GASInputStarted(FGameplayTag Tag)
@@ -84,7 +97,7 @@ void AMDCharacterPlayer::GASInputPressed(FGameplayTag Tag)
 			if (Spec.IsActive())
 			{
 				ASC->AbilitySpecInputPressed(Spec);
-				MD_LOG(LogMD, Log, TEXT("Pressed"));
+				//MD_LOG(LogMD, Log, TEXT("Pressed"));
 			}
 			else
 			{
@@ -125,7 +138,7 @@ void AMDCharacterPlayer::GASInputReleased(FGameplayTag Tag)
 			if(Spec.IsActive())
 			{
 				ASC->AbilitySpecInputReleased(Spec);
-				MD_LOG(LogMD, Log, TEXT("Released"));
+				//MD_LOG(LogMD, Log, TEXT("Released"));
 			}
 		}
 	}

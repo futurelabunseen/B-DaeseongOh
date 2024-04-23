@@ -54,8 +54,9 @@ void UMDWeaponBase::EquipWeapon(AMDCharacterBase* InCharacter)
 			if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerController->InputComponent))
 			{
 				EnhancedInputComponent->BindAction(InputData->AttackAction, ETriggerEvent::Triggered, CharacterPlayer, &AMDCharacterPlayer::GASInputPressed, MDTAG_INPUT_ATTACK);
-				EnhancedInputComponent->BindAction(InputData->SkillAction_01, ETriggerEvent::Triggered, CharacterPlayer, &AMDCharacterPlayer::GASInputPressed, MDTAG_WEAPON_SKILL_01);
-				EnhancedInputComponent->BindAction(InputData->SkillAction_01, ETriggerEvent::Completed, CharacterPlayer, &AMDCharacterPlayer::GASInputReleased, MDTAG_WEAPON_SKILL_01);
+				EnhancedInputComponent->BindAction(InputData->SkillAction_01, ETriggerEvent::Triggered, CharacterPlayer, &AMDCharacterPlayer::GASInputPressed, MDTAG_INPUT_SKILL01);
+				EnhancedInputComponent->BindAction(InputData->SkillAction_01, ETriggerEvent::Completed, CharacterPlayer, &AMDCharacterPlayer::GASInputReleased, MDTAG_INPUT_SKILL01);
+				EnhancedInputComponent->BindAction(InputData->SkillAction_02, ETriggerEvent::Triggered, CharacterPlayer, &AMDCharacterPlayer::GASInputPressed, MDTAG_INPUT_SKILL02);
 			}
 		}
 	}

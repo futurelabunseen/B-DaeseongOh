@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "GameplayTagContainer.h"
 #include "MDAnimInstance.generated.h"
 
 /**
@@ -17,16 +18,27 @@ class MAKEDUNGEON_API UMDAnimInstance : public UAnimInstance
 public:
 	UMDAnimInstance();
 
+	FORCEINLINE void SetAnimPlaySpeed(float AnimSpeed = 1.f) { AnimPlaySpeed = AnimSpeed; }
+
 protected:
 	virtual void NativeInitializeAnimation() override;
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
-	TObjectPtr<class ACharacter> Owner;
+	TObjectPtr<class AMDCharacterBase> Owner;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
 	TObjectPtr<class UCharacterMovementComponent> Movement;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
+	FGameplayTag WeaponType;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = GAS)
+	TObjectPtr<class UAbilitySystemComponent> ASC;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = GAS)
+	FGameplayTagContainer CurrentOwnedTags;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	FVector Velocity;
@@ -48,4 +60,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	float JumpingThreshould;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
+	uint8 bIsCharging : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
+	float AnimPlaySpeed;
 };

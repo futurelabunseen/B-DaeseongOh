@@ -55,9 +55,26 @@ void AMDCharacterBase::BeginPlay()
 
 }
 
+FGameplayTag AMDCharacterBase::GetWeaponType() const
+{
+	FGameplayTag CurentWeaponType = FGameplayTag();
+
+	if (UMDWeaponAttackData* WeaponData = Weapon->GetWeaponAttackData())
+	{
+		CurentWeaponType = WeaponData->WeaponType;
+	}
+
+	return CurentWeaponType;
+}
+
 UAbilitySystemComponent* AMDCharacterBase::GetAbilitySystemComponent() const
 {
 	return ASC;
+}
+
+FRotator AMDCharacterBase::GetAttackDirection() const
+{
+	return FRotationMatrix::MakeFromX(GetActorForwardVector()).Rotator();
 }
 
 void AMDCharacterBase::SwapWeapon(FGameplayTag Tag)

@@ -4,6 +4,7 @@
 #include "Character/Abilities/MDGA_Bow_MultiShot.h"
 #include "Character/MDCharacterBase.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "../MakeDungeon.h"
 
 UMDGA_Bow_MultiShot::UMDGA_Bow_MultiShot()
 {
@@ -15,54 +16,40 @@ UMDGA_Bow_MultiShot::UMDGA_Bow_MultiShot()
 void UMDGA_Bow_MultiShot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	
+	OuterAngle = 60.0;
+	DecreaseAngle = OuterAngle * 0.02;
 }
 
 void UMDGA_Bow_MultiShot::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
-
+	OuterAngle = FMath::Clamp(OuterAngle - DecreaseAngle, 1.0, OuterAngle);
+	MD_LOG(LogMD, Log, TEXT("CurrentAngle : %lf"), OuterAngle);
 }
 
 void UMDGA_Bow_MultiShot::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
-	ShootBullet(CurrentEventData, FVector(0.0, 0.0, 0.0));
-	ShootBullet(CurrentEventData, FVector(0.0, 20.0, 0.0));
-	ShootBullet(CurrentEventData, FVector(0.0, 40.0, 0.0));
-	ShootBullet(CurrentEventData, FVector(0.0, -20.0, 0.0));
-	ShootBullet(CurrentEventData, FVector(0.0, -40.0, 0.0));
+	UWorld* SpawnWorld = GetWorld();
+	AActor* SpawnOwner = GetOwningActorFromActorInfo();
+	AMDCharacterBase* SpawnInstigator = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
+	FVector SpawnLocation = SpawnInstigator->GetActorLocation();
+	FRotator DirectionOrigin = SpawnInstigator->GetAttackDirection();
+
+	FRotator DirectionSpawn[5] = { FRotator(DirectionOrigin.Pitch, DirectionOrigin.Yaw, DirectionOrigin.Roll), 
+									FRotator(DirectionOrigin.Pitch, DirectionOrigin.Yaw + OuterAngle * 0.5, DirectionOrigin.Roll),
+									FRotator(DirectionOrigin.Pitch, DirectionOrigin.Yaw + OuterAngle, DirectionOrigin.Roll),
+									FRotator(DirectionOrigin.Pitch, DirectionOrigin.Yaw + -(OuterAngle * 0.5), DirectionOrigin.Roll),
+									FRotator(DirectionOrigin.Pitch, DirectionOrigin.Yaw + -OuterAngle, DirectionOrigin.Roll) };
+
+	AMDProjectile::ShootProjectile(SpawnWorld, ProjectileClass, SpawnOwner,
+		SpawnInstigator, SpawnLocation, DirectionSpawn[0], 1000.f, EProjectileType::Normal);
+	AMDProjectile::ShootProjectile(SpawnWorld, ProjectileClass, SpawnOwner,
+		SpawnInstigator, SpawnLocation, DirectionSpawn[1], 1000.f, EProjectileType::Normal);
+	AMDProjectile::ShootProjectile(SpawnWorld, ProjectileClass, SpawnOwner,
+		SpawnInstigator, SpawnLocation, DirectionSpawn[2], 1000.f, EProjectileType::Normal);
+	AMDProjectile::ShootProjectile(SpawnWorld, ProjectileClass, SpawnOwner,
+		SpawnInstigator, SpawnLocation, DirectionSpawn[3], 1000.f, EProjectileType::Normal);
+	AMDProjectile::ShootProjectile(SpawnWorld, ProjectileClass, SpawnOwner,
+		SpawnInstigator, SpawnLocation, DirectionSpawn[4], 1000.f, EProjectileType::Normal);
 
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-}
-
-void UMDGA_Bow_MultiShot::ShootBullet(FGameplayEventData EventData, const FVector& DeltaPitchYawRoll)
-{
-	AMDCharacterBase* MDCharacter = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
-	if (!MDCharacter)
-	{
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
-	}
-
-	FVector Start = MDCharacter->GetMesh()->GetSocketLocation(SocketName);
-	FVector End = MDCharacter->GetActorLocation() + MDCharacter->GetActorForwardVector() * Range;
-	FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(Start, End);
-
-	Rotation.Add(DeltaPitchYawRoll.X, DeltaPitchYawRoll.Y, DeltaPitchYawRoll.Z);
-
-	FTransform MuzzleTransform = MDCharacter->GetMesh()->GetSocketTransform(SocketName);
-	MuzzleTransform.SetRotation(Rotation.Quaternion());
-	MuzzleTransform.SetScale3D(FVector(1.f));
-
-	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	//SpawnParameters.Owner = GetOwningActorFromActorInfo();
-	//SpawnParameters.Instigator = MDCharacter;
-
-	
-	//AMDProjectile* Projectile = GetWorld()->SpawnActor<AMDProjectile>(ProjectileClass, MuzzleTransform, SpawnParameters);
-	//AMDProjectile* Projectile = GetWorld()->SpawnActorAbsolute<AMDProjectile>(ProjectileClass, MuzzleTransform, SpawnParameters);
-	AMDProjectile* Projectile = GetWorld()->SpawnActorDeferred<AMDProjectile>(ProjectileClass, MuzzleTransform, 
-						GetOwningActorFromActorInfo(), MDCharacter, SpawnParameters.SpawnCollisionHandlingOverride);
-	Projectile->Range = Range;
-	Projectile->FinishSpawning(MuzzleTransform);
 }

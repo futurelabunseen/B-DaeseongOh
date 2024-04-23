@@ -26,11 +26,11 @@ public:
 	virtual void InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
 
 protected:
-	UFUNCTION()
-	void ShootBullet(FGameplayEventData EventData, const FVector& DeltaPitchYawRoll);
+
 
 private:
 	float Range;
-
+	double OuterAngle;
+	double DecreaseAngle;
 	FName SocketName;
 };

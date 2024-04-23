@@ -2,23 +2,27 @@
 
 
 #include "Animation/MDAnimInstance.h"
-#include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Character/MDCharacterBase.h"
+#include "AbilitySystemComponent.h"
 
 UMDAnimInstance::UMDAnimInstance()
 {
 	MovingThreshould = 3.f;
 	JumpingThreshould = 100.f;
+	AnimPlaySpeed = 1.f;
 }
 
 void UMDAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
-	Owner = Cast<ACharacter>(GetOwningActor());
+	AActor* Temp = GetOwningActor();
+	Owner = Cast<AMDCharacterBase>(Temp);
 	if (Owner)
 	{
 		Movement = Owner->GetCharacterMovement();
+		ASC = Owner->GetAbilitySystemComponent();
 	}
 }
 
@@ -33,5 +37,15 @@ void UMDAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsIdle = GroundSpeed < MovingThreshould;
 		bIsFalling = Movement->IsFalling();
 		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
+	}
+	if (Owner)
+	{
+		bIsCharging = Owner->IsCharged();
+		WeaponType = Owner->GetWeaponType();
+
+		if (ASC)
+		{
+			ASC->GetOwnedGameplayTags(CurrentOwnedTags);
+		}
 	}
 }
