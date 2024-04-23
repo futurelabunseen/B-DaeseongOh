@@ -13,7 +13,8 @@ UENUM()
 enum class EProjectileType : uint8
 {
 	Normal	UMETA(DisplayName = "Normal"),
-	Spread	UMETA(DisplayName = "Normal"),
+	Spread	UMETA(DisplayName = "Spread"),
+	Mortar	UMETA(DisplayName = "Mortar")
 };
 
 UCLASS()

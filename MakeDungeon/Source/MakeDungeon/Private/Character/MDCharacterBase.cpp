@@ -47,12 +47,26 @@ AMDCharacterBase::AMDCharacterBase()
 	}
 
 	Weapon = CreateDefaultSubobject<UMDWeaponBase>(TEXT("Weapon"));
+
+	TrackingSpeed = 20.f;
+	bIsTrackingTarget = false;
 }
 
 void AMDCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+}
+
+void AMDCharacterBase::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (bIsTrackingTarget)
+	{
+		FRotator TargetRotator = GetAttackDirection();
+		SetActorRotation(FMath::RInterpTo(GetActorRotation(), TargetRotator, DeltaSeconds, TrackingSpeed));
+	}
 }
 
 FGameplayTag AMDCharacterBase::GetWeaponType() const
@@ -70,6 +84,11 @@ FGameplayTag AMDCharacterBase::GetWeaponType() const
 UAbilitySystemComponent* AMDCharacterBase::GetAbilitySystemComponent() const
 {
 	return ASC;
+}
+
+FVector AMDCharacterBase::GetAttackLocation() const
+{
+	return FVector();
 }
 
 FRotator AMDCharacterBase::GetAttackDirection() const

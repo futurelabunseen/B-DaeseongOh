@@ -79,6 +79,9 @@ void AMDProjectile::BeginPlay()
 	case EProjectileType::Spread:
 		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AMDProjectile::OnBeginOverlapAndSpread);
 		break;
+	case EProjectileType::Mortar:
+		
+		break;
 	default:
 		break;
 	}

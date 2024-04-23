@@ -44,7 +44,7 @@ void UMDGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 		MDCharacter->StopMovement();
 	}
 
-
+	MDCharacter->SetIsTrackingTarget(true);
 
 	MD_LOG(LogMD, Log, TEXT("Activate"));
 }

@@ -32,5 +32,7 @@ void UMDGA_AttackRanged::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	AMDProjectile::ShootProjectile(GetWorld(), ProjectileClass, GetOwningActorFromActorInfo(),
 		SpawnInstigator, SpawnInstigator->GetActorLocation(), Direction, 1000.f, EProjectileType::Normal);
 
+	SpawnInstigator->SetIsTrackingTarget(false);
+
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 }

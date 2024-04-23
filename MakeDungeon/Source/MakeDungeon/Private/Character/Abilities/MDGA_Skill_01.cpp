@@ -66,6 +66,7 @@ void UMDGA_Skill_01::ActivateAbility(const FGameplayAbilitySpecHandle Handle, co
 	{
 		AnimInst->SetAnimPlaySpeed(AnimPlaySpeed);
 	}
+
 	MD_LOG(LogMD, Log, TEXT("Activate"));
 }
 

@@ -18,6 +18,9 @@ void UMDGA_Bow_MultiShot::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	OuterAngle = 60.0;
 	DecreaseAngle = OuterAngle * 0.02;
+
+	AMDCharacterBase* MDCharacter = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
+	MDCharacter->SetIsTrackingTarget(true);
 }
 
 void UMDGA_Bow_MultiShot::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
@@ -50,6 +53,8 @@ void UMDGA_Bow_MultiShot::InputReleased(const FGameplayAbilitySpecHandle Handle,
 		SpawnInstigator, SpawnLocation, DirectionSpawn[3], 1000.f, EProjectileType::Normal);
 	AMDProjectile::ShootProjectile(SpawnWorld, ProjectileClass, SpawnOwner,
 		SpawnInstigator, SpawnLocation, DirectionSpawn[4], 1000.f, EProjectileType::Normal);
+
+	SpawnInstigator->SetIsTrackingTarget(false);
 
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 }

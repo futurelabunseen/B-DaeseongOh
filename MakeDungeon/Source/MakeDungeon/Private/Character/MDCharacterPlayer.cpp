@@ -64,6 +64,15 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 	Weapon->EquipWeapon(this);
 }
 
+FVector AMDCharacterPlayer::GetAttackLocation() const
+{
+	FHitResult HitResult;
+	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, HitResult);
+
+	return HitResult.Location;
+}
+
 FRotator AMDCharacterPlayer::GetAttackDirection() const
 {
 	FHitResult HitResult;
