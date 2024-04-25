@@ -63,6 +63,7 @@ void UMDWeaponBase::EquipWeapon(AMDCharacterBase* InCharacter)
 				EnhancedInputComponent->BindAction(InputData->SkillAction_01, ETriggerEvent::Triggered, CharacterPlayer, &AMDCharacterPlayer::GASInputPressed, MDTAG_INPUT_SKILL01);
 				EnhancedInputComponent->BindAction(InputData->SkillAction_01, ETriggerEvent::Completed, CharacterPlayer, &AMDCharacterPlayer::GASInputReleased, MDTAG_INPUT_SKILL01);
 				EnhancedInputComponent->BindAction(InputData->SkillAction_02, ETriggerEvent::Triggered, CharacterPlayer, &AMDCharacterPlayer::GASInputPressed, MDTAG_INPUT_SKILL02);
+				EnhancedInputComponent->BindAction(InputData->SkillAction_03, ETriggerEvent::Triggered, CharacterPlayer, &AMDCharacterPlayer::GASInputPressed, MDTAG_INPUT_SKILL03);
 			}
 		}
 	}

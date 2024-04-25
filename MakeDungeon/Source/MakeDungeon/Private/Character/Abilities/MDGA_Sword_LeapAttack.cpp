@@ -41,10 +41,6 @@ void UMDGA_Sword_LeapAttack::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 
 void UMDGA_Sword_LeapAttack::OnCompletedCallback()
 {
-	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(CurrentActorInfo->AvatarActor.Get());
-	MDCharacter->SetIsTrackingTarget(false);
-
-
 	bool bReplicatedEndAbility = true;
 	bool bWasCancelled = false;
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);

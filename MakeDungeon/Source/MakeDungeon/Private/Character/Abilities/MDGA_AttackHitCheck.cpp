@@ -3,7 +3,6 @@
 
 #include "Character/Abilities/MDGA_AttackHitCheck.h"
 #include "Character/Abilities/Tasks/MDAT_Trace.h"
-#include "Character/Abilities/Tasks/MDAT_Projectile.h"
 #include "Character/Abilities/TargetActors/MDTA_Trace.h"
 #include "Character/Abilities/TargetActors/MDTA_Projectile.h"
 #include "Character/Abilities/AttributeSets/MDCharacterAttributeSet.h"
