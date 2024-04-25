@@ -15,20 +15,26 @@ UMDWeaponBase::UMDWeaponBase()
 
 void UMDWeaponBase::SetWeaponAttackData(AMDCharacterBase* InCharacter, UMDWeaponAttackData* WeaponData)
 {
+	UAbilitySystemComponent* ASC = InCharacter->GetAbilitySystemComponent();
 
+	FGameplayTagContainer CurrentOwnedTags;
+	ASC->GetOwnedGameplayTags(CurrentOwnedTags);
+	if (WeaponAttackData && CurrentOwnedTags.HasTag(WeaponAttackData->WeaponType))
+	{
+		ASC->RemoveLooseGameplayTag(WeaponAttackData->WeaponType);
+	}
 
 	WeaponAttackData = WeaponData;
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	AttachToComponent(InCharacter->GetMesh(), AttachmentRules, FName(TEXT("Weapon_R")));
 	SetSkeletalMesh(WeaponAttackData->WeaponMesh);
 
-	UAbilitySystemComponent* ASC = InCharacter->GetAbilitySystemComponent();
-
 	for (const auto& WeaponAbility : WeaponAttackData->WeaponAbilities)
 	{
 		FGameplayAbilitySpec StartSpec(WeaponAbility);
 		ASC->GiveAbility(StartSpec);
 	}
+	ASC->AddLooseGameplayTag(WeaponAttackData->WeaponType);
 }
 
 void UMDWeaponBase::EquipWeapon(AMDCharacterBase* InCharacter)

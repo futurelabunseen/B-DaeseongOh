@@ -28,24 +28,22 @@ void UMDGA_Sword_LeapAttack::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 		return;
 	}
 
-	CurrentWeaponAttackData = Weapon->GetWeaponAttackData();
-
 	UAnimMontage* SkillMontage = Weapon->GetSkillMontage();
 	if (SkillMontage)
 	{
+		MDCharacter->StopMovement();
 		UAbilityTask_PlayMontageAndWait* PlayAttackMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayAttack"), SkillMontage);
 		PlayAttackMontageTask->OnCompleted.AddDynamic(this, &UMDGA_Sword_LeapAttack::OnCompletedCallback);
 		PlayAttackMontageTask->OnInterrupted.AddDynamic(this, &UMDGA_Sword_LeapAttack::OnInterruptedCallback);
 		PlayAttackMontageTask->ReadyForActivation();
 	}
-
-	MDCharacter->SetIsTrackingTarget(true);
 }
 
 void UMDGA_Sword_LeapAttack::OnCompletedCallback()
 {
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(CurrentActorInfo->AvatarActor.Get());
 	MDCharacter->SetIsTrackingTarget(false);
+
 
 	bool bReplicatedEndAbility = true;
 	bool bWasCancelled = false;

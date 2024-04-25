@@ -12,6 +12,7 @@ class UAbilitySystemComponent;
 class UGameplayAbility;
 class UMDCharacterAttributeSet;
 class UMDWeaponBase;
+class UMotionWarpingComponent;
 
 UCLASS()
 class MAKEDUNGEON_API AMDCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -39,7 +40,6 @@ public:
 	FORCEINLINE bool IsTrackingTarget() const { return bIsTrackingTarget; }
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void SetIsTrackingTarget(bool IsTrackingTarget) { bIsTrackingTarget = IsTrackingTarget; }
-	
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE bool IsCharged() { return bIsCharged; }
@@ -69,6 +69,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
 	TObjectPtr<UMDWeaponBase> Weapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MotionWarping")
+	TObjectPtr<UMotionWarpingComponent> MWC;
 
 private:
 	float TrackingSpeed;

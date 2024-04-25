@@ -19,6 +19,7 @@ public:
 	UMDAnimInstance();
 
 	FORCEINLINE void SetAnimPlaySpeed(float AnimSpeed = 1.f) { AnimPlaySpeed = AnimSpeed; }
+	FORCEINLINE void SetWeaponType(FGameplayTag Type) { WeaponType = Type; }
 
 protected:
 	virtual void NativeInitializeAnimation() override;

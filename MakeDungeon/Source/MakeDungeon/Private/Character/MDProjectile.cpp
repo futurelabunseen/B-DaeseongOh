@@ -160,7 +160,8 @@ void AMDProjectile::OnBeginOverlapAndSpread(UPrimitiveComponent* OverlappedCompo
 
 			FVector StartLocation = BulletTest->GetActorLocation();
 
-			UKismetSystemLibrary::SphereOverlapActors(GetWorld(), StartLocation, 1000.f, ObjectTypes, ClassFilter, ActorToIgnore, ResultActors);
+			UKismetSystemLibrary::SphereOverlapActors(GetWorld(), StartLocation, 700.f, ObjectTypes, ClassFilter, ActorToIgnore, ResultActors);
+			DrawDebugSphere(GetWorld(), StartLocation, 700.f, 16, FColor::Blue, false, 2.f);
 
 			for (auto& TargetActor : ResultActors)
 			{

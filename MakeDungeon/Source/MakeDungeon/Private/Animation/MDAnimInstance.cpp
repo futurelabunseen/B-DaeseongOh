@@ -4,7 +4,6 @@
 #include "Animation/MDAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Character/MDCharacterBase.h"
-#include "AbilitySystemComponent.h"
 
 UMDAnimInstance::UMDAnimInstance()
 {
@@ -22,7 +21,6 @@ void UMDAnimInstance::NativeInitializeAnimation()
 	if (Owner)
 	{
 		Movement = Owner->GetCharacterMovement();
-		ASC = Owner->GetAbilitySystemComponent();
 	}
 }
 
@@ -42,10 +40,5 @@ void UMDAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		bIsCharging = Owner->IsCharged();
 		WeaponType = Owner->GetWeaponType();
-
-		if (ASC)
-		{
-			ASC->GetOwnedGameplayTags(CurrentOwnedTags);
-		}
 	}
 }
