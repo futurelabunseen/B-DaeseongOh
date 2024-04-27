@@ -4,9 +4,7 @@
 #include "Character/Abilities/MDGA_Attack.h"
 #include "Character/MDCharacterBase.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
-#include "Data/MDWeaponAttackData.h"
 #include "Item/MDWeaponBase.h"
-#include "Tags/MDGameplayTag.h"
 #include "../MakeDungeon.h"
 
 
@@ -42,9 +40,11 @@ void UMDGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 		PlayAttackMontageTask->ReadyForActivation();
 
 		StartComboTimer();
+		
+		MDCharacter->StopMovement();
 	}
 
-
+	MDCharacter->SetIsTrackingTarget(true);
 
 	MD_LOG(LogMD, Log, TEXT("Activate"));
 }
@@ -89,7 +89,7 @@ void UMDGA_Attack::OnInterruptedCallback()
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
 }
 
-FName UMDGA_Attack::GetNextSection(bool bIsSecondary)
+FName UMDGA_Attack::GetNextSection()
 {
 	FName NextSection;
 	CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, CurrentWeaponAttackData->MaxComboCount);

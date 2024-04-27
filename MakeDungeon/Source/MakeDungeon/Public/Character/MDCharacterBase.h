@@ -12,6 +12,7 @@ class UAbilitySystemComponent;
 class UGameplayAbility;
 class UMDCharacterAttributeSet;
 class UMDWeaponBase;
+class UMotionWarpingComponent;
 
 UCLASS()
 class MAKEDUNGEON_API AMDCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -23,13 +24,32 @@ public:
 	AMDCharacterBase();
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 
 	//FORCEINLINE virtual UAnimMontage* GetAttackMontage() const { return AttackMontage; }
 	//FORCEINLINE class UMDAttackMontageData* GetAttackMontageData() const { return AttackMontageData; }
 	FORCEINLINE UMDWeaponBase* GetWeapon() const { return Weapon; }
+	FGameplayTag GetWeaponType() const;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
+	UFUNCTION(BlueprintCallable)
+	virtual FVector GetAttackLocation() const;
+	UFUNCTION(BlueprintCallable)
+	virtual FRotator GetAttackDirection() const;
+	
+	FORCEINLINE bool IsTrackingTarget() const { return bIsTrackingTarget; }
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void SetIsTrackingTarget(bool IsTrackingTarget) { bIsTrackingTarget = IsTrackingTarget; }
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE bool IsCharged() { return bIsCharged; }
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void SetIsCharged(bool IsCharged) { bIsCharged = IsCharged; }
+
 	void SwapWeapon(FGameplayTag Tag);
+
+	virtual void StopMovement() {}
 
 protected:
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
@@ -49,4 +69,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
 	TObjectPtr<UMDWeaponBase> Weapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MotionWarping")
+	TObjectPtr<UMotionWarpingComponent> MWC;
+
+private:
+	float TrackingSpeed;
+	uint8 bIsTrackingTarget : 1;
+	uint8 bIsCharged : 1;
 };

@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Abilities/Tasks/AbilityTask.h"
-#include "MDAT_Projectile.generated.h"
+#include "Item/MDWeaponBase.h"
+#include "MDWeaponBow.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MAKEDUNGEON_API UMDAT_Projectile : public UAbilityTask
+class MAKEDUNGEON_API UMDWeaponBow : public UMDWeaponBase
 {
 	GENERATED_BODY()
 	

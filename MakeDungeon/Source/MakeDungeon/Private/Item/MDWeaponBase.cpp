@@ -15,18 +15,26 @@ UMDWeaponBase::UMDWeaponBase()
 
 void UMDWeaponBase::SetWeaponAttackData(AMDCharacterBase* InCharacter, UMDWeaponAttackData* WeaponData)
 {
+	UAbilitySystemComponent* ASC = InCharacter->GetAbilitySystemComponent();
+
+	FGameplayTagContainer CurrentOwnedTags;
+	ASC->GetOwnedGameplayTags(CurrentOwnedTags);
+	if (WeaponAttackData && CurrentOwnedTags.HasTag(WeaponAttackData->WeaponType))
+	{
+		ASC->RemoveLooseGameplayTag(WeaponAttackData->WeaponType);
+	}
+
 	WeaponAttackData = WeaponData;
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 	AttachToComponent(InCharacter->GetMesh(), AttachmentRules, FName(TEXT("Weapon_R")));
 	SetSkeletalMesh(WeaponAttackData->WeaponMesh);
-
-	UAbilitySystemComponent* ASC = InCharacter->GetAbilitySystemComponent();
 
 	for (const auto& WeaponAbility : WeaponAttackData->WeaponAbilities)
 	{
 		FGameplayAbilitySpec StartSpec(WeaponAbility);
 		ASC->GiveAbility(StartSpec);
 	}
+	ASC->AddLooseGameplayTag(WeaponAttackData->WeaponType);
 }
 
 void UMDWeaponBase::EquipWeapon(AMDCharacterBase* InCharacter)
@@ -53,6 +61,9 @@ void UMDWeaponBase::EquipWeapon(AMDCharacterBase* InCharacter)
 			{
 				EnhancedInputComponent->BindAction(InputData->AttackAction, ETriggerEvent::Triggered, CharacterPlayer, &AMDCharacterPlayer::GASInputPressed, MDTAG_INPUT_ATTACK);
 				EnhancedInputComponent->BindAction(InputData->SkillAction_01, ETriggerEvent::Triggered, CharacterPlayer, &AMDCharacterPlayer::GASInputPressed, MDTAG_INPUT_SKILL01);
+				EnhancedInputComponent->BindAction(InputData->SkillAction_01, ETriggerEvent::Completed, CharacterPlayer, &AMDCharacterPlayer::GASInputReleased, MDTAG_INPUT_SKILL01);
+				EnhancedInputComponent->BindAction(InputData->SkillAction_02, ETriggerEvent::Triggered, CharacterPlayer, &AMDCharacterPlayer::GASInputPressed, MDTAG_INPUT_SKILL02);
+				EnhancedInputComponent->BindAction(InputData->SkillAction_03, ETriggerEvent::Triggered, CharacterPlayer, &AMDCharacterPlayer::GASInputPressed, MDTAG_INPUT_SKILL03);
 			}
 		}
 	}

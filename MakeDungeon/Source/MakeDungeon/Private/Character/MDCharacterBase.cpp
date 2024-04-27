@@ -7,6 +7,7 @@
 #include "Physics/MDCollision.h"
 #include "Tags/MDGameplayTag.h"
 #include "Item/MDWeaponBase.h"
+#include "MotionWarpingComponent.h"
 
 // Sets default values
 AMDCharacterBase::AMDCharacterBase()
@@ -18,7 +19,7 @@ AMDCharacterBase::AMDCharacterBase()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
-
+	
 	// Capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
 	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_MDCAPSULE);
@@ -47,6 +48,11 @@ AMDCharacterBase::AMDCharacterBase()
 	}
 
 	Weapon = CreateDefaultSubobject<UMDWeaponBase>(TEXT("Weapon"));
+
+	MWC = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
+
+	TrackingSpeed = 20.f;
+	bIsTrackingTarget = false;
 }
 
 void AMDCharacterBase::BeginPlay()
@@ -55,9 +61,42 @@ void AMDCharacterBase::BeginPlay()
 
 }
 
+void AMDCharacterBase::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (bIsTrackingTarget)
+	{
+		FRotator TargetRotator = GetAttackDirection();
+		SetActorRotation(FMath::RInterpTo(GetActorRotation(), TargetRotator, DeltaSeconds, TrackingSpeed));
+	}
+}
+
+FGameplayTag AMDCharacterBase::GetWeaponType() const
+{
+	FGameplayTag CurentWeaponType = FGameplayTag();
+
+	if (UMDWeaponAttackData* WeaponData = Weapon->GetWeaponAttackData())
+	{
+		CurentWeaponType = WeaponData->WeaponType;
+	}
+
+	return CurentWeaponType;
+}
+
 UAbilitySystemComponent* AMDCharacterBase::GetAbilitySystemComponent() const
 {
 	return ASC;
+}
+
+FVector AMDCharacterBase::GetAttackLocation() const
+{
+	return FVector();
+}
+
+FRotator AMDCharacterBase::GetAttackDirection() const
+{
+	return FRotationMatrix::MakeFromX(GetActorForwardVector()).Rotator();
 }
 
 void AMDCharacterBase::SwapWeapon(FGameplayTag Tag)

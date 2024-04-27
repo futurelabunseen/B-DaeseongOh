@@ -20,10 +20,15 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	virtual FVector GetAttackLocation() const override;
+	virtual FRotator GetAttackDirection() const override;
+
 	void GASInputStarted(FGameplayTag Tag);
 	void GASInputPressed(FGameplayTag Tag);
 	void GASInputReleased(FGameplayTag Tag);
 	
+	virtual void StopMovement() override;
+
 protected:
 	virtual void BeginPlay() override;
 

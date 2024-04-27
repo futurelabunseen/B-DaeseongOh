@@ -61,8 +61,30 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 		APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
 		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 	}
-
 	Weapon->EquipWeapon(this);
+}
+
+FVector AMDCharacterPlayer::GetAttackLocation() const
+{
+	FHitResult HitResult;
+	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, HitResult);
+
+	return HitResult.Location;
+}
+
+FRotator AMDCharacterPlayer::GetAttackDirection() const
+{
+	FHitResult HitResult;
+	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, HitResult);
+	FVector MouseLocation = HitResult.Location;
+	MouseLocation.Z = 0.0;
+
+	FVector StartPoint = GetActorLocation();
+	StartPoint.Z = 0.0;
+
+	return FRotationMatrix::MakeFromX(MouseLocation - StartPoint).Rotator();
 }
 
 void AMDCharacterPlayer::GASInputStarted(FGameplayTag Tag)
@@ -75,7 +97,27 @@ void AMDCharacterPlayer::GASInputStarted(FGameplayTag Tag)
 
 void AMDCharacterPlayer::GASInputPressed(FGameplayTag Tag)
 {
-	FGameplayTagContainer TagContainer;
+	TArray<FGameplayAbilitySpec> ActivatableAbilities = ASC->GetActivatableAbilities();
+
+	for (auto& Spec : ActivatableAbilities)
+	{
+		if (Spec.Ability && Spec.Ability->AbilityTags.HasTag(Tag))
+		{
+			if (Spec.IsActive())
+			{
+				ASC->AbilitySpecInputPressed(Spec);
+				//MD_LOG(LogMD, Log, TEXT("Pressed"));
+			}
+			else
+			{
+				ASC->TryActivateAbility(Spec.Handle);
+				MD_LOG(LogMD, Log, TEXT("Activate"));
+			}
+		}
+	}
+
+	//If Input TagContainer
+	/*FGameplayTagContainer TagContainer;
 	TagContainer.AddTag(Tag);
 
 	TArray<FGameplayAbilitySpec*> AbilitiesToActivate;
@@ -91,12 +133,27 @@ void AMDCharacterPlayer::GASInputPressed(FGameplayTag Tag)
 		{
 			ASC->TryActivateAbility(GameplayAbilitySpec->Handle);
 		}
-	}
+	}*/
 }
 
 void AMDCharacterPlayer::GASInputReleased(FGameplayTag Tag)
 {
-	FGameplayTagContainer TagContainer;
+	TArray<FGameplayAbilitySpec> ActivatableAbilities = ASC->GetActivatableAbilities();
+
+	for (auto& Spec : ActivatableAbilities)
+	{
+		if (Spec.Ability && Spec.Ability->AbilityTags.HasTag(Tag))
+		{
+			if(Spec.IsActive())
+			{
+				ASC->AbilitySpecInputReleased(Spec);
+				//MD_LOG(LogMD, Log, TEXT("Released"));
+			}
+		}
+	}
+
+	//If Input TagContainer
+	/*FGameplayTagContainer TagContainer;
 	TagContainer.AddTag(Tag);
 
 	TArray<FGameplayAbilitySpec*> AbilitiesToActivate;
@@ -105,7 +162,12 @@ void AMDCharacterPlayer::GASInputReleased(FGameplayTag Tag)
 	for (auto GameplayAbilitySpec : AbilitiesToActivate)
 	{
 		ASC->AbilitySpecInputReleased(*GameplayAbilitySpec);
-	}
+	}*/
+}
+
+void AMDCharacterPlayer::StopMovement()
+{
+	GetController()->StopMovement();
 }
 
 void AMDCharacterPlayer::BeginPlay()
