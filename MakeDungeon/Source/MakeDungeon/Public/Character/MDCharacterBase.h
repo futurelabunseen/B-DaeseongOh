@@ -23,17 +23,18 @@ public:
 	// Sets default values for this character's properties
 	AMDCharacterBase();
 
+	virtual void PreInitializeComponents() override;
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
 	//FORCEINLINE virtual UAnimMontage* GetAttackMontage() const { return AttackMontage; }
 	//FORCEINLINE class UMDAttackMontageData* GetAttackMontageData() const { return AttackMontageData; }
-	FORCEINLINE UMDWeaponBase* GetWeapon() const { return Weapon; }
-	FGameplayTag GetWeaponType() const;
+	FORCEINLINE UMDWeaponBase* GetWeapon() const { return Weapons[CurrentWeapon]; }
+	FORCEINLINE FGameplayTag GetWeaponType() const { return CurrentWeapon; }
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
 	UFUNCTION(BlueprintCallable)
-	virtual FVector GetAttackLocation() const;
+	virtual FVector GetAttackLocation() const { return FVector(); }
 	UFUNCTION(BlueprintCallable)
 	virtual FRotator GetAttackDirection() const;
 	
@@ -46,8 +47,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void SetIsCharged(bool IsCharged) { bIsCharged = IsCharged; }
-
-	void SwapWeapon(FGameplayTag Tag);
 
 	virtual void StopMovement() {}
 
@@ -67,8 +66,10 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UMDCharacterAttributeSet> AttributeSet;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
-	TObjectPtr<UMDWeaponBase> Weapon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	TMap<FGameplayTag, TObjectPtr<UMDWeaponBase>> Weapons;
+
+	FGameplayTag CurrentWeapon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MotionWarping")
 	TObjectPtr<UMotionWarpingComponent> MWC;

@@ -5,7 +5,6 @@
 #include "GameFramework/Pawn.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "InputActionValue.h"
 #include "Player/MDPlayerState.h"
 #include "AbilitySystemComponent.h"
 #include "Data/MDInputData.h"
@@ -14,8 +13,9 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Tags/MDGameplayTag.h"
 #include "GameplayTagContainer.h"
-#include "Character/MDCharacterBase.h"
-#include "Item/MDWeaponBase.h"
+#include "Character/MDCharacterPlayer.h"
+
+//#include "Item/MDWeaponBase.h"
 
 AMDPlayerController::AMDPlayerController()
 {
@@ -32,6 +32,7 @@ void AMDPlayerController::BeginPlay()
 	if (SubSystem)
 	{
 		SubSystem->AddMappingContext(InputData->DefaultMappingContext, 0);
+		SubSystem->AddMappingContext(InputData->WeaponMappingContext, 1);
 	}
 }
 
@@ -50,8 +51,12 @@ void AMDPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Completed, this, &AMDPlayerController::OnMouseMoveReleased);
 
 		EnhancedInputComponent->BindAction(InputData->WeaponSwapAction, ETriggerEvent::Started, this, &AMDPlayerController::SwapWeapon);
-		
 
+		EnhancedInputComponent->BindAction(InputData->AttackAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_WEAPON_PRIMARYATTACK);
+		EnhancedInputComponent->BindAction(InputData->SkillAction_01, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_WEAPON_SKILL_01);
+		EnhancedInputComponent->BindAction(InputData->SkillAction_01, ETriggerEvent::Completed, this, &AMDPlayerController::GASInputReleased, MDTAG_WEAPON_SKILL_01);
+		EnhancedInputComponent->BindAction(InputData->SkillAction_02, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_WEAPON_SKILL_02);
+		EnhancedInputComponent->BindAction(InputData->SkillAction_03, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_WEAPON_SKILL_03);
 	}
 }
 
@@ -116,23 +121,9 @@ void AMDPlayerController::OnMouseMoveReleased()
 
 void AMDPlayerController::SwapWeapon()
 {
-	AMDCharacterBase* MDChatacter = CastChecked<AMDCharacterBase>(GetPawn());
+	AMDCharacterPlayer* MDPlayer = CastChecked<AMDCharacterPlayer>(GetPawn());
 
-	UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-
-	if(SubSystem)
-	{
-		UMDWeaponBase* MDWeapon = MDChatacter->GetWeapon();
-
-		if (!MDWeapon->GetWeaponAttackData() || MDTAG_WEAPON_TWOHANDEDSWORD != MDWeapon->GetWeaponAttackData()->WeaponType)
-		{
-			MDChatacter->SwapWeapon(MDTAG_WEAPON_TWOHANDEDSWORD);
-		}
-		else
-		{
-			MDChatacter->SwapWeapon(MDTAG_WEAPON_BOW);
-		}
-	}
+	MDPlayer->SwapWeapon(MDTAG_WEAPON_TWOHANDEDSWORD);
 }
 
 void AMDPlayerController::GASInputStarted(FGameplayTag Tag)
@@ -148,38 +139,40 @@ void AMDPlayerController::GASInputStarted(FGameplayTag Tag)
 void AMDPlayerController::GASInputPressed(FGameplayTag Tag)
 {
 	UAbilitySystemComponent* ASC = GetPlayerState<AMDPlayerState>()->GetAbilitySystemComponent();
+	
+	TArray<FGameplayAbilitySpec> ActivatableAbilities = ASC->GetActivatableAbilities();
 
-	FGameplayTagContainer TagContainer;
-	TagContainer.AddTag(Tag);
-
-	TArray<FGameplayAbilitySpec*> AbilitiesToActivate;
-	ASC->GetActivatableGameplayAbilitySpecsByAllMatchingTags(TagContainer, AbilitiesToActivate);
-
-	for (auto GameplayAbilitySpec : AbilitiesToActivate)
+	for (auto& Spec : ActivatableAbilities)
 	{
-		if(GameplayAbilitySpec->IsActive())
+		if (Spec.Ability && Spec.Ability->AbilityTags.HasTag(Tag))
 		{
-			ASC->AbilitySpecInputPressed(*GameplayAbilitySpec);
-		}
-		else
-		{
-			ASC->TryActivateAbility(GameplayAbilitySpec->Handle);
+			if (Spec.IsActive())
+			{
+				ASC->AbilitySpecInputPressed(Spec);
+			}
+			else
+			{
+				ASC->TryActivateAbility(Spec.Handle);
+			}
 		}
 	}
+
 }
 
 void AMDPlayerController::GASInputReleased(FGameplayTag Tag)
 {
 	UAbilitySystemComponent* ASC = GetPlayerState<AMDPlayerState>()->GetAbilitySystemComponent();
 
-	FGameplayTagContainer TagContainer;
-	TagContainer.AddTag(Tag);
+	TArray<FGameplayAbilitySpec> ActivatableAbilities = ASC->GetActivatableAbilities();
 
-	TArray<FGameplayAbilitySpec*> AbilitiesToActivate;
-	ASC->GetActivatableGameplayAbilitySpecsByAllMatchingTags(TagContainer, AbilitiesToActivate);
-
-	for (auto GameplayAbilitySpec : AbilitiesToActivate)
+	for (auto& Spec : ActivatableAbilities)
 	{
-		ASC->AbilitySpecInputReleased(*GameplayAbilitySpec);
+		if (Spec.Ability && Spec.Ability->AbilityTags.HasTag(Tag))
+		{
+			if (Spec.IsActive())
+			{
+				ASC->AbilitySpecInputReleased(Spec);
+			}
+		}
 	}
 }

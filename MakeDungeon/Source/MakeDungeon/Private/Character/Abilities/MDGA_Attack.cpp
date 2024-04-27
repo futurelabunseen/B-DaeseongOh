@@ -19,7 +19,8 @@ void UMDGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
 	
-	UMDWeaponBase* Weapon = MDCharacter->GetWeapon();
+	//Refactoring
+	/*UMDWeaponBase* Weapon = MDCharacter->GetWeapon();
 	if (!Weapon->GetWeaponAttackData())
 	{
 		bool bReplicatedEndAbility = true;
@@ -42,7 +43,7 @@ void UMDGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 		StartComboTimer();
 		
 		MDCharacter->StopMovement();
-	}
+	}*/
 
 	MDCharacter->SetIsTrackingTarget(true);
 

@@ -12,9 +12,9 @@ class UGameplayAbility;
 class AMDCharacterBase;
 class UMDWeaponInputData;
 
-enum class EMDSkillMontage : uint8
+enum class EMDMontage : uint8
 {
-	Skill_01, Skill_02, Skill_03, Skill_04
+	PrimaryAttack, Skill_01, Skill_02, Skill_03, Skill_04
 };
 
 /**
@@ -28,20 +28,28 @@ class MAKEDUNGEON_API UMDWeaponBase : public USkeletalMeshComponent
 public:
 	UMDWeaponBase();
 
-	FORCEINLINE UAnimMontage* GetAttackMontage() const { return WeaponAttackData->AttackMontage; }
-	FORCEINLINE UMDWeaponAttackData* GetWeaponAttackData() const { return WeaponAttackData; }
-	FORCEINLINE UAnimMontage* GetSkillMontage(EMDSkillMontage MontageIndex = EMDSkillMontage::Skill_01) const { return WeaponAttackData->SkillMontage[static_cast<uint8>(MontageIndex)]; }
-	void SetWeaponAttackData(AMDCharacterBase* InCharacter, UMDWeaponAttackData* WeaponData);
+	//FORCEINLINE UAnimMontage* GetAttackMontage() const { return WeaponAttackData->AttackMontage; }
+	//FORCEINLINE UMDWeaponAttackData* GetWeaponAttackData() const { return WeaponAttackData; }
+	FORCEINLINE UAnimMontage* GetMontage(EMDMontage MontageIndex = EMDMontage::PrimaryAttack) const { return Montage[static_cast<uint8>(MontageIndex)]; }
+	FORCEINLINE FGameplayTag GetWeaponType() { return WeaponType; }
+	//void SetWeaponAttackData(AMDCharacterBase* InCharacter, UMDWeaponAttackData* WeaponData);
+	virtual void InitializeComponent() override;
 
-	void EquipWeapon(AMDCharacterBase* InCharacter);
-	void UnequipWeapon(AMDCharacterBase* InCharacter);
-	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<UMDWeaponAttackData> WeaponAttackData;
+	TArray<TObjectPtr<UAnimMontage>> Montage;
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	TObjectPtr<UMDWeaponAttackData> WeaponAttackData;*/
+
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	TArray<TSubclassOf<UGameplayAbility>> WeaponAbilities;
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TMap<FGameplayTag, TSubclassOf<UGameplayAbility>> WeaponInputAbilities;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Type")
+	FGameplayTag WeaponType;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Data")

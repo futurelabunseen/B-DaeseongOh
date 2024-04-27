@@ -18,7 +18,8 @@ void UMDGA_Sword_LeapAttack::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
 
-	UMDWeaponBase* Weapon = MDCharacter->GetWeapon();
+	//Refactoring
+	/*UMDWeaponBase* Weapon = MDCharacter->GetWeapon();
 	if (!Weapon->GetWeaponAttackData())
 	{
 		bool bReplicatedEndAbility = true;
@@ -28,7 +29,7 @@ void UMDGA_Sword_LeapAttack::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 		return;
 	}
 
-	UAnimMontage* SkillMontage = Weapon->GetSkillMontage();
+	UAnimMontage* SkillMontage = Weapon->GetMontage(EMDMontage::Skill_01);
 	if (SkillMontage)
 	{
 		MDCharacter->StopMovement();
@@ -36,7 +37,7 @@ void UMDGA_Sword_LeapAttack::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 		PlayAttackMontageTask->OnCompleted.AddDynamic(this, &UMDGA_Sword_LeapAttack::OnCompletedCallback);
 		PlayAttackMontageTask->OnInterrupted.AddDynamic(this, &UMDGA_Sword_LeapAttack::OnInterruptedCallback);
 		PlayAttackMontageTask->ReadyForActivation();
-	}
+	}*/
 }
 
 void UMDGA_Sword_LeapAttack::OnCompletedCallback()

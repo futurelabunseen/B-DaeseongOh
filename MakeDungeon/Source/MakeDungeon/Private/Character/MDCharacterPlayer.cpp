@@ -10,6 +10,7 @@
 #include "Player/MDPlayerState.h"
 #include "AbilitySystemComponent.h"
 #include "Item/MDWeaponBase.h"
+#include "Tags/MDGameplayTag.h"
 #include "../MakeDungeon.h"
 
 
@@ -61,7 +62,7 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 		APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
 		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 	}
-	Weapon->EquipWeapon(this);
+
 }
 
 FVector AMDCharacterPlayer::GetAttackLocation() const
@@ -87,87 +88,32 @@ FRotator AMDCharacterPlayer::GetAttackDirection() const
 	return FRotationMatrix::MakeFromX(MouseLocation - StartPoint).Rotator();
 }
 
-void AMDCharacterPlayer::GASInputStarted(FGameplayTag Tag)
-{
-	FGameplayTagContainer TagContainer;
-	TagContainer.AddTag(Tag);
-
-	ASC->TryActivateAbilitiesByTag(TagContainer);
-}
-
-void AMDCharacterPlayer::GASInputPressed(FGameplayTag Tag)
-{
-	TArray<FGameplayAbilitySpec> ActivatableAbilities = ASC->GetActivatableAbilities();
-
-	for (auto& Spec : ActivatableAbilities)
-	{
-		if (Spec.Ability && Spec.Ability->AbilityTags.HasTag(Tag))
-		{
-			if (Spec.IsActive())
-			{
-				ASC->AbilitySpecInputPressed(Spec);
-				//MD_LOG(LogMD, Log, TEXT("Pressed"));
-			}
-			else
-			{
-				ASC->TryActivateAbility(Spec.Handle);
-				MD_LOG(LogMD, Log, TEXT("Activate"));
-			}
-		}
-	}
-
-	//If Input TagContainer
-	/*FGameplayTagContainer TagContainer;
-	TagContainer.AddTag(Tag);
-
-	TArray<FGameplayAbilitySpec*> AbilitiesToActivate;
-	ASC->GetActivatableGameplayAbilitySpecsByAllMatchingTags(TagContainer, AbilitiesToActivate);
-
-	for (auto GameplayAbilitySpec : AbilitiesToActivate)
-	{
-		if (GameplayAbilitySpec->IsActive())
-		{
-			ASC->AbilitySpecInputPressed(*GameplayAbilitySpec);
-		}
-		else
-		{
-			ASC->TryActivateAbility(GameplayAbilitySpec->Handle);
-		}
-	}*/
-}
-
-void AMDCharacterPlayer::GASInputReleased(FGameplayTag Tag)
-{
-	TArray<FGameplayAbilitySpec> ActivatableAbilities = ASC->GetActivatableAbilities();
-
-	for (auto& Spec : ActivatableAbilities)
-	{
-		if (Spec.Ability && Spec.Ability->AbilityTags.HasTag(Tag))
-		{
-			if(Spec.IsActive())
-			{
-				ASC->AbilitySpecInputReleased(Spec);
-				//MD_LOG(LogMD, Log, TEXT("Released"));
-			}
-		}
-	}
-
-	//If Input TagContainer
-	/*FGameplayTagContainer TagContainer;
-	TagContainer.AddTag(Tag);
-
-	TArray<FGameplayAbilitySpec*> AbilitiesToActivate;
-	ASC->GetActivatableGameplayAbilitySpecsByAllMatchingTags(TagContainer, AbilitiesToActivate);
-
-	for (auto GameplayAbilitySpec : AbilitiesToActivate)
-	{
-		ASC->AbilitySpecInputReleased(*GameplayAbilitySpec);
-	}*/
-}
-
 void AMDCharacterPlayer::StopMovement()
 {
 	GetController()->StopMovement();
+}
+
+void AMDCharacterPlayer::SwapWeapon(FGameplayTag Tag)
+{
+	UMDWeaponBase* Weapon = Weapons.Find(Tag)->Get();
+	if (Weapon)
+	{
+		FGameplayTagContainer CurrentOwnedTags;
+		ASC->GetOwnedGameplayTags(CurrentOwnedTags);
+
+		if (CurrentOwnedTags.HasTag(MDTAG_WEAPON_TYPE))
+		{
+			ASC->RemoveLooseGameplayTag(MDTAG_WEAPON_TYPE);
+		}
+
+		//OnOff Visible
+
+		ASC->AddLooseGameplayTag(Tag);
+	}
+	else
+	{
+		MD_LOG(LogMD, Error, TEXT("No Weapon"));
+	}
 }
 
 void AMDCharacterPlayer::BeginPlay()

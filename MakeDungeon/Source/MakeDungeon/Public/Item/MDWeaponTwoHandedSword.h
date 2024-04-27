@@ -14,4 +14,6 @@ class MAKEDUNGEON_API UMDWeaponTwoHandedSword : public UMDWeaponBase
 {
 	GENERATED_BODY()
 	
+public:
+	UMDWeaponTwoHandedSword();
 };

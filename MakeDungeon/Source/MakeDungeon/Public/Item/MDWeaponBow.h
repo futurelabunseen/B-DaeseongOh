@@ -14,4 +14,6 @@ class MAKEDUNGEON_API UMDWeaponBow : public UMDWeaponBase
 {
 	GENERATED_BODY()
 	
+public:
+	UMDWeaponBow();
 };

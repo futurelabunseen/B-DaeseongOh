@@ -3,3 +3,6 @@
 
 #include "Item/MDWeaponTwoHandedSword.h"
 
+UMDWeaponTwoHandedSword::UMDWeaponTwoHandedSword()
+{
+}

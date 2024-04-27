@@ -47,12 +47,17 @@ AMDCharacterBase::AMDCharacterBase()
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
 
-	Weapon = CreateDefaultSubobject<UMDWeaponBase>(TEXT("Weapon"));
-
 	MWC = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
 
 	TrackingSpeed = 20.f;
 	bIsTrackingTarget = false;
+}
+
+void AMDCharacterBase::PreInitializeComponents()
+{
+	Super::PreInitializeComponents();
+
+
 }
 
 void AMDCharacterBase::BeginPlay()
@@ -72,41 +77,12 @@ void AMDCharacterBase::Tick(float DeltaSeconds)
 	}
 }
 
-FGameplayTag AMDCharacterBase::GetWeaponType() const
-{
-	FGameplayTag CurentWeaponType = FGameplayTag();
-
-	if (UMDWeaponAttackData* WeaponData = Weapon->GetWeaponAttackData())
-	{
-		CurentWeaponType = WeaponData->WeaponType;
-	}
-
-	return CurentWeaponType;
-}
-
 UAbilitySystemComponent* AMDCharacterBase::GetAbilitySystemComponent() const
 {
 	return ASC;
 }
 
-FVector AMDCharacterBase::GetAttackLocation() const
-{
-	return FVector();
-}
-
 FRotator AMDCharacterBase::GetAttackDirection() const
 {
 	return FRotationMatrix::MakeFromX(GetActorForwardVector()).Rotator();
-}
-
-void AMDCharacterBase::SwapWeapon(FGameplayTag Tag)
-{
-	if (MDTAG_WEAPON_TWOHANDEDSWORD == Tag)
-	{
-		Weapon->SetWeaponAttackData(this, LoadObject<UMDWeaponAttackData>(NULL, TEXT("/Script/MakeDungeon.MDWeaponAttackData'/Game/MakeDungeon/Data/MD_Attack_TwoHandedSword.MD_Attack_TwoHandedSword'")));
-	}
-	else if (MDTAG_WEAPON_BOW == Tag)
-	{
-		Weapon->SetWeaponAttackData(this, LoadObject<UMDWeaponAttackData>(NULL, TEXT("/Script/MakeDungeon.MDWeaponAttackData'/Game/MakeDungeon/Data/MD_Attack_Bow.MD_Attack_Bow'")));
-	}
 }

@@ -23,11 +23,9 @@ public:
 	virtual FVector GetAttackLocation() const override;
 	virtual FRotator GetAttackDirection() const override;
 
-	void GASInputStarted(FGameplayTag Tag);
-	void GASInputPressed(FGameplayTag Tag);
-	void GASInputReleased(FGameplayTag Tag);
-	
 	virtual void StopMovement() override;
+
+	void SwapWeapon(FGameplayTag Tag);
 
 protected:
 	virtual void BeginPlay() override;

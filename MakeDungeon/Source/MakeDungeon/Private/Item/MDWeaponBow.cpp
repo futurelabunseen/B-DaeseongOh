@@ -3,3 +3,6 @@
 
 #include "Item/MDWeaponBow.h"
 
+UMDWeaponBow::UMDWeaponBow()
+{
+}
