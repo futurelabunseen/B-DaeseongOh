@@ -33,10 +33,6 @@ protected:
 	UFUNCTION()
 	void OnInterruptedCallback();
 
-protected:
-	UPROPERTY()
-	TObjectPtr<class UMDWeaponAttackData> CurrentWeaponAttackData;
-
 private:
 	uint8 bInputReleased : 1;
 	float AnimPlaySpeed;

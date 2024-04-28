@@ -17,19 +17,10 @@ void UMDGA_Sword_LeapAttack::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
-
-	//Refactoring
-	/*UMDWeaponBase* Weapon = MDCharacter->GetWeapon();
-	if (!Weapon->GetWeaponAttackData())
-	{
-		bool bReplicatedEndAbility = true;
-		bool bWasCancelled = true;
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
-		MD_LOG(LogMD, Log, TEXT("No Weapon"));
-		return;
-	}
-
-	UAnimMontage* SkillMontage = Weapon->GetMontage(EMDMontage::Skill_01);
+	
+	UMDWeaponBase* Weapon = MDCharacter->GetWeapon();
+	
+	UAnimMontage* SkillMontage = Weapon->GetMontage(EMDAttackType::Skill_02);
 	if (SkillMontage)
 	{
 		MDCharacter->StopMovement();
@@ -37,7 +28,7 @@ void UMDGA_Sword_LeapAttack::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 		PlayAttackMontageTask->OnCompleted.AddDynamic(this, &UMDGA_Sword_LeapAttack::OnCompletedCallback);
 		PlayAttackMontageTask->OnInterrupted.AddDynamic(this, &UMDGA_Sword_LeapAttack::OnInterruptedCallback);
 		PlayAttackMontageTask->ReadyForActivation();
-	}*/
+	}
 }
 
 void UMDGA_Sword_LeapAttack::OnCompletedCallback()

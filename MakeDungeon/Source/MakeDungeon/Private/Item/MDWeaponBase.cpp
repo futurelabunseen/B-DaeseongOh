@@ -13,12 +13,11 @@ UMDWeaponBase::UMDWeaponBase()
 {
 }
 
-void UMDWeaponBase::InitializeComponent()
+void UMDWeaponBase::InitWeapon(AMDCharacterBase* InCharacter)
 {
-	Super::InitializeComponent();
-
-	AMDCharacterBase* MDCharacter = Cast<AMDCharacterBase>(GetOwner());
-	UAbilitySystemComponent* ASC = MDCharacter->GetAbilitySystemComponent();
+	UAbilitySystemComponent* ASC = InCharacter->GetAbilitySystemComponent();
+	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+	AttachToComponent(InCharacter->GetMesh(), AttachmentRules, FName(TEXT("Weapon_R")));
 
 	for (auto& WeaponAbility : WeaponAbilities)
 	{

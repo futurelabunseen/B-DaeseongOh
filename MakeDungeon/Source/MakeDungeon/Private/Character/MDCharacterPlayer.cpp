@@ -11,6 +11,7 @@
 #include "AbilitySystemComponent.h"
 #include "Item/MDWeaponBase.h"
 #include "Tags/MDGameplayTag.h"
+#include "Player/MDPlayerController.h"
 #include "../MakeDungeon.h"
 
 
@@ -95,28 +96,45 @@ void AMDCharacterPlayer::StopMovement()
 
 void AMDCharacterPlayer::SwapWeapon(FGameplayTag Tag)
 {
-	UMDWeaponBase* Weapon = Weapons.Find(Tag)->Get();
-	if (Weapon)
+	if (Tag != CurrentWeapon)
 	{
-		FGameplayTagContainer CurrentOwnedTags;
-		ASC->GetOwnedGameplayTags(CurrentOwnedTags);
-
-		if (CurrentOwnedTags.HasTag(MDTAG_WEAPON_TYPE))
+		UMDWeaponBase* Weapon = Weapons.Find(Tag)->Get();
+		if (Weapon)
 		{
-			ASC->RemoveLooseGameplayTag(MDTAG_WEAPON_TYPE);
+			FGameplayTagContainer CurrentOwnedTags;
+			ASC->GetOwnedGameplayTags(CurrentOwnedTags);
+
+			if (CurrentOwnedTags.HasTag(CurrentWeapon))
+			{
+				ASC->RemoveLooseGameplayTag(CurrentWeapon);
+			}
+
+			//Off Current
+
+			CurrentWeapon = Tag;
+
+			//On New
+
+			ASC->AddLooseGameplayTag(CurrentWeapon);
 		}
-
-		//OnOff Visible
-
-		ASC->AddLooseGameplayTag(Tag);
-	}
-	else
-	{
-		MD_LOG(LogMD, Error, TEXT("No Weapon"));
+		else
+		{
+			MD_LOG(LogMD, Error, TEXT("No Weapon"));
+		}
 	}
 }
 
 void AMDCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();	
+
+	/*APlayerState* PS = GetPlayerState();
+	if (PS)
+	{
+		AMDPlayerController* MDPlayerController = Cast<AMDPlayerController>(PS->GetPlayerController());
+		if (MDPlayerController)
+		{
+			MDPlayerController->SetupWeaponInput();
+		}
+	}*/
 }

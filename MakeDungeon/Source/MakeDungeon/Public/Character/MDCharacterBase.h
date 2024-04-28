@@ -23,7 +23,11 @@ public:
 	// Sets default values for this character's properties
 	AMDCharacterBase();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	TMap<FGameplayTag, TSubclassOf<UMDWeaponBase>> WeaponsInfo;
+
 	virtual void PreInitializeComponents() override;
+	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
@@ -56,6 +60,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	TObjectPtr<class UMDWeaponAttackData> AttackMontageData;*/
+	void InitWeapons();
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TObjectPtr<UAbilitySystemComponent> ASC;
@@ -66,7 +71,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UMDCharacterAttributeSet> AttributeSet;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	UPROPERTY()
 	TMap<FGameplayTag, TObjectPtr<UMDWeaponBase>> Weapons;
 
 	FGameplayTag CurrentWeapon;

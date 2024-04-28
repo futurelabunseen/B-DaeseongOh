@@ -14,6 +14,7 @@
 #include "Tags/MDGameplayTag.h"
 #include "GameplayTagContainer.h"
 #include "Character/MDCharacterPlayer.h"
+#include "../MakeDungeon.h"
 
 //#include "Item/MDWeaponBase.h"
 
@@ -123,7 +124,16 @@ void AMDPlayerController::SwapWeapon()
 {
 	AMDCharacterPlayer* MDPlayer = CastChecked<AMDCharacterPlayer>(GetPawn());
 
-	MDPlayer->SwapWeapon(MDTAG_WEAPON_TWOHANDEDSWORD);
+	if (MDTAG_WEAPON_TWOHANDEDSWORD == MDPlayer->GetWeaponType())
+	{
+		MDPlayer->SwapWeapon(MDTAG_WEAPON_BOW);
+	}
+	else
+	{
+		MDPlayer->SwapWeapon(MDTAG_WEAPON_TWOHANDEDSWORD);
+	}
+
+	
 }
 
 void AMDPlayerController::GASInputStarted(FGameplayTag Tag)

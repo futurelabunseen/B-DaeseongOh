@@ -35,7 +35,7 @@ protected:
 
 protected:
 	UPROPERTY()
-	TObjectPtr<class UMDWeaponAttackData> CurrentWeaponAttackData;
+	TObjectPtr<class UMDComboAttackData> CurrentComboAttackData;
 
 	uint8 CurrentCombo = 0;
 	FTimerHandle ComboTimerHandle;

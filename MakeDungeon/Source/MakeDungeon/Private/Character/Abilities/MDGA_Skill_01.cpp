@@ -19,46 +19,7 @@ void UMDGA_Skill_01::ActivateAbility(const FGameplayAbilitySpecHandle Handle, co
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
-
-	/*UMDWeaponBase* Weapon = MDCharacter->GetWeapon();
-	if (!Weapon->GetWeaponAttackData())
-	{
-		bool bReplicatedEndAbility = true;
-		bool bWasCancelled = true;
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
-		MD_LOG(LogMD, Log, TEXT("No Weapon"));
-		return;
-	}
-
-	CurrentWeaponAttackData = Weapon->GetWeaponAttackData();
-	if (CurrentWeaponAttackData->SkillMontage.IsEmpty())
-	{
-		bool bReplicatedEndAbility = true;
-		bool bWasCancelled = true;
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
-		MD_LOG(LogMD, Log, TEXT("SkillMontageIsEmpty"));
-		return;
-	}
-
-	UAnimMontage* SkillMontage = Weapon->GetSkillMontage(EMDSkillMontage::Skill_01);
-	if (SkillMontage)
-	{
-		UAbilityTask_PlayMontageAndWait* PlayAttackMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, 
-			TEXT("PlaySkill_01"), SkillMontage, 0.5f, FName("SkillStart"));
-		PlayAttackMontageTask->OnCompleted.AddDynamic(this, &UMDGA_Skill_01::OnCompletedStart);
-		PlayAttackMontageTask->OnInterrupted.AddDynamic(this, &UMDGA_Skill_01::OnInterruptedCallback);
-		PlayAttackMontageTask->ReadyForActivation();
-
-		MDCharacter->StopMovement();
-	}
-	else
-	{
-		bool bReplicatedEndAbility = true;
-		bool bWasCancelled = true;
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
-		MD_LOG(LogMD, Log, TEXT("No SkillMontage"));
-		return;
-	}*/
+	
 	bInputReleased = false;
 	MDCharacter->SetIsCharged(true);
 	UMDAnimInstance* AnimInst = Cast<UMDAnimInstance>(ActorInfo->GetAnimInstance());

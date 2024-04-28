@@ -5,16 +5,22 @@
 #include "CoreMinimal.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameplayTagContainer.h"
-#include "Data/MDWeaponAttackData.h"
+#include "Data/MDComboAttackData.h"
 #include "MDWeaponBase.generated.h"
 
 class UGameplayAbility;
 class AMDCharacterBase;
 class UMDWeaponInputData;
 
-enum class EMDMontage : uint8
+UENUM()
+enum class EMDAttackType : uint8
 {
-	PrimaryAttack, Skill_01, Skill_02, Skill_03, Skill_04
+	None			UMETA(DisplayName = "None"),
+	PrimaryAttack	UMETA(DisplayName = "PrimaryAttack"), 
+	Skill_01		UMETA(DisplayName = "Skill_01"), 
+	Skill_02		UMETA(DisplayName = "Skill_02"), 
+	Skill_03		UMETA(DisplayName = "Skill_03"), 
+	Skill_04		UMETA(DisplayName = "Skill_04")
 };
 
 /**
@@ -29,18 +35,18 @@ public:
 	UMDWeaponBase();
 
 	//FORCEINLINE UAnimMontage* GetAttackMontage() const { return WeaponAttackData->AttackMontage; }
-	//FORCEINLINE UMDWeaponAttackData* GetWeaponAttackData() const { return WeaponAttackData; }
-	FORCEINLINE UAnimMontage* GetMontage(EMDMontage MontageIndex = EMDMontage::PrimaryAttack) const { return Montage[static_cast<uint8>(MontageIndex)]; }
+	FORCEINLINE UMDComboAttackData* GetComboAttackData(EMDAttackType AttackIndex = EMDAttackType::PrimaryAttack) const { return ComboAttackData[AttackIndex]; }
+	FORCEINLINE UAnimMontage* GetMontage(EMDAttackType AttackIndex = EMDAttackType::PrimaryAttack) const { return Montage[AttackIndex]; }
 	FORCEINLINE FGameplayTag GetWeaponType() { return WeaponType; }
 	//void SetWeaponAttackData(AMDCharacterBase* InCharacter, UMDWeaponAttackData* WeaponData);
-	virtual void InitializeComponent() override;
+	void InitWeapon(AMDCharacterBase* InCharacter);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TArray<TObjectPtr<UAnimMontage>> Montage;
+	TMap<EMDAttackType, TObjectPtr<UAnimMontage>> Montage;
 
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<UMDWeaponAttackData> WeaponAttackData;*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	TMap<EMDAttackType, TObjectPtr<UMDComboAttackData>> ComboAttackData;
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TArray<TSubclassOf<UGameplayAbility>> WeaponAbilities;

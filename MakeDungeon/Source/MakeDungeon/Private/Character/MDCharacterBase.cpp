@@ -56,14 +56,18 @@ AMDCharacterBase::AMDCharacterBase()
 void AMDCharacterBase::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
+}
 
-
+void AMDCharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
 }
 
 void AMDCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	InitWeapons();
 }
 
 void AMDCharacterBase::Tick(float DeltaSeconds)
@@ -85,4 +89,28 @@ UAbilitySystemComponent* AMDCharacterBase::GetAbilitySystemComponent() const
 FRotator AMDCharacterBase::GetAttackDirection() const
 {
 	return FRotationMatrix::MakeFromX(GetActorForwardVector()).Rotator();
+}
+
+void AMDCharacterBase::InitWeapons()
+{
+	bool IsFirst = true;
+
+	for (auto& WeaponInfo : WeaponsInfo)
+	{
+		if (IsFirst)
+		{
+			CurrentWeapon = WeaponInfo.Key;
+			IsFirst = false;
+		}
+
+		UMDWeaponBase* Weapon = nullptr;
+		Weapon = Cast<UMDWeaponBase>(AddComponentByClass(WeaponInfo.Value, true, FTransform::Identity, false));
+		if (Weapon)
+		{
+			Weapons.Add(WeaponInfo.Key, Weapon);
+			Weapon->InitWeapon(this);
+		}
+	}
+
+	ASC->AddLooseGameplayTag(CurrentWeapon);
 }
