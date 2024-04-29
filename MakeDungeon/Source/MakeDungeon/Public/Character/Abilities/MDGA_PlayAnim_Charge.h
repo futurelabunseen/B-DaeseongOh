@@ -4,32 +4,29 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
-#include "MDGA_Skill_01.generated.h"
+#include "MDGA_PlayAnim_Charge.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MAKEDUNGEON_API UMDGA_Skill_01 : public UGameplayAbility
+class MAKEDUNGEON_API UMDGA_PlayAnim_Charge : public UGameplayAbility
 {
 	GENERATED_BODY()
 	
 public:
-	UMDGA_Skill_01();
+	UMDGA_PlayAnim_Charge();
 
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-	virtual void InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
 	virtual void InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
 protected:
 	UFUNCTION()
-	void OnCompletedStart();
+	void OnCompleted();
 
 	UFUNCTION()
-	void OnCompletedEnd();
-
-	UFUNCTION()
-	void OnInterruptedCallback();
+	void OnInterrupted();
 
 private:
 	uint8 bInputReleased : 1;

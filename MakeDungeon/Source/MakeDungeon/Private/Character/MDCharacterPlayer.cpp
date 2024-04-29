@@ -94,27 +94,27 @@ void AMDCharacterPlayer::StopMovement()
 	GetController()->StopMovement();
 }
 
-void AMDCharacterPlayer::SwapWeapon(FGameplayTag Tag)
+void AMDCharacterPlayer::SwapWeapon(FGameplayTag Tag, UEnhancedInputLocalPlayerSubsystem* SubSysyem)
 {
 	if (Tag != CurrentWeapon)
 	{
-		UMDWeaponBase* Weapon = Weapons.Find(Tag)->Get();
+		UMDWeaponBase* Weapon = Weapons.Find(Tag)->Get(); 
 		if (Weapon)
 		{
 			FGameplayTagContainer CurrentOwnedTags;
 			ASC->GetOwnedGameplayTags(CurrentOwnedTags);
-
+			
 			if (CurrentOwnedTags.HasTag(CurrentWeapon))
 			{
 				ASC->RemoveLooseGameplayTag(CurrentWeapon);
 			}
 
+			SubSysyem->RemoveMappingContext(Weapons[CurrentWeapon]->GetMappingContext());
 			//Off Current
 
 			CurrentWeapon = Tag;
-
 			//On New
-
+			SubSysyem->AddMappingContext(Weapons[CurrentWeapon]->GetMappingContext(), 1);
 			ASC->AddLooseGameplayTag(CurrentWeapon);
 		}
 		else

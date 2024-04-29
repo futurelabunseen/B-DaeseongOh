@@ -7,6 +7,9 @@
 #define MDTAG_INPUT_SKILL01 FGameplayTag::RequestGameplayTag(FName("Player.Input.Skill_01"))
 #define MDTAG_INPUT_SKILL02 FGameplayTag::RequestGameplayTag(FName("Player.Input.Skill_02"))
 #define MDTAG_INPUT_SKILL03 FGameplayTag::RequestGameplayTag(FName("Player.Input.Skill_03"))
+#define MDTAG_INPUT_ANIMCHARGE FGameplayTag::RequestGameplayTag(FName("Player.Input.AnimCharge"))
+#define MDTAG_INPUT_ANIMCOMBO FGameplayTag::RequestGameplayTag(FName("Player.Input.AnimCombo"))
+#define MDTAG_INPUT_ANIMONCE FGameplayTag::RequestGameplayTag(FName("Player.Input.AnimOnce"))
 #define MDTAG_DATA_DAMAGE FGameplayTag::RequestGameplayTag(FName("Data.Damage"))
 
 #define MDTAG_WEAPON_TYPE FGameplayTag::RequestGameplayTag(FName("Weapon.Type"))

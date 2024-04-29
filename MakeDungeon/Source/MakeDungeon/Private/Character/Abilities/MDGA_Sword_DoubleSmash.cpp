@@ -15,16 +15,17 @@ void UMDGA_Sword_DoubleSmash::ActivateAbility(const FGameplayAbilitySpecHandle H
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
+	/*AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
 
-	if (SkillMontage)
+	MDCh
+	if ()
 	{
 		MDCharacter->StopMovement();
 		UAbilityTask_PlayMontageAndWait* PlayAttackMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayAttack"), SkillMontage);
 		PlayAttackMontageTask->OnCompleted.AddDynamic(this, &UMDGA_Sword_DoubleSmash::OnCompletedCallback);
 		PlayAttackMontageTask->OnInterrupted.AddDynamic(this, &UMDGA_Sword_DoubleSmash::OnInterruptedCallback);
 		PlayAttackMontageTask->ReadyForActivation();
-	}
+	}*/
 }
 
 void UMDGA_Sword_DoubleSmash::OnCompletedCallback()

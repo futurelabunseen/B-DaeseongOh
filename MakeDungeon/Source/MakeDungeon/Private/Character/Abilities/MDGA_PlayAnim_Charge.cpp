@@ -1,25 +1,25 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Character/Abilities/MDGA_Skill_01.h"
+#include "Character/Abilities/MDGA_PlayAnim_Charge.h"
 #include "Character/MDCharacterBase.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Item/MDWeaponBase.h"
 #include "Animation/MDAnimInstance.h"
 #include "../MakeDungeon.h"
 
-UMDGA_Skill_01::UMDGA_Skill_01()
+UMDGA_PlayAnim_Charge::UMDGA_PlayAnim_Charge()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	AnimPlaySpeed = 0.5f;
 }
 
-void UMDGA_Skill_01::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UMDGA_PlayAnim_Charge::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
-	
+
 	bInputReleased = false;
 	MDCharacter->SetIsCharged(true);
 	UMDAnimInstance* AnimInst = Cast<UMDAnimInstance>(ActorInfo->GetAnimInstance());
@@ -31,46 +31,33 @@ void UMDGA_Skill_01::ActivateAbility(const FGameplayAbilitySpecHandle Handle, co
 	MD_LOG(LogMD, Log, TEXT("Activate"));
 }
 
-void UMDGA_Skill_01::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
+void UMDGA_PlayAnim_Charge::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
-	
-}
-
-void UMDGA_Skill_01::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
-{
-	if(!bInputReleased)
+	if (!bInputReleased)
 	{
 		bInputReleased = true;
-
-		AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
-		MDCharacter->SetIsCharged(false);
-
-		MD_LOG(LogMD, Log, TEXT("Released"));
-
-		bool bReplicatedEndAbility = true;
-		bool bWasCancelled = false;
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
+		OnCompleted();
 	}
+
+	MD_LOG(LogMD, Log, TEXT("Released"));
 }
 
-void UMDGA_Skill_01::OnCompletedStart()
-{
-	MD_LOG(LogMD, Log, TEXT("Charged"));
-}
-
-void UMDGA_Skill_01::OnCompletedEnd()
+void UMDGA_PlayAnim_Charge::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(CurrentActorInfo->AvatarActor.Get());
 	MDCharacter->SetIsCharged(false);
-	bInputReleased = false;
 
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
+void UMDGA_PlayAnim_Charge::OnCompleted()
+{
 	bool bReplicatedEndAbility = true;
 	bool bWasCancelled = false;
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
-	MD_LOG(LogMD, Log, TEXT("End"));
 }
 
-void UMDGA_Skill_01::OnInterruptedCallback()
+void UMDGA_PlayAnim_Charge::OnInterrupted()
 {
 	bool bReplicatedEndAbility = true;
 	bool bWasCancelled = true;

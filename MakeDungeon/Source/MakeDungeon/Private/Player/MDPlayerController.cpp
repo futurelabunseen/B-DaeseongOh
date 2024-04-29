@@ -33,7 +33,6 @@ void AMDPlayerController::BeginPlay()
 	if (SubSystem)
 	{
 		SubSystem->AddMappingContext(InputData->DefaultMappingContext, 0);
-		SubSystem->AddMappingContext(InputData->WeaponMappingContext, 1);
 	}
 }
 
@@ -52,6 +51,11 @@ void AMDPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Completed, this, &AMDPlayerController::OnMouseMoveReleased);
 
 		EnhancedInputComponent->BindAction(InputData->WeaponSwapAction, ETriggerEvent::Started, this, &AMDPlayerController::SwapWeapon);
+		
+		EnhancedInputComponent->BindAction(InputData->PlayAnim_ChargeAction, ETriggerEvent::Completed, this, &AMDPlayerController::GASInputReleased, MDTAG_INPUT_ANIMCHARGE);
+		EnhancedInputComponent->BindAction(InputData->PlayAnim_ChargeAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_INPUT_ANIMCHARGE);
+		EnhancedInputComponent->BindAction(InputData->PlayAnim_ComboAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_INPUT_ANIMCOMBO);
+		EnhancedInputComponent->BindAction(InputData->PlayAnim_OnceAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_INPUT_ANIMONCE);
 
 		EnhancedInputComponent->BindAction(InputData->AttackAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_WEAPON_PRIMARYATTACK);
 		EnhancedInputComponent->BindAction(InputData->SkillAction_01, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_WEAPON_SKILL_01);
@@ -123,14 +127,15 @@ void AMDPlayerController::OnMouseMoveReleased()
 void AMDPlayerController::SwapWeapon()
 {
 	AMDCharacterPlayer* MDPlayer = CastChecked<AMDCharacterPlayer>(GetPawn());
-
-	if (MDTAG_WEAPON_TWOHANDEDSWORD == MDPlayer->GetWeaponType())
+	UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	
+	if (MDTAG_WEAPON_TWOHANDEDSWORD == MDPlayer->GetWeaponType() && SubSystem)
 	{
-		MDPlayer->SwapWeapon(MDTAG_WEAPON_BOW);
+		MDPlayer->SwapWeapon(MDTAG_WEAPON_BOW, SubSystem);
 	}
 	else
 	{
-		MDPlayer->SwapWeapon(MDTAG_WEAPON_TWOHANDEDSWORD);
+		MDPlayer->SwapWeapon(MDTAG_WEAPON_TWOHANDEDSWORD, SubSystem);
 	}
 
 	
@@ -159,10 +164,12 @@ void AMDPlayerController::GASInputPressed(FGameplayTag Tag)
 			if (Spec.IsActive())
 			{
 				ASC->AbilitySpecInputPressed(Spec);
+				MD_LOG(LogMD, Log, TEXT("Pressed"));
 			}
 			else
 			{
 				ASC->TryActivateAbility(Spec.Handle);
+				MD_LOG(LogMD, Log, TEXT("Activate"));
 			}
 		}
 	}
@@ -182,6 +189,7 @@ void AMDPlayerController::GASInputReleased(FGameplayTag Tag)
 			if (Spec.IsActive())
 			{
 				ASC->AbilitySpecInputReleased(Spec);
+				MD_LOG(LogMD, Log, TEXT("Released"));
 			}
 		}
 	}

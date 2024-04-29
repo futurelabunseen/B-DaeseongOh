@@ -35,6 +35,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|PlayerDefault", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> JumpAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|PlayerDefault", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> PlayAnim_ChargeAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|PlayerDefault", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> PlayAnim_ComboAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|PlayerDefault", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> PlayAnim_OnceAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Weapon", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputMappingContext> WeaponMappingContext;
 

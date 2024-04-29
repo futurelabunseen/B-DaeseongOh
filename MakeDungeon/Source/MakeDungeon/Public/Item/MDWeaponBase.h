@@ -11,6 +11,7 @@
 class UGameplayAbility;
 class AMDCharacterBase;
 class UMDWeaponInputData;
+class UInputMappingContext;
 
 UENUM()
 enum class EMDAttackType : uint8
@@ -34,14 +35,16 @@ class MAKEDUNGEON_API UMDWeaponBase : public USkeletalMeshComponent
 public:
 	UMDWeaponBase();
 
-	//FORCEINLINE UAnimMontage* GetAttackMontage() const { return WeaponAttackData->AttackMontage; }
 	FORCEINLINE UMDComboAttackData* GetComboAttackData(EMDAttackType AttackIndex = EMDAttackType::PrimaryAttack) const { return ComboAttackData[AttackIndex]; }
 	FORCEINLINE UAnimMontage* GetMontage(EMDAttackType AttackIndex = EMDAttackType::PrimaryAttack) const { return Montage[AttackIndex]; }
-	FORCEINLINE FGameplayTag GetWeaponType() { return WeaponType; }
-	//void SetWeaponAttackData(AMDCharacterBase* InCharacter, UMDWeaponAttackData* WeaponData);
+	FORCEINLINE FGameplayTag GetWeaponType() const { return WeaponType; }
+	FORCEINLINE UInputMappingContext* GetMappingContext() const { return WeaponMappingContext; }
 	void InitWeapon(AMDCharacterBase* InCharacter);
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputMappingContext> WeaponMappingContext;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	TMap<EMDAttackType, TObjectPtr<UAnimMontage>> Montage;
 

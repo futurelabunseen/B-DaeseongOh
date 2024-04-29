@@ -25,7 +25,7 @@ public:
 
 	virtual void StopMovement() override;
 
-	void SwapWeapon(FGameplayTag Tag);
+	void SwapWeapon(FGameplayTag Tag, class UEnhancedInputLocalPlayerSubsystem* SubSysyem);
 
 protected:
 	virtual void BeginPlay() override;
