@@ -4,6 +4,7 @@
 #include "Character/Abilities/MDGA_Sword_ChargeSwing.h"
 #include "Character/MDCharacterBase.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include "../MakeDungeon.h"
 
 UMDGA_Sword_ChargeSwing::UMDGA_Sword_ChargeSwing()
@@ -34,6 +35,9 @@ void UMDGA_Sword_ChargeSwing::InputReleased(const FGameplayAbilitySpecHandle Han
 	AMDCharacterBase* MDCharacter = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
 	MDCharacter->SetIsTrackingTarget(false);
 	DrawDebugSphere(GetWorld(), SpawnLocation, Radius, 16, FColor::Green, false, 1.f);
+
+	FGameplayEventData PayloadData;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActorFromActorInfo(), TriggerGameplayTag, PayloadData);
 
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 }

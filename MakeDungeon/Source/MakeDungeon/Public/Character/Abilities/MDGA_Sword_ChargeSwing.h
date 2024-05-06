@@ -21,6 +21,10 @@ public:
 	virtual void InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
 	virtual void InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
 
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTag TriggerGameplayTag;
+
 private:
 	float Radius;
 	FVector SpawnLocation;
