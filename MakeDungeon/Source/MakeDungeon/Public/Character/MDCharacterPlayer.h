@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MDCharacterBase.h"
-//#include "GameplayTagContainer.h"
+#include "Abilities/GameplayAbilityTypes.h"
 #include "MDCharacterPlayer.generated.h"
 
 /**
@@ -30,6 +30,12 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void OnOutOfHealth() override;
+
+	//Temp
+	void EquipWeapon(const FGameplayEventData* EventData);
+	void UnequipWeapon(const FGameplayEventData* EventData);
+
 // Camera Section
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
@@ -39,7 +45,6 @@ protected:
 	TObjectPtr<class UCameraComponent> FollowCamera;
 
 // Input Section
-protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TMap<FGameplayTag, TSubclassOf<UGameplayAbility>> InputAbilities;
 };

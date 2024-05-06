@@ -55,7 +55,7 @@ AMDProjectile::AMDProjectile()
 	//InitialLifeSpan = 3.0f;
 }
 
-void AMDProjectile::ShootProjectile(UWorld* WorldContextObject, UClass* Class, AActor* ProjectileOwner, APawn* ProjectileInstigator, const FVector& StartPoint, const FRotator& Direction, float ProjectileRange, EProjectileType Type)
+AMDProjectile* AMDProjectile::ShootProjectile(UWorld* WorldContextObject, UClass* Class, AActor* ProjectileOwner, APawn* ProjectileInstigator, const FVector& StartPoint, const FRotator& Direction, float ProjectileRange, EProjectileType Type, AActor* IgnoreActor)
 {
 	FTransform SpawnTransform = FTransform::Identity;
 	SpawnTransform.SetLocation(StartPoint);
@@ -64,7 +64,10 @@ void AMDProjectile::ShootProjectile(UWorld* WorldContextObject, UClass* Class, A
 	AMDProjectile* Projectile = WorldContextObject->SpawnActorDeferred<AMDProjectile>(Class, SpawnTransform, ProjectileOwner, ProjectileInstigator, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	Projectile->SetProjectileType(Type);
 	Projectile->Range = ProjectileRange;
+	Projectile->SetIgnoreTarget(IgnoreActor);
 	Projectile->FinishSpawning(SpawnTransform);
+
+	return Projectile;
 }
 
 void AMDProjectile::BeginPlay()
@@ -77,7 +80,10 @@ void AMDProjectile::BeginPlay()
 		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AMDProjectile::OnBeginOverlap);
 		break;
 	case EProjectileType::Spread:
-		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AMDProjectile::OnBeginOverlapAndSpread);
+		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AMDProjectile::OnBeginOverlap);
+		break;
+	case EProjectileType::Pierce:
+		CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AMDProjectile::OnBeginOverlap_Pierce);
 		break;
 	case EProjectileType::Mortar:
 		
@@ -86,6 +92,12 @@ void AMDProjectile::BeginPlay()
 		break;
 	}
 	
+}
+
+void AMDProjectile::SetDead()
+{
+	SetActorEnableCollision(false);
+	Destroy();
 }
 
 bool AMDProjectile::FindAroundTarget()
@@ -111,71 +123,92 @@ void AMDProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 {
 	if ((OtherActor != GetOwner()) && (OtherActor != GetInstigator()))
 	{
-		AMDCharacterBase* MDCharacter = Cast<AMDCharacterBase>(OtherActor);
-		if (!MDCharacter)
+		if(!IgnoreTarget || (IgnoreTarget && OtherActor != IgnoreTarget))
 		{
-
-		}
-
-		//UAbilitySystemComponent* ASC = MDCharacter->GetAbilitySystemComponent();
-		//if (ASC)
-		//{
-		//	//ActorLineTraceSingle
-		//	//GetWorld()->OverlapMultiByChannel()
-		//	//UKismetSystemLibrary::SphereOverlapActors()
-		//	//UKismetSystemLibrary::SphereTraceSingle()
-		//}
-
-		/*CollisionDisable();
-
-		UObjectPoolWorldSubsystem* ObjectPool = UWorld::GetSubsystem<UObjectPoolWorldSubsystem>(GetWorld());
-		ObjectPool->CollectObject(this);*/
-
-		MD_LOG(LogMD, Log, TEXT("Collect_Overlap"));
-	}
-}
-
-void AMDProjectile::OnBeginOverlapAndSpread(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	AActor* ProjectileOwner = GetOwner();
-	APawn* ProjectileInstigator = GetInstigator();
-	if ((OtherActor != ProjectileOwner) && (OtherActor != ProjectileInstigator))
-	{
-		AMDCharacterBase* BulletTest = Cast<AMDCharacterBase>(OtherActor);
-		if (BulletTest && false == bIsOverlapped)
-		{
-			bIsOverlapped = true;
-			TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-			TEnumAsByte PhysicsBody = UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_PhysicsBody);
-			TEnumAsByte Pawn = UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn);
-			ObjectTypes.Add(PhysicsBody);
-			ObjectTypes.Add(Pawn);
-
-			UClass* ClassFilter = AMDCharacterBase::StaticClass();
-
-			TArray<AActor*> ActorToIgnore;
-			ActorToIgnore.Add(OtherActor);
-			ActorToIgnore.Add(ProjectileInstigator);
-			TArray<AActor*> ResultActors;
-
-			FVector StartLocation = BulletTest->GetActorLocation();
-
-			UKismetSystemLibrary::SphereOverlapActors(GetWorld(), StartLocation, 700.f, ObjectTypes, ClassFilter, ActorToIgnore, ResultActors);
-			DrawDebugSphere(GetWorld(), StartLocation, 700.f, 16, FColor::Blue, false, 2.f);
-
-			for (auto& TargetActor : ResultActors)
+			AMDCharacterBase* MDCharacter = Cast<AMDCharacterBase>(OtherActor);
+			if (MDCharacter)
 			{
-				FRotator Direction = UKismetMathLibrary::FindLookAtRotation(StartLocation, TargetActor->GetActorLocation());
-
-				ShootProjectile(GetWorld(), this->StaticClass(), ProjectileOwner, ProjectileInstigator, StartLocation, Direction, Range);
+				SetDead();
 			}
 
-			Destroy();
-		}
+			//UAbilitySystemComponent* ASC = MDCharacter->GetAbilitySystemComponent();
+			//if (ASC)
+			//{
+			//	//ActorLineTraceSingle
+			//	//GetWorld()->OverlapMultiByChannel()
+			//	//UKismetSystemLibrary::SphereOverlapActors()
+			//	//UKismetSystemLibrary::SphereTraceSingle()
+			//}
 
-		MD_LOG(LogMD, Log, TEXT("Collect_Overlap"));
+			/*CollisionDisable();
+
+			UObjectPoolWorldSubsystem* ObjectPool = UWorld::GetSubsystem<UObjectPoolWorldSubsystem>(GetWorld());
+			ObjectPool->CollectObject(this);*/
+
+			MD_LOG(LogMD, Log, TEXT("Collect_Overlap"));
+		}
 	}
 }
+
+void AMDProjectile::OnBeginOverlap_Pierce(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if ((OtherActor != GetOwner()) && (OtherActor != GetInstigator()))
+	{
+		if (!IgnoreTarget || (IgnoreTarget && OtherActor != IgnoreTarget))
+		{
+			AMDCharacterBase* MDCharacter = Cast<AMDCharacterBase>(OtherActor);
+			if (MDCharacter)
+			{
+				//SetDead();
+			}
+
+			MD_LOG(LogMD, Log, TEXT("Collect_Overlap"));
+		}
+	}
+}
+
+//BeDelete
+//void AMDProjectile::OnBeginOverlapAndSpread(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	AActor* ProjectileOwner = GetOwner();
+//	APawn* ProjectileInstigator = GetInstigator();
+//	if ((OtherActor != ProjectileOwner) && (OtherActor != ProjectileInstigator))
+//	{
+//		AMDCharacterBase* BulletTest = Cast<AMDCharacterBase>(OtherActor);
+//		if (BulletTest && false == bIsOverlapped)
+//		{
+//			bIsOverlapped = true;
+//			TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+//			TEnumAsByte PhysicsBody = UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_PhysicsBody);
+//			TEnumAsByte Pawn = UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn);
+//			ObjectTypes.Add(PhysicsBody);
+//			ObjectTypes.Add(Pawn);
+//
+//			UClass* ClassFilter = AMDCharacterBase::StaticClass();
+//
+//			TArray<AActor*> ActorToIgnore;
+//			ActorToIgnore.Add(OtherActor);
+//			ActorToIgnore.Add(ProjectileInstigator);
+//			TArray<AActor*> ResultActors;
+//
+//			FVector StartLocation = BulletTest->GetActorLocation();
+//
+//			UKismetSystemLibrary::SphereOverlapActors(GetWorld(), StartLocation, 700.f, ObjectTypes, ClassFilter, ActorToIgnore, ResultActors);
+//			DrawDebugSphere(GetWorld(), StartLocation, 700.f, 16, FColor::Blue, false, 2.f);
+//
+//			for (auto& TargetActor : ResultActors)
+//			{
+//				FRotator Direction = UKismetMathLibrary::FindLookAtRotation(StartLocation, TargetActor->GetActorLocation());
+//
+//				ShootProjectile(GetWorld(), this->StaticClass(), ProjectileOwner, ProjectileInstigator, StartLocation, Direction, Range);
+//			}
+//
+//			Destroy();
+//		}
+//
+//		MD_LOG(LogMD, Log, TEXT("Collect_Overlap"));
+//	}
+//}
 
 void AMDProjectile::OnDestroyedCallBack(AActor* DestroyedActor)
 {

@@ -16,12 +16,14 @@ UMDGA_Sword_LeapAttack::UMDGA_Sword_LeapAttack()
 void UMDGA_Sword_LeapAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	CommitAbility(Handle, ActorInfo, ActivationInfo);
 
-	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
+	//OnCompletedCallback();
+	//AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
 	
-	UMDWeaponBase* Weapon = MDCharacter->GetWeapon();
+	//UMDWeaponBase* Weapon = MDCharacter->GetWeapon();
 	
-	UAnimMontage* SkillMontage = Weapon->GetMontage(EMDAttackType::Skill_02);
+	/*UAnimMontage* SkillMontage = Weapon->GetMontage(EMDAttackType::Skill_02);
 	if (SkillMontage)
 	{
 		MDCharacter->StopMovement();
@@ -29,7 +31,7 @@ void UMDGA_Sword_LeapAttack::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 		PlayAttackMontageTask->OnCompleted.AddDynamic(this, &UMDGA_Sword_LeapAttack::OnCompletedCallback);
 		PlayAttackMontageTask->OnInterrupted.AddDynamic(this, &UMDGA_Sword_LeapAttack::OnInterruptedCallback);
 		PlayAttackMontageTask->ReadyForActivation();
-	}
+	}*/
 }
 
 void UMDGA_Sword_LeapAttack::OnCompletedCallback()

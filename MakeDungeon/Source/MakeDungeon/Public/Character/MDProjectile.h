@@ -14,6 +14,7 @@ enum class EProjectileType : uint8
 {
 	Normal	UMETA(DisplayName = "Normal"),
 	Spread	UMETA(DisplayName = "Spread"),
+	Pierce	UMETA(DisplayName = "Pierce"),
 	Mortar	UMETA(DisplayName = "Mortar")
 };
 
@@ -25,8 +26,7 @@ class MAKEDUNGEON_API AMDProjectile : public AActor
 public:	
 	AMDProjectile();
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	TSubclassOf<UStaticMesh> BulletMesh;
+	static AMDProjectile* ShootProjectile(UWorld* WorldContextObject, UClass* Class, AActor* ProjectileOwner, APawn* ProjectileInstigator, const FVector& StartPoint, const FRotator& Direction, float ProjectileRange, EProjectileType Type = EProjectileType::Normal, AActor* IgnoreActor = nullptr);
 
 	FORCEINLINE USphereComponent* GetCollisionComp() const { return CollisionComponent; }
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
@@ -34,17 +34,35 @@ public:
 	FORCEINLINE EProjectileType GetProjectileType() const { return ProjectileType; }
 	FORCEINLINE void SetProjectileType(EProjectileType Type) { ProjectileType = Type; }
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
-	float Range;
-
-	static void ShootProjectile(UWorld* WorldContextObject, UClass* Class, AActor* ProjectileOwner, APawn* ProjectileInstigator, const FVector& StartPoint, const FRotator& Direction, float ProjectileRange, EProjectileType Type = EProjectileType::Normal);
-
-	/*UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
-	FGameplayEffectSpecHandle DamageEffectSpecHandle;*/
+	FORCEINLINE void SetIgnoreTarget(AActor* IgnoreActor) { IgnoreTarget = IgnoreActor; }
 
 protected:
 	virtual void BeginPlay() override;
+	void SetDead();
+
 	bool FindAroundTarget();
+
+	UFUNCTION()
+	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
+	UFUNCTION()
+	void OnBeginOverlap_Pierce(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	//BeDelete
+	/*UFUNCTION()
+	void OnBeginOverlapAndSpread(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);*/
+
+	UFUNCTION()
+	void OnDestroyedCallBack(AActor* DestroyedActor);
+
+public:
+
+protected:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSubclassOf<UStaticMesh> BulletMesh;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
+	float Range;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Projectile")
 	EProjectileType ProjectileType;
@@ -58,15 +76,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
 
-	UFUNCTION()
-	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	void OnBeginOverlapAndSpread(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	void OnDestroyedCallBack(AActor* DestroyedActor);
-
+	UPROPERTY()
+	TObjectPtr<AActor> IgnoreTarget = nullptr;
 private:
+
 	uint8 bIsOverlapped : 1;
 };

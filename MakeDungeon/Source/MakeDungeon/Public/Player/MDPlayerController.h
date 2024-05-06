@@ -28,7 +28,7 @@ public:
 	float ShortPressThreshold;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	class UNiagaraSystem* FXCursor;
+	TObjectPtr<class UNiagaraSystem> FXCursor;
 
 protected:
 	virtual void SetupInputComponent() override;

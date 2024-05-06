@@ -55,7 +55,7 @@ FGameplayAbilityTargetDataHandle AMDTA_Trace::MakeTargetData() const
 	const float AttackRange = AttributeSet->GetAttackRange();
 	const float AttackRadius = AttributeSet->GetAttackRadius();
 
-	FCollisionQueryParams Params(SCENE_QUERY_STAT(UDTTA_Trace), false, Character);
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(UMDTA_Trace), false, Character);
 	const FVector Forward = Character->GetActorForwardVector();
 	const FVector Start = Character->GetActorLocation() + Forward * Character->GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + Forward * AttackRange;

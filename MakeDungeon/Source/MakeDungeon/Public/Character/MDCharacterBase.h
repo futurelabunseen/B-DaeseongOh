@@ -13,6 +13,7 @@ class UGameplayAbility;
 class UMDCharacterAttributeSet;
 class UMDWeaponBase;
 class UMotionWarpingComponent;
+class UMDWidgetComponent;
 
 UCLASS()
 class MAKEDUNGEON_API AMDCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -55,12 +56,10 @@ public:
 	virtual void StopMovement() {}
 
 protected:
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<UAnimMontage> AttackMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<class UMDWeaponAttackData> AttackMontageData;*/
 	void InitWeapons();
+
+	UFUNCTION()
+	virtual void OnOutOfHealth();
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TObjectPtr<UAbilitySystemComponent> ASC;
@@ -78,6 +77,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MotionWarping")
 	TObjectPtr<UMotionWarpingComponent> MWC;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UMDWidgetComponent> HpBar;
 
 private:
 	float TrackingSpeed;

@@ -18,6 +18,7 @@ void AMDCharacterNonPlayer::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 
 	ASC->InitAbilityActorInfo(this, this);
+	//AttributeSet->OnOutOfHealth.AddDynamic(this, &ThisClass::OnOutOfHealth);
 
 	FGameplayEffectContextHandle EffectContextHandle = ASC->MakeEffectContext();
 	EffectContextHandle.AddSourceObject(this);
@@ -26,4 +27,9 @@ void AMDCharacterNonPlayer::PossessedBy(AController* NewController)
 	{
 		ASC->BP_ApplyGameplayEffectSpecToSelf(EffectSpecHandle);
 	}
+}
+
+void AMDCharacterNonPlayer::OnOutOfHealth()
+{
+	Super::OnOutOfHealth();
 }

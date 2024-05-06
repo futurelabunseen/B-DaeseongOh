@@ -52,10 +52,10 @@ void AMDPlayerController::SetupInputComponent()
 
 		EnhancedInputComponent->BindAction(InputData->WeaponSwapAction, ETriggerEvent::Started, this, &AMDPlayerController::SwapWeapon);
 		
-		EnhancedInputComponent->BindAction(InputData->PlayAnim_ChargeAction, ETriggerEvent::Completed, this, &AMDPlayerController::GASInputReleased, MDTAG_INPUT_ANIMCHARGE);
-		EnhancedInputComponent->BindAction(InputData->PlayAnim_ChargeAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_INPUT_ANIMCHARGE);
-		EnhancedInputComponent->BindAction(InputData->PlayAnim_ComboAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_INPUT_ANIMCOMBO);
-		EnhancedInputComponent->BindAction(InputData->PlayAnim_OnceAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_INPUT_ANIMONCE);
+		EnhancedInputComponent->BindAction(InputData->PlayAnim_ChargeAction, ETriggerEvent::Completed, this, &AMDPlayerController::GASInputReleased, MDTAG_ANIM_CHARGE);
+		EnhancedInputComponent->BindAction(InputData->PlayAnim_ChargeAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed,	MDTAG_ANIM_CHARGE);
+		EnhancedInputComponent->BindAction(InputData->PlayAnim_ComboAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_ANIM_COMBO);
+		EnhancedInputComponent->BindAction(InputData->PlayAnim_OnceAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_ANIM_ONCE);
 
 		EnhancedInputComponent->BindAction(InputData->AttackAction, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_WEAPON_PRIMARYATTACK);
 		EnhancedInputComponent->BindAction(InputData->SkillAction_01, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_WEAPON_SKILL_01);

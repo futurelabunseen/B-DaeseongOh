@@ -5,6 +5,7 @@
 #include "Character/MDCharacterBase.h"
 #include "Item/MDWeaponBase.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "Tags/MDGameplayTag.h"
 #include "../MakeDungeon.h"
 
 UMDGA_PlayAnim_Once::UMDGA_PlayAnim_Once()
@@ -17,10 +18,31 @@ void UMDGA_PlayAnim_Once::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
+	UAbilitySystemComponent* ASC = MDCharacter->GetAbilitySystemComponent();
+
+	FGameplayTagContainer CurrentOwnedTags;
+	ASC->GetOwnedGameplayTags(CurrentOwnedTags);
+	
+	FGameplayTag TargetTag = MDTAG_WEAPON_ATTACK;
+	FGameplayTag ResultTag;
+	for (FGameplayTag Tag : CurrentOwnedTags)
+	{
+		if (Tag.MatchesTag(TargetTag))
+		{
+			ResultTag = Tag;
+		}
+	}
+
+	if (!ResultTag.IsValid() || ResultTag.MatchesTagExact(TargetTag))
+	{
+		OnInterrupted();
+		MD_LOG(LogMD, Log, TEXT("No Anim"));
+		return;
+	}
 
 	UMDWeaponBase* Weapon = MDCharacter->GetWeapon();
 
-	UAnimMontage* SkillMontage = Weapon->GetMontage(EMDAttackType::Skill_02);
+	UAnimMontage* SkillMontage = Weapon->GetMontage(ResultTag);
 	if (SkillMontage)
 	{
 		MDCharacter->StopMovement();
@@ -33,6 +55,9 @@ void UMDGA_PlayAnim_Once::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 
 void UMDGA_PlayAnim_Once::OnCompleted()
 {
+	FGameplayTagContainer CancelAbilityTags = MDTAG_WEAPON_ATTACK.GetSingleTagContainer();
+	GetAbilitySystemComponentFromActorInfo()->CancelAbilities(&CancelAbilityTags);
+
 	bool bReplicatedEndAbility = true;
 	bool bWasCancelled = false;
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);

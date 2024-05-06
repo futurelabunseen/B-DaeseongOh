@@ -3,6 +3,7 @@
 
 #include "Character/Abilities/AttributeSets/MDCharacterAttributeSet.h"
 #include "GameplayEffectExtension.h"
+#include "Tags/MDGameplayTag.h"
 #include "../MakeDungeon.h"
 
 UMDCharacterAttributeSet::UMDCharacterAttributeSet() : 
@@ -10,9 +11,11 @@ UMDCharacterAttributeSet::UMDCharacterAttributeSet() :
 	AttackRadius(50.f), MaxAttackRadius(150.f),
 	AttackRate(10.f), MaxAttackRate(100.f),
 	Health(0.f), MaxHealth(100.f),
+	Mana(0.f), MaxMana(100.f),
 	Damage(0.f)
 {
 	InitHealth(GetMaxHealth());
+	InitMana(GetMaxMana());
 }
 
 void UMDCharacterAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -21,6 +24,28 @@ void UMDCharacterAttributeSet::PreAttributeChange(const FGameplayAttribute& Attr
 	{
 		NewValue = NewValue < 0.f ? 0.f : NewValue;
 	}
+}
+
+bool UMDCharacterAttributeSet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data)
+{
+	if (!Super::PreGameplayEffectExecute(Data))
+	{
+		return false;
+	}
+
+	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
+	{
+		if (Data.EvaluatedData.Magnitude > 0.f)
+		{
+			if (Data.Target.HasMatchingGameplayTag(MDTAG_CHARACTER_INVINCIBLE))
+			{
+				Data.EvaluatedData.Magnitude = 0.f;
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 void UMDCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -40,4 +65,12 @@ void UMDCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffectMo
 		SetHealth(FMath::Clamp(GetHealth() - GetDamage(), MinHealth, GetMaxHealth()));
 		SetDamage(0.f);
 	}
+
+	if ((GetHealth() <= 0.0f) && !bOutOfHealth)
+	{
+		Data.Target.AddLooseGameplayTag(MDTAG_CHARACTER_ISDEAD);
+		OnOutOfHealth.Broadcast();
+	}
+
+	bOutOfHealth = (GetHealth() <= 0.f);
 }

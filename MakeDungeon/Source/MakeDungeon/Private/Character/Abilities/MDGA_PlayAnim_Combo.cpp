@@ -5,6 +5,7 @@
 #include "Character/MDCharacterBase.h"
 #include "Item/MDWeaponBase.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "Tags/MDGameplayTag.h"
 #include "../MakeDungeon.h"
 
 UMDGA_PlayAnim_Combo::UMDGA_PlayAnim_Combo()
@@ -18,9 +19,31 @@ void UMDGA_PlayAnim_Combo::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
 
+	UAbilitySystemComponent* ASC = MDCharacter->GetAbilitySystemComponent();
+
+	FGameplayTagContainer CurrentOwnedTags;
+	ASC->GetOwnedGameplayTags(CurrentOwnedTags);
+
+	FGameplayTag TargetTag = MDTAG_WEAPON_ATTACK;
+	FGameplayTag ResultTag;
+	for (FGameplayTag Tag : CurrentOwnedTags)
+	{
+		if (Tag.MatchesTag(TargetTag))
+		{
+			ResultTag = Tag;
+		}
+	}
+
+	if (!ResultTag.IsValid() || ResultTag.MatchesTagExact(TargetTag))
+	{
+		OnInterrupted();
+		MD_LOG(LogMD, Log, TEXT("No Anim"));
+		return;
+	}
+
 	UMDWeaponBase* Weapon = MDCharacter->GetWeapon();
 
-	CurrentComboAttackData = Weapon->GetComboAttackData(EMDAttackType::PrimaryAttack);
+	CurrentComboAttackData = Weapon->GetComboAttackData(ResultTag);
 	if (!CurrentComboAttackData)
 	{
 		OnInterrupted();
@@ -28,7 +51,7 @@ void UMDGA_PlayAnim_Combo::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 		return;
 	}
 
-	UAnimMontage* AttackMontage = Weapon->GetMontage(EMDAttackType::PrimaryAttack);
+	UAnimMontage* AttackMontage = Weapon->GetMontage(ResultTag);
 	if (AttackMontage)
 	{
 		UAbilityTask_PlayMontageAndWait* PlayAttackMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayAttack"), AttackMontage, 1.f, GetNextSection());
@@ -60,6 +83,9 @@ void UMDGA_PlayAnim_Combo::InputPressed(const FGameplayAbilitySpecHandle Handle,
 
 void UMDGA_PlayAnim_Combo::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
+	FGameplayTagContainer CancelAbilityTags = MDTAG_WEAPON_ATTACK.GetSingleTagContainer();
+	GetAbilitySystemComponentFromActorInfo()->CancelAbilities(&CancelAbilityTags);
+
 	CurrentComboAttackData = nullptr;
 	CurrentCombo = 0;
 	HasNextAttackInput = false;

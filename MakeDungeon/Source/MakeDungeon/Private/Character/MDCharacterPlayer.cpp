@@ -12,6 +12,7 @@
 #include "Item/MDWeaponBase.h"
 #include "Tags/MDGameplayTag.h"
 #include "Player/MDPlayerController.h"
+#include "Character/Abilities/AttributeSets/MDCharacterAttributeSet.h"
 #include "../MakeDungeon.h"
 
 
@@ -47,6 +48,12 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 		ASC = PS->GetAbilitySystemComponent();
 		AttributeSet = PS->GetAttributeSet();
 		ASC->InitAbilityActorInfo(PS, this);
+		//AttributeSet->OnOutOfHealth.AddDynamic(this, &ThisClass::OnOutOfHealth)
+
+		ASC->GenericGameplayEventCallbacks.FindOrAdd(MDTAG_EVENT_CHARACTER_WEAPONEQUIP).
+										AddUObject(this, &AMDCharacterPlayer::EquipWeapon);
+		ASC->GenericGameplayEventCallbacks.FindOrAdd(MDTAG_EVENT_CHARACTER_WEAPONUNEQUIP).
+										AddUObject(this, &AMDCharacterPlayer::UnequipWeapon);
 
 		for (const auto& StartAbility : CharacterAbilities)
 		{
@@ -136,5 +143,29 @@ void AMDCharacterPlayer::BeginPlay()
 		{
 			MDPlayerController->SetupWeaponInput();
 		}
+	}*/
+}
+
+void AMDCharacterPlayer::OnOutOfHealth()
+{
+	Super::OnOutOfHealth();
+}
+
+void AMDCharacterPlayer::EquipWeapon(const FGameplayEventData* EventData)
+{
+	/*FGameplayAbilitySpec NewSkillSpec(Class);
+
+	if (!ASC->FindAbilitySpecFromClass(Class))
+	{
+		ASC->GiveAbility(NewSkillSpec);
+	}*/
+}
+
+void AMDCharacterPlayer::UnequipWeapon(const FGameplayEventData* EventData)
+{
+	/*FGameplayAbilitySpec* SkillAbilitySpec = ASC->FindAbilitySpecFromClass(Class);
+	if (SkillAbilitySpec)
+	{
+		ASC->ClearAbility(SkillAbilitySpec->Handle);
 	}*/
 }

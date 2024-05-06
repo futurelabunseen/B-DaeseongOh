@@ -8,6 +8,8 @@
 #include "Tags/MDGameplayTag.h"
 #include "Item/MDWeaponBase.h"
 #include "MotionWarpingComponent.h"
+#include "UI/MDWidgetComponent.h"
+#include "UI/MDUserWidget.h"
 
 // Sets default values
 AMDCharacterBase::AMDCharacterBase()
@@ -48,6 +50,17 @@ AMDCharacterBase::AMDCharacterBase()
 	}
 
 	MWC = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
+	HpBar = CreateDefaultSubobject<UMDWidgetComponent>(TEXT("Widget"));
+	HpBar->SetupAttachment(GetMesh());
+	HpBar->SetRelativeLocation(FVector(0.f, 0.f, 200.f));
+	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/MakeDungeon/UI/WBP_HpBar.WBP_HpBar_C"));
+	if (HpBarWidgetRef.Class)
+	{
+		HpBar->SetWidgetClass(HpBarWidgetRef.Class);
+		HpBar->SetWidgetSpace(EWidgetSpace::Screen);
+		HpBar->SetDrawSize(FVector2D(200.f, 20.f));
+		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 
 	TrackingSpeed = 20.f;
 	bIsTrackingTarget = false;
@@ -113,4 +126,8 @@ void AMDCharacterBase::InitWeapons()
 	}
 
 	ASC->AddLooseGameplayTag(CurrentWeapon);
+}
+
+void AMDCharacterBase::OnOutOfHealth()
+{
 }

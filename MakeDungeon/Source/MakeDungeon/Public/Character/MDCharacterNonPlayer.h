@@ -18,6 +18,10 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+protected:
+	virtual void OnOutOfHealth() override;
+
+protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TSubclassOf<class UGameplayEffect> InitStatEffect;
 

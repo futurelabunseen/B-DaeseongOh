@@ -4,34 +4,30 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
-#include "MDGA_Skill_01.generated.h"
+#include "MDGA_Bow_PiercingArrow.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MAKEDUNGEON_API UMDGA_Skill_01 : public UGameplayAbility
+class MAKEDUNGEON_API UMDGA_Bow_PiercingArrow : public UGameplayAbility
 {
 	GENERATED_BODY()
 	
 public:
-	UMDGA_Skill_01();
+	UMDGA_Bow_PiercingArrow();
 
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	virtual void InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
-	virtual void InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
 
 protected:
 	UFUNCTION()
-	void OnCompletedStart();
+	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UFUNCTION()
-	void OnCompletedEnd();
+protected:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSubclassOf<class AMDProjectile> ProjectileClass;
 
-	UFUNCTION()
-	void OnInterruptedCallback();
-
-private:
-	uint8 bInputReleased : 1;
-	float AnimPlaySpeed;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSubclassOf<UGameplayEffect> AttackDamageEffect;
 };

@@ -35,8 +35,8 @@ class MAKEDUNGEON_API UMDWeaponBase : public USkeletalMeshComponent
 public:
 	UMDWeaponBase();
 
-	FORCEINLINE UMDComboAttackData* GetComboAttackData(EMDAttackType AttackIndex = EMDAttackType::PrimaryAttack) const { return ComboAttackData[AttackIndex]; }
-	FORCEINLINE UAnimMontage* GetMontage(EMDAttackType AttackIndex = EMDAttackType::PrimaryAttack) const { return Montage[AttackIndex]; }
+	FORCEINLINE UMDComboAttackData* GetComboAttackData(FGameplayTag Tag) const { return ComboAttackData[Tag]; }
+	FORCEINLINE UAnimMontage* GetMontage(FGameplayTag Tag) const { return Montage[Tag]; }
 	FORCEINLINE FGameplayTag GetWeaponType() const { return WeaponType; }
 	FORCEINLINE UInputMappingContext* GetMappingContext() const { return WeaponMappingContext; }
 	void InitWeapon(AMDCharacterBase* InCharacter);
@@ -46,10 +46,10 @@ protected:
 	TObjectPtr<UInputMappingContext> WeaponMappingContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TMap<EMDAttackType, TObjectPtr<UAnimMontage>> Montage;
+	TMap<FGameplayTag, TObjectPtr<UAnimMontage>> Montage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TMap<EMDAttackType, TObjectPtr<UMDComboAttackData>> ComboAttackData;
+	TMap<FGameplayTag, TObjectPtr<UMDComboAttackData>> ComboAttackData;
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TArray<TSubclassOf<UGameplayAbility>> WeaponAbilities;
