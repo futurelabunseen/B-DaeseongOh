@@ -4,8 +4,8 @@
 #include "Character/Abilities/AttributeSets/MDCharacterSkillAttributeSet.h"
 
 UMDCharacterSkillAttributeSet::UMDCharacterSkillAttributeSet() : 
-	SkillRange(500.f), MaxSkillRange(1000.f),
-	SkillAttackRate(100.f), MaxSkillAttackRate(200.f),
+	SkillRange(0.1f), MaxSkillRange(1000.f),
+	SkillAttackRate(0.f), MaxSkillAttackRate(200.f),
 	SkillEnergy(25.f), MaxSkillEnergy(50.f)
 {
 }
