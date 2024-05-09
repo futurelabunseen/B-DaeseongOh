@@ -26,7 +26,7 @@ class MAKEDUNGEON_API AMDProjectile : public AActor
 public:	
 	AMDProjectile();
 
-	static AMDProjectile* ShootProjectile(UWorld* WorldContextObject, UClass* Class, AActor* ProjectileOwner, APawn* ProjectileInstigator, const FVector& StartPoint, const FRotator& Direction, float ProjectileRange, EProjectileType Type = EProjectileType::Normal, AActor* IgnoreActor = nullptr);
+	static AMDProjectile* ShootProjectile(UWorld* WorldContextObject, UClass* Class, AActor* ProjectileOwner, APawn* ProjectileInstigator, const FVector& StartPoint, const FRotator& Direction, float InitSpeed, EProjectileType Type = EProjectileType::Normal, AActor* IgnoreActor = nullptr);
 
 	FORCEINLINE USphereComponent* GetCollisionComp() const { return CollisionComponent; }
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
@@ -44,13 +44,9 @@ protected:
 
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
+
 	UFUNCTION()
 	void OnBeginOverlap_Pierce(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	//BeDelete
-	/*UFUNCTION()
-	void OnBeginOverlapAndSpread(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);*/
 
 	UFUNCTION()
 	void OnDestroyedCallBack(AActor* DestroyedActor);

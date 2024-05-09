@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
-#include "MDGA_AttackRanged.generated.h"
+#include "MDGA_Bullet_Normal.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MAKEDUNGEON_API UMDGA_AttackRanged : public UGameplayAbility
+class MAKEDUNGEON_API UMDGA_Bullet_Normal : public UGameplayAbility
 {
 	GENERATED_BODY()
 
 public:
-	UMDGA_AttackRanged();
+	UMDGA_Bullet_Normal();
 	
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 

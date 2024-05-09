@@ -35,7 +35,6 @@ class MAKEDUNGEON_API UMDWeaponBase : public USkeletalMeshComponent
 public:
 	UMDWeaponBase();
 
-	FORCEINLINE UMDComboAttackData* GetComboAttackData(FGameplayTag Tag) const { return ComboAttackData[Tag]; }
 	FORCEINLINE UAnimMontage* GetMontage(FGameplayTag Tag) const { return Montage[Tag]; }
 	FORCEINLINE FGameplayTag GetWeaponType() const { return WeaponType; }
 	FORCEINLINE UInputMappingContext* GetMappingContext() const { return WeaponMappingContext; }
@@ -48,9 +47,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	TMap<FGameplayTag, TObjectPtr<UAnimMontage>> Montage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TMap<FGameplayTag, TObjectPtr<UMDComboAttackData>> ComboAttackData;
-
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TArray<TSubclassOf<UGameplayAbility>> WeaponAbilities;
 
@@ -59,8 +55,4 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Type")
 	FGameplayTag WeaponType;
-
-private:
-	UPROPERTY(EditAnywhere, Category = "Data")
-	TObjectPtr<UMDWeaponInputData> InputData;
 };

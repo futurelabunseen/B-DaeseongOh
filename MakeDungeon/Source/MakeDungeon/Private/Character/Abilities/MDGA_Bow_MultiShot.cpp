@@ -4,6 +4,7 @@
 #include "Character/Abilities/MDGA_Bow_MultiShot.h"
 #include "Character/MDCharacterBase.h"
 #include "Character/MDProjectile.h"
+#include "Animation/MDAnimInstance.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -22,26 +23,43 @@ void UMDGA_Bow_MultiShot::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
+
+	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
+
+	// For Anim
+	MDCharacter->SetIsCharged(true);
+	UMDAnimInstance* AnimInst = Cast<UMDAnimInstance>(ActorInfo->GetAnimInstance());
+	if (AnimInst)
+	{
+		AnimInst->SetAnimPlaySpeed(AnimPlaySpeed);
+	}
+
+
+	// For Attack
 	OuterAngle = 60.0;
 	DecreaseAngle = OuterAngle * 0.02;
 
-	AMDCharacterBase* MDCharacter = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
 	MDCharacter->SetIsTrackingTarget(true);
 }
 
 void UMDGA_Bow_MultiShot::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
+	// For Attack
 	OuterAngle = FMath::Clamp(OuterAngle - DecreaseAngle, 1.0, OuterAngle);
 	MD_LOG(LogMD, Log, TEXT("CurrentAngle : %lf"), OuterAngle);
 }
 
 void UMDGA_Bow_MultiShot::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
+	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
+	
+	// For Anim
+
+	// For Attack
 	UWorld* SpawnWorld = GetWorld();
-	AActor* SpawnOwner = GetOwningActorFromActorInfo();
-	AMDCharacterBase* SpawnInstigator = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
-	FVector SpawnLocation = SpawnInstigator->GetActorLocation();
-	FRotator DirectionOrigin = SpawnInstigator->GetAttackDirection();
+	AActor* SpawnOwner = ActorInfo->OwnerActor.Get();
+	FVector SpawnLocation = MDCharacter->GetActorLocation();
+	FRotator DirectionOrigin = MDCharacter->GetAttackDirection();
 
 	FRotator DirectionSpawn[5] = { FRotator(DirectionOrigin.Pitch, DirectionOrigin.Yaw, DirectionOrigin.Roll), 
 									FRotator(DirectionOrigin.Pitch, DirectionOrigin.Yaw + OuterAngle * 0.5, DirectionOrigin.Roll),
@@ -53,7 +71,7 @@ void UMDGA_Bow_MultiShot::InputReleased(const FGameplayAbilitySpecHandle Handle,
 	for (uint8 SpawnLocationIndex = 0; SpawnLocationIndex < 5; SpawnLocationIndex++)
 	{
 		SpawnedProjectile = AMDProjectile::ShootProjectile(SpawnWorld, ProjectileClass, SpawnOwner,
-			SpawnInstigator, SpawnLocation, DirectionSpawn[SpawnLocationIndex], 1000.f, EProjectileType::Normal);
+			MDCharacter, SpawnLocation, DirectionSpawn[SpawnLocationIndex], 3000.f, EProjectileType::Normal);
 
 		if(SpawnedProjectile)
 		{
@@ -63,16 +81,24 @@ void UMDGA_Bow_MultiShot::InputReleased(const FGameplayAbilitySpecHandle Handle,
 	
 	SpawnedProjectile = nullptr;
 
-	SpawnInstigator->SetIsTrackingTarget(false);
+	MDCharacter->SetIsTrackingTarget(false);
 
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+}
+
+void UMDGA_Bow_MultiShot::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(CurrentActorInfo->AvatarActor.Get());
+	MDCharacter->SetIsCharged(false);
+
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void UMDGA_Bow_MultiShot::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if ((OtherActor != GetOwningActorFromActorInfo()))
 	{
-		AMDCharacterBase* MDCharacter = Cast<AMDCharacterBase>(OtherActor);
+		AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(CurrentActorInfo->AvatarActor.Get());
 		if (MDCharacter)
 		{
 			UAbilitySystemComponent* TargetASC = MDCharacter->GetAbilitySystemComponent();

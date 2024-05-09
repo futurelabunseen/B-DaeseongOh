@@ -4,22 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
-#include "MDGA_Bow_PiercingArrow.generated.h"
+#include "MDGA_Bullet_HitAndSpread.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MAKEDUNGEON_API UMDGA_Bow_PiercingArrow : public UGameplayAbility
+class MAKEDUNGEON_API UMDGA_Bullet_HitAndSpread : public UGameplayAbility
 {
 	GENERATED_BODY()
 	
 public:
-	UMDGA_Bow_PiercingArrow();
+	UMDGA_Bullet_HitAndSpread();
 
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-	virtual void InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
-	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
 protected:
 	UFUNCTION()
@@ -33,5 +31,5 @@ protected:
 	TSubclassOf<UGameplayEffect> AttackDamageEffect;
 
 private:
-	uint8 AttackCount = 1;
+	uint8 bIsFirst : 1;
 };

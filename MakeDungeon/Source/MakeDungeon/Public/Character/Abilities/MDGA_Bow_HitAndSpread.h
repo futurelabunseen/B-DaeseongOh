@@ -21,14 +21,12 @@ public:
 	
 protected:
 	UFUNCTION()
-	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnCompletedCallback();
+
+	UFUNCTION()
+	void OnInterruptedCallback();
 
 protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	TSubclassOf<class AMDProjectile> ProjectileClass;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	TSubclassOf<UGameplayEffect> AttackDamageEffect;
-
-	uint8 bIsFirst : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	TObjectPtr<UAnimMontage> Montage;
 };

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Character/Abilities/MDGA_AttackRanged.h"
+#include "Character/Abilities/MDGA_Bullet_Normal.h"
 #include "Character/MDCharacterBase.h"
 #include "Character/MDProjectile.h"
 #include "Components/SphereComponent.h"
@@ -12,40 +12,36 @@
 #include "Tags/MDGameplayTag.h"
 #include "../MakeDungeon.h"
 
-UMDGA_AttackRanged::UMDGA_AttackRanged()
+UMDGA_Bullet_Normal::UMDGA_Bullet_Normal()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	Range = 1000.f;
 	SocketName = FName("Weapon_R");
 }
 
-void UMDGA_AttackRanged::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UMDGA_Bullet_Normal::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	/*UAbilityTask_WaitGameplayEvent* Task = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, TriggerEventData->EventTag);
-	Task->EventReceived.AddDynamic(this, &UMDGA_AttackRanged::ShootBullet);
-	Task->ReadyForActivation();*/
-
-	//ShootBullet(CurrentEventData);
+	CommitAbility(Handle, ActorInfo, ActivationInfo);
+	
 	AMDCharacterBase* SpawnInstigator = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
 
 	FRotator Direction = SpawnInstigator->GetAttackDirection();
 
 	AMDProjectile* SpawnProjectile = nullptr;
 	SpawnProjectile = AMDProjectile::ShootProjectile(GetWorld(), ProjectileClass, GetOwningActorFromActorInfo(),
-		SpawnInstigator, SpawnInstigator->GetActorLocation(), Direction, 1000.f, EProjectileType::Normal);
+		SpawnInstigator, SpawnInstigator->GetActorLocation(), Direction, 3000.f, EProjectileType::Normal);
 
 	if (SpawnProjectile)
 	{
-		SpawnProjectile->GetCollisionComp()->OnComponentBeginOverlap.AddDynamic(this, &UMDGA_AttackRanged::OnBeginOverlap);
+		SpawnProjectile->GetCollisionComp()->OnComponentBeginOverlap.AddDynamic(this, &UMDGA_Bullet_Normal::OnBeginOverlap);
 	}
 
 	SpawnInstigator->SetIsTrackingTarget(false);
 
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 }
-void UMDGA_AttackRanged::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void UMDGA_Bullet_Normal::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if ((OtherActor != GetOwningActorFromActorInfo()))
 	{
@@ -77,21 +73,5 @@ void UMDGA_AttackRanged::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent
 				MD_LOG(LogMD, Warning, TEXT("Hit!"));
 			}
 		}
-
-		//UAbilitySystemComponent* ASC = MDCharacter->GetAbilitySystemComponent();
-		//if (ASC)
-		//{
-		//	//ActorLineTraceSingle
-		//	//GetWorld()->OverlapMultiByChannel()
-		//	//UKismetSystemLibrary::SphereOverlapActors()
-		//	//UKismetSystemLibrary::SphereTraceSingle()
-		//}
-
-		/*CollisionDisable();
-
-		UObjectPoolWorldSubsystem* ObjectPool = UWorld::GetSubsystem<UObjectPoolWorldSubsystem>(GetWorld());
-		ObjectPool->CollectObject(this);*/
-
-		MD_LOG(LogMD, Log, TEXT("Collect_Overlap"));
 	}
 }

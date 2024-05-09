@@ -4,8 +4,6 @@
 #include "Character/Abilities/MDGA_Bow_PiercingArrow.h"
 #include "Character/MDCharacterBase.h"
 #include "Character/MDProjectile.h"
-#include "Kismet/KismetSystemLibrary.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Components/SphereComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
@@ -22,24 +20,47 @@ void UMDGA_Bow_PiercingArrow::ActivateAbility(const FGameplayAbilitySpecHandle H
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
 
-	AMDCharacterBase* SpawnInstigator = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
+	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
 
-	FRotator Direction = SpawnInstigator->GetAttackDirection();
+	FRotator Direction = MDCharacter->GetAttackDirection();
 
 	AMDProjectile* SpawnedProjectile = AMDProjectile::ShootProjectile(GetWorld(), ProjectileClass, GetOwningActorFromActorInfo(),
-		SpawnInstigator, SpawnInstigator->GetActorLocation(), Direction, 1000.f, EProjectileType::Pierce);
+		MDCharacter, MDCharacter->GetActorLocation(), Direction, 3000.f, EProjectileType::Pierce);
 
 	if (SpawnedProjectile)
 	{
 		SpawnedProjectile->GetCollisionComp()->OnComponentBeginOverlap.AddDynamic(this, &UMDGA_Bow_PiercingArrow::OnBeginOverlap);
 	}
 	
-	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+	//EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 }
 
 void UMDGA_Bow_PiercingArrow::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
-	
+	MD_LOG(LogMD, Log, TEXT("Pressed %d"), AttackCount);
+
+	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
+
+	FRotator Direction = MDCharacter->GetAttackDirection();
+
+	Direction.Add(AttackCount * 30.0, 0.0, 0.0);
+
+	++AttackCount;
+
+	AMDProjectile* SpawnedProjectile = AMDProjectile::ShootProjectile(GetWorld(), ProjectileClass, GetOwningActorFromActorInfo(),
+		MDCharacter, MDCharacter->GetActorLocation(), Direction, 3000.f, EProjectileType::Pierce);
+
+	if (3 <= AttackCount)
+	{
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+	}
+}
+
+void UMDGA_Bow_PiercingArrow::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	AttackCount = 1;
+
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void UMDGA_Bow_PiercingArrow::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
