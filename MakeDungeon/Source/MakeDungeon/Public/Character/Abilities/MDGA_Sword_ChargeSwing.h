@@ -27,13 +27,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AnimPlaySpeed = 0.5f;
 
-	// For Attack
+	// For Attack;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTag TriggerGameplayTag;
 
 	// For Effect
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TSubclassOf<UGameplayEffect> SkillInitEffect;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSubclassOf<UGameplayEffect> SkillUpdateEffect;
 
 private:
 	// For Anim

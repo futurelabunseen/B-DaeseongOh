@@ -2,9 +2,11 @@
 
 
 #include "Character/Abilities/MDGA_Sword_ChargeSwing.h"
+#include "Character/Abilities/AttributeSets/MDCharacterSkillAttributeSet.h"
 #include "Character/MDCharacterBase.h"
 #include "Animation/MDAnimInstance.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Abilities/GameplayAbility.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Tags/MDGameplayTag.h"
 #include "../MakeDungeon.h"
@@ -30,9 +32,8 @@ void UMDGA_Sword_ChargeSwing::ActivateAbility(const FGameplayAbilitySpecHandle H
 		AnimInst->SetAnimPlaySpeed(AnimPlaySpeed);
 	}
 
-	// For Attack
-	Radius = 250.f;
-	SpawnLocation = MDCharacter->GetActorLocation();
+	UAbilitySystemComponent* ASC = MDCharacter->GetAbilitySystemComponent();
+	const UMDCharacterSkillAttributeSet* SkillAttribute = ASC->GetSet<UMDCharacterSkillAttributeSet>();
 
 	// For Effect
 	FGameplayEffectSpecHandle SkillInitEffectHandle = MakeOutgoingGameplayEffectSpec(SkillInitEffect);
@@ -41,12 +42,23 @@ void UMDGA_Sword_ChargeSwing::ActivateAbility(const FGameplayAbilitySpecHandle H
 		ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, SkillInitEffectHandle);
 	}
 
+	Radius = SkillAttribute->GetSkillRange();
+	// For Attack
+	SpawnLocation = MDCharacter->GetActorLocation();
+
 	MDCharacter->SetIsTrackingTarget(true);
 }
 
 void UMDGA_Sword_ChargeSwing::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
+
+	// For Effect
+	FGameplayEffectSpecHandle SkillUpdateEffectHandle = MakeOutgoingGameplayEffectSpec(SkillUpdateEffect);
+	if (SkillUpdateEffectHandle.IsValid())
+	{
+		ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, SkillUpdateEffectHandle);
+	}
 
 	// For Attack
 	Radius = FMath::Clamp(Radius + 1.f, Radius, 350.f);
@@ -65,6 +77,7 @@ void UMDGA_Sword_ChargeSwing::InputReleased(const FGameplayAbilitySpecHandle Han
 	DrawDebugSphere(GetWorld(), SpawnLocation, Radius, 16, FColor::Green, false, 1.f);
 
 	FGameplayEventData PayloadData;
+	
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActorFromActorInfo(), TriggerGameplayTag, PayloadData);
 
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
