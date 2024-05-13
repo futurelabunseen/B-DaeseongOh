@@ -16,6 +16,7 @@ class MAKEDUNGEON_API AMDTA_Trace : public AGameplayAbilityTargetActor
 public:
 	AMDTA_Trace();
 
+	virtual void StartTargeting(UGameplayAbility* Ability, const FVector& InSpawnLocation);
 	virtual void StartTargeting(UGameplayAbility* Ability) override;
 
 	virtual void ConfirmTargetingAndContinue() override;
@@ -24,5 +25,6 @@ public:
 protected:
 	virtual FGameplayAbilityTargetDataHandle MakeTargetData() const;
 
+	FVector SpawnLocation;
 	bool bShowDebug = false;
 };

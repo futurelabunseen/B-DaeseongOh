@@ -20,8 +20,14 @@ void UMDGA_AttackHitCheck::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	CurrentLevel = TriggerEventData->EventMagnitude;
+	FVector SpawnLocation(FVector::ZeroVector);
 
-	UMDAT_Trace* AttackTraceTask = UMDAT_Trace::CreateTask(this, TargetActorClass);
+	if (TriggerEventData->ContextHandle.HasOrigin())
+	{
+		SpawnLocation = TriggerEventData->ContextHandle.GetOrigin();
+	}
+
+	UMDAT_Trace* AttackTraceTask = UMDAT_Trace::CreateTask(this, TargetActorClass, SpawnLocation);
 	AttackTraceTask->OnComplete.AddDynamic(this, &UMDGA_AttackHitCheck::OnTraceResultCallback);
 	AttackTraceTask->ReadyForActivation();
 	MD_LOG(LogMD, Log, TEXT("Activate"));

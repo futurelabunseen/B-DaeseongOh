@@ -16,6 +16,13 @@ AMDTA_Trace::AMDTA_Trace()
 {
 }
 
+void AMDTA_Trace::StartTargeting(UGameplayAbility* Ability, const FVector& InSpawnLocation)
+{
+	StartTargeting(Ability);
+
+	SpawnLocation = InSpawnLocation;
+}
+
 void AMDTA_Trace::StartTargeting(UGameplayAbility* Ability)
 {
 	Super::StartTargeting(Ability);

@@ -23,9 +23,15 @@ public:
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
 protected:
+	void SendGameplayEvent();
+
+protected:
 	// For Anim
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AnimPlaySpeed = 0.5f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float AttackCheckTime = 0.5f;
 
 	// For Attack;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -40,6 +46,7 @@ protected:
 
 private:
 	// For Anim
+	FTimerHandle AttackCheckTimerHandle;
 
 	// For Attack
 	float Radius;

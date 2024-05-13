@@ -34,7 +34,16 @@ FGameplayAbilityTargetDataHandle AMDTA_SphereMultiTrace::MakeTargetData() const
 	TArray<FOverlapResult> Overlaps;
 	const float SkillRadius = SkillAttribute->GetSkillRange();
 
-	FVector Origin = Character->GetMesh()->GetSocketLocation(FName("Weapon_R_Muzzle"));
+	FVector Origin;
+	if (!SpawnLocation.IsZero())
+	{
+		Origin = SpawnLocation;
+	}
+	else
+	{
+		Origin = Character->GetMesh()->GetSocketLocation(FName("Weapon_R_Muzzle"));
+	}
+
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(AMDTA_SphereMultiTrace), false, Character);
 	GetWorld()->OverlapMultiByChannel(Overlaps, Origin, FQuat::Identity, CCHANNEL_MDACTION, FCollisionShape::MakeSphere(SkillRadius), Params);
 

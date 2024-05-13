@@ -42,7 +42,7 @@ void UMDGA_Sword_ChargeSwing::ActivateAbility(const FGameplayAbilitySpecHandle H
 		ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, SkillInitEffectHandle);
 	}
 
-	Radius = SkillAttribute->GetSkillRange();
+	//Radius = SkillAttribute->GetSkillRange();
 	// For Attack
 	SpawnLocation = MDCharacter->GetActorLocation();
 
@@ -61,9 +61,9 @@ void UMDGA_Sword_ChargeSwing::InputPressed(const FGameplayAbilitySpecHandle Hand
 	}
 
 	// For Attack
-	Radius = FMath::Clamp(Radius + 1.f, Radius, 350.f);
-	SpawnLocation = MDCharacter->GetActorLocation() + MDCharacter->GetActorForwardVector() * Radius * 0.8f;
-	DrawDebugSphere(GetWorld(), SpawnLocation, Radius, 16, FColor::Cyan, false, 0.2f);
+	//Radius = FMath::Clamp(Radius + 1.f, Radius, 350.f);
+	//SpawnLocation = MDCharacter->GetActorLocation() + MDCharacter->GetActorForwardVector() * Radius * 0.8f;
+	//DrawDebugSphere(GetWorld(), SpawnLocation, Radius, 16, FColor::Cyan, false, 0.2f);
 	MD_LOG(LogMD, Log, TEXT("CurrentAngle : %f"), Radius);
 }
 
@@ -73,22 +73,41 @@ void UMDGA_Sword_ChargeSwing::InputReleased(const FGameplayAbilitySpecHandle Han
 	// For Anim
 
 	// For Attack
+	UAbilitySystemComponent* ASC = MDCharacter->GetAbilitySystemComponent();
+	const UMDCharacterSkillAttributeSet* SkillAttribute = ASC->GetSet<UMDCharacterSkillAttributeSet>();
+
+	Radius = SkillAttribute->GetSkillRange();
+
 	MDCharacter->SetIsTrackingTarget(false);
-	DrawDebugSphere(GetWorld(), SpawnLocation, Radius, 16, FColor::Green, false, 1.f);
+	SpawnLocation = MDCharacter->GetActorLocation() + MDCharacter->GetActorForwardVector() * Radius * 0.8f;
+	//DrawDebugSphere(GetWorld(), SpawnLocation, Radius, 16, FColor::Green, false, 1.f);
 
-	FGameplayEventData PayloadData;
-	
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActorFromActorInfo(), TriggerGameplayTag, PayloadData);
+	MDCharacter->SetIsCharged(false);
 
-	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+	GetWorld()->GetTimerManager().SetTimer(AttackCheckTimerHandle, this, &UMDGA_Sword_ChargeSwing::SendGameplayEvent,
+											AttackCheckTime, false);
 }
 
 void UMDGA_Sword_ChargeSwing::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(CurrentActorInfo->AvatarActor.Get());
-	MDCharacter->SetIsCharged(false);
 
 	BP_RemoveGameplayEffectFromOwnerWithGrantedTags(MDTAG_EVENT_CHARACTER_TRACESKILL.GetSingleTagContainer());
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
+void UMDGA_Sword_ChargeSwing::SendGameplayEvent()
+{
+	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(CurrentActorInfo->AvatarActor.Get());
+
+	UAbilitySystemComponent* ASC = MDCharacter->GetAbilitySystemComponent();
+
+	FGameplayEventData PayloadData;
+	PayloadData.ContextHandle = ASC->MakeEffectContext();
+	PayloadData.ContextHandle.AddOrigin(SpawnLocation);
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActorFromActorInfo(), TriggerGameplayTag, PayloadData);
+
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 }
