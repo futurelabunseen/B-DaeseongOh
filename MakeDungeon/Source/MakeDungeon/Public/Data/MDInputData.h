@@ -30,6 +30,15 @@ public:
 	TObjectPtr<UInputAction> MouseMoveAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|PlayerDefault", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> CameraMoveAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|PlayerDefault", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> CameraRotateAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|PlayerDefault", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> CameraZoomAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|PlayerDefault", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> WeaponSwapAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|PlayerDefault", meta = (AllowPrivateAccess = "true"))

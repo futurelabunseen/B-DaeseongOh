@@ -3,6 +3,7 @@
 
 #include "Player/MDPlayerController.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Player/MDPlayerState.h"
@@ -44,11 +45,15 @@ void AMDPlayerController::SetupInputComponent()
 	{
 		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 
-		EnhancedInputComponent->BindAction(InputData->KeyboardMoveAction, ETriggerEvent::Triggered, this, &AMDPlayerController::KeyboardMove);
+		//EnhancedInputComponent->BindAction(InputData->KeyboardMoveAction, ETriggerEvent::Triggered, this, &AMDPlayerController::KeyboardMove);
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Started, this, &AMDPlayerController::OnMouseMoveStarted);
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Triggered, this, &AMDPlayerController::OnMouseMoveTriggered);
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Canceled, this, &AMDPlayerController::OnMouseMoveReleased);
 		EnhancedInputComponent->BindAction(InputData->MouseMoveAction, ETriggerEvent::Completed, this, &AMDPlayerController::OnMouseMoveReleased);
+		EnhancedInputComponent->BindAction(InputData->CameraMoveAction, ETriggerEvent::Triggered, this, &AMDPlayerController::OnCameraMove);
+		EnhancedInputComponent->BindAction(InputData->CameraMoveAction, ETriggerEvent::Completed, this, &AMDPlayerController::OffCameraMove);
+		EnhancedInputComponent->BindAction(InputData->CameraRotateAction, ETriggerEvent::Triggered, this, &AMDPlayerController::OnCameraRotate);
+		EnhancedInputComponent->BindAction(InputData->CameraZoomAction, ETriggerEvent::Triggered, this, &AMDPlayerController::OnCameraZoom);
 
 		EnhancedInputComponent->BindAction(InputData->WeaponSwapAction, ETriggerEvent::Started, this, &AMDPlayerController::SwapWeapon);
 
@@ -119,9 +124,40 @@ void AMDPlayerController::OnMouseMoveReleased()
 	FollowTime = 0.f;
 }
 
-void AMDPlayerController::SwapWeapon()
+void AMDPlayerController::OnCameraMove(const FInputActionValue& Value)
+{
+	bIsCameraMove = true;
+}
+
+void AMDPlayerController::OffCameraMove(const FInputActionValue& Value)
+{
+	bIsCameraMove = false;
+}
+
+void AMDPlayerController::OnCameraRotate(const FInputActionValue& Value)
+{
+	if(bIsCameraMove)
+	{
+		FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+		AMDCharacterPlayer* MDPlayer = CastChecked<AMDCharacterPlayer>(GetPawn());
+		USpringArmComponent* PlayerCameraBoom = MDPlayer->GetCameraBoom();
+		FRotator CurrentRotaion = PlayerCameraBoom->GetRelativeRotation();
+		PlayerCameraBoom->SetRelativeRotation(FRotator(FMath::Clamp(CurrentRotaion.Pitch + LookAxisVector.Y, -70.0, -10.0),
+			CurrentRotaion.Yaw + LookAxisVector.X, 0.0));
+	}
+}
+
+void AMDPlayerController::OnCameraZoom(const FInputActionValue& Value)
 {
 	AMDCharacterPlayer* MDPlayer = CastChecked<AMDCharacterPlayer>(GetPawn());
+	USpringArmComponent* PlayerCameraBoom = MDPlayer->GetCameraBoom();
+	PlayerCameraBoom->TargetArmLength = FMath::Clamp(PlayerCameraBoom->TargetArmLength + Value.GetMagnitude() * 10.f, 200.f, 1000.f);
+}
+
+void AMDPlayerController::SwapWeapon()
+{
+	AMDCharacterPlayer* MDPlayer = CastChecked<AMDCharacterPlayer>(GetPawn	());
 	UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	
 	if (MDTAG_WEAPON_TWOHANDEDSWORD == MDPlayer->GetWeaponType() && SubSystem)
@@ -132,8 +168,6 @@ void AMDPlayerController::SwapWeapon()
 	{
 		MDPlayer->SwapWeapon(MDTAG_WEAPON_TWOHANDEDSWORD, SubSystem);
 	}
-
-	
 }
 
 void AMDPlayerController::GASInputStarted(FGameplayTag Tag)

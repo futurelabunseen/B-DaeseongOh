@@ -7,6 +7,7 @@
 #include "Abilities/GameplayAbilityTypes.h"
 #include "MDCharacterPlayer.generated.h"
 
+class USpringArmComponent;
 /**
  * 
  */
@@ -18,28 +19,29 @@ class MAKEDUNGEON_API AMDCharacterPlayer : public AMDCharacterBase
 public:
 	AMDCharacterPlayer();
 
+	virtual void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
 
 	virtual FVector GetAttackLocation() const override;
 	virtual FRotator GetAttackDirection() const override;
+
+	USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 	virtual void StopMovement() override;
 
 	void SwapWeapon(FGameplayTag Tag, class UEnhancedInputLocalPlayerSubsystem* SubSysyem);
 
 protected:
-	virtual void BeginPlay() override;
-
 	virtual void OnOutOfHealth() override;
 
 	//Temp
-	void EquipWeapon(const FGameplayEventData* EventData);
+	void EquipWeapon(FGameplayTag Tag);
 	void UnequipWeapon(const FGameplayEventData* EventData);
 
 // Camera Section
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class USpringArmComponent> CameraBoom;
+	TObjectPtr<USpringArmComponent> CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCameraComponent> FollowCamera;

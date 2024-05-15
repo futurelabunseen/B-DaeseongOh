@@ -38,7 +38,7 @@ public:
 	FORCEINLINE UAnimMontage* GetMontage(FGameplayTag Tag) const { return Montage[Tag]; }
 	FORCEINLINE FGameplayTag GetWeaponType() const { return WeaponType; }
 	FORCEINLINE UInputMappingContext* GetMappingContext() const { return WeaponMappingContext; }
-	void InitWeapon(AMDCharacterBase* InCharacter);
+	virtual void InitWeapon(AMDCharacterBase* InCharacter);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))

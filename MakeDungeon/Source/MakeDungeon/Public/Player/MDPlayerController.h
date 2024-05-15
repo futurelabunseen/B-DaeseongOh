@@ -37,6 +37,10 @@ protected:
 	void OnMouseMoveStarted();
 	void OnMouseMoveTriggered();
 	void OnMouseMoveReleased();
+	void OnCameraMove(const FInputActionValue& Value);
+	void OffCameraMove(const FInputActionValue& Value);
+	void OnCameraRotate(const FInputActionValue& Value);
+	void OnCameraZoom(const FInputActionValue& Value);
 
 	void SwapWeapon();
 
@@ -45,6 +49,7 @@ protected:
 	void GASInputReleased(FGameplayTag Tag);
 
 	uint32 bMoveToMouseCursor : 1;
+	uint8	bIsCameraMove : 1;
 
 	FVector CachedDestination;
 

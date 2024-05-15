@@ -53,12 +53,13 @@ void UMDGA_Bullet_HitAndSpread::OnBeginOverlap(UPrimitiveComponent* OverlappedCo
 				return;
 			}
 
+			FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(SweepResult);
+			FGameplayAbilityTargetDataHandle TargetDataHandle;
+			TargetDataHandle.Add(TargetData);
+
 			FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(AttackDamageEffect);
 			if (EffectSpecHandle.IsValid())
 			{
-				FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(SweepResult);
-				FGameplayAbilityTargetDataHandle TargetDataHandle;
-				TargetDataHandle.Add(TargetData);
 				ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
 
 				FGameplayEffectContextHandle CueContextHandle = UAbilitySystemBlueprintLibrary::GetEffectContext(EffectSpecHandle);
@@ -69,6 +70,12 @@ void UMDGA_Bullet_HitAndSpread::OnBeginOverlap(UPrimitiveComponent* OverlappedCo
 				TargetASC->ExecuteGameplayCue(MDTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
 
 				MD_LOG(LogMD, Warning, TEXT("Hit!"));
+			}
+
+			FGameplayEffectSpecHandle DebuffEffectSpecHandle = MakeOutgoingGameplayEffectSpec(TargetDebuffEffect);
+			if (DebuffEffectSpecHandle.IsValid())
+			{
+				ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, DebuffEffectSpecHandle, TargetDataHandle);
 			}
 
 			AMDProjectile* Projectile = Cast<AMDProjectile>(OverlappedComponent->GetOwner());

@@ -35,8 +35,15 @@ AMDCharacterPlayer::AMDCharacterPlayer()
 	
 	//PrimaryActorTick.bCanEverTick = true;
 	//PrimaryActorTick.bStartWithTickEnabled = true;
-	
 }
+
+void AMDCharacterPlayer::BeginPlay()
+{
+	Super::BeginPlay();
+
+	EquipWeapon(MDTAG_WEAPON_TWOHANDEDSWORD);
+}
+
 
 void AMDCharacterPlayer::PossessedBy(AController* NewController)
 {
@@ -49,12 +56,7 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 		AttributeSet = PS->GetAttributeSet();
 		ASC->InitAbilityActorInfo(PS, this);
 		//AttributeSet->OnOutOfHealth.AddDynamic(this, &ThisClass::OnOutOfHealth)
-
-		ASC->GenericGameplayEventCallbacks.FindOrAdd(MDTAG_EVENT_CHARACTER_WEAPONEQUIP).
-										AddUObject(this, &AMDCharacterPlayer::EquipWeapon);
-		ASC->GenericGameplayEventCallbacks.FindOrAdd(MDTAG_EVENT_CHARACTER_WEAPONUNEQUIP).
-										AddUObject(this, &AMDCharacterPlayer::UnequipWeapon);
-
+		
 		for (const auto& StartAbility : CharacterAbilities)
 		{
 			FGameplayAbilitySpec StartSpec(StartAbility);
@@ -70,7 +72,6 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 		APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
 		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 	}
-
 }
 
 FVector AMDCharacterPlayer::GetAttackLocation() const
@@ -117,12 +118,14 @@ void AMDCharacterPlayer::SwapWeapon(FGameplayTag Tag, UEnhancedInputLocalPlayerS
 			}
 
 			SubSysyem->RemoveMappingContext(Weapons[CurrentWeapon]->GetMappingContext());
+			Weapons[CurrentWeapon]->SetHiddenInGame(true);
 			//Off Current
 
 			CurrentWeapon = Tag;
 			//On New
 			SubSysyem->AddMappingContext(Weapons[CurrentWeapon]->GetMappingContext(), 1);
 			ASC->AddLooseGameplayTag(CurrentWeapon);
+			Weapons[CurrentWeapon]->SetHiddenInGame(false);
 		}
 		else
 		{
@@ -131,34 +134,30 @@ void AMDCharacterPlayer::SwapWeapon(FGameplayTag Tag, UEnhancedInputLocalPlayerS
 	}
 }
 
-void AMDCharacterPlayer::BeginPlay()
-{
-	Super::BeginPlay();	
-
-	/*APlayerState* PS = GetPlayerState();
-	if (PS)
-	{
-		AMDPlayerController* MDPlayerController = Cast<AMDPlayerController>(PS->GetPlayerController());
-		if (MDPlayerController)
-		{
-			MDPlayerController->SetupWeaponInput();
-		}
-	}*/
-}
-
 void AMDCharacterPlayer::OnOutOfHealth()
 {
 	Super::OnOutOfHealth();
 }
 
-void AMDCharacterPlayer::EquipWeapon(const FGameplayEventData* EventData)
+void AMDCharacterPlayer::EquipWeapon(FGameplayTag Tag)
 {
-	/*FGameplayAbilitySpec NewSkillSpec(Class);
+	CurrentWeapon = Tag;
 
-	if (!ASC->FindAbilitySpecFromClass(Class))
+	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	if (PlayerController)
 	{
-		ASC->GiveAbility(NewSkillSpec);
-	}*/
+		ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
+		if (LocalPlayer)
+		{
+			UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
+			if (Subsystem)
+			{
+				Subsystem->AddMappingContext(Weapons[CurrentWeapon]->GetMappingContext(), 1);
+				ASC->AddLooseGameplayTag(CurrentWeapon);
+				Weapons[CurrentWeapon]->SetHiddenInGame(false);
+			}
+		}
+	}
 }
 
 void AMDCharacterPlayer::UnequipWeapon(const FGameplayEventData* EventData)

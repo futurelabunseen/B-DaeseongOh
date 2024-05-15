@@ -125,7 +125,7 @@ void AMDCharacterBase::InitWeapons()
 		}
 	}
 
-	ASC->AddLooseGameplayTag(CurrentWeapon);
+	//ASC->AddLooseGameplayTag(CurrentWeapon);
 }
 
 void AMDCharacterBase::OnOutOfHealth()

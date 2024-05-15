@@ -33,5 +33,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TSubclassOf<class AMDTA_Trace> TargetActorClass;
 
-	//Add Debuff
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	TSubclassOf<class UGameplayEffect> TargetDebuffEffect;
 };

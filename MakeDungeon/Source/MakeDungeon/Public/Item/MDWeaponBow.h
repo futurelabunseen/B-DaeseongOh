@@ -16,4 +16,6 @@ class MAKEDUNGEON_API UMDWeaponBow : public UMDWeaponBase
 	
 public:
 	UMDWeaponBow();
+
+	virtual void InitWeapon(AMDCharacterBase* InCharacter) override;
 };

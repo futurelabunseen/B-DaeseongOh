@@ -68,6 +68,12 @@ void UMDGA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 		{
 			ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, BuffEffectSpecHandle);
 		}
+
+		FGameplayEffectSpecHandle DebuffEffectSpecHandle = MakeOutgoingGameplayEffectSpec(TargetDebuffEffect);
+		if (DebuffEffectSpecHandle.IsValid())
+		{
+			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, DebuffEffectSpecHandle, TargetDataHandle);
+		}
 	}
 	else if (UAbilitySystemBlueprintLibrary::TargetDataHasActor(TargetDataHandle, 0))
 	{
@@ -85,6 +91,13 @@ void UMDGA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 			CueParam.EffectContext = CueContextHandle;
 
 			SourceASC->ExecuteGameplayCue(MDTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
+			SourceASC->AddGameplayCue(MDTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
+		}
+
+		FGameplayEffectSpecHandle DebuffEffectSpecHandle = MakeOutgoingGameplayEffectSpec(TargetDebuffEffect);
+		if (DebuffEffectSpecHandle.IsValid())
+		{
+			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, DebuffEffectSpecHandle, TargetDataHandle);
 		}
 	}
 

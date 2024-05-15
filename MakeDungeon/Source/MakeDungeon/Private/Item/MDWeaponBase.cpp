@@ -24,4 +24,6 @@ void UMDWeaponBase::InitWeapon(AMDCharacterBase* InCharacter)
 		FGameplayAbilitySpec AbilitySpec(WeaponAbility);
 		ASC->GiveAbility(AbilitySpec);
 	}
+
+	SetHiddenInGame(true);
 }

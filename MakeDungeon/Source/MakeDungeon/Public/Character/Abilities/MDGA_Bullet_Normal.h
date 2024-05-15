@@ -30,6 +30,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TSubclassOf<UGameplayEffect> AttackDamageEffect;
 
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	TSubclassOf<class UGameplayEffect> TargetDebuffEffect;
+
 private:
 	float Range;
 
