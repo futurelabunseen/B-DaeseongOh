@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Character/MDCharacterBase.h"
+#include "Interface/MDCharacterAIInterface.h"
 #include "MDCharacterNonPlayer.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MAKEDUNGEON_API AMDCharacterNonPlayer : public AMDCharacterBase
+class MAKEDUNGEON_API AMDCharacterNonPlayer : public AMDCharacterBase, public IMDCharacterAIInterface
 {
 	GENERATED_BODY()
 public:
@@ -27,4 +28,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	float Level;
+
+// AI Section
+	virtual float GetAIPatrolRadius() override;
+	virtual float GetAIDetectRange() override;
+	virtual float GetAIAttackRange() override;
+	virtual float GetAITurnSpeed() override;
+
 };
