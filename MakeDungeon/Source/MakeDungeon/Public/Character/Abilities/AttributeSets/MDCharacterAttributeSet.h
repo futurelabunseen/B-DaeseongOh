@@ -30,6 +30,7 @@ public:
 	virtual bool PreGameplayEffectExecute(struct FGameplayEffectModCallbackData& Data) override;
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
+	void Revive();
 
 	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, AttackRange);
 	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, MaxAttackRange);
@@ -43,6 +44,7 @@ public:
 	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, MaxMana);
 	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, Damage);
 
+public:
 	mutable FOutOfHealthDelegate OnOutOfHealth;
 
 protected:

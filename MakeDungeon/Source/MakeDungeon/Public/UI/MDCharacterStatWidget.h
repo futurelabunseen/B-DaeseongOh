@@ -5,36 +5,41 @@
 #include "CoreMinimal.h"
 #include "UI/MDUserWidget.h"
 #include "GameplayEffectTypes.h"
-#include "MDHpBarUserWidget.generated.h"
+#include "MDCharacterStatWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MAKEDUNGEON_API UMDHpBarUserWidget : public UMDUserWidget
+class MAKEDUNGEON_API UMDCharacterStatWidget : public UMDUserWidget
 {
 	GENERATED_BODY()
 	
 public:
-	void UpdateHpBar();
+	void UpdateStat();
 
 	virtual void SetAbilitySystemComponent(AActor* InOwner) override;
 protected:
 
 	virtual void OnHealthChanged(const FOnAttributeChangeData& ChangeData);
 	virtual void OnMaxHealthChanged(const FOnAttributeChangeData& ChangeData);
-	virtual void OnInvinsibleTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+	virtual void OnManaChanged(const FOnAttributeChangeData& ChangeData);
+	virtual void OnMaxManaChanged(const FOnAttributeChangeData& ChangeData);
+
 
 protected:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UProgressBar> PbHpBar;
+	TObjectPtr<class UTextBlock> TxtHpStat;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTextBlock> TxtMpStat;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UTextBlock> TxtHpStat;
+	TObjectPtr<class UTextBlock> TxtCurrentWeapon;
 
 	float CurrentHealth = 0.f;
-	float CurrentMaxHealth = 0.1f;
+	float CurrentMaxHealth = 0.f;
 
-	FLinearColor HealthColor = FLinearColor::Red;
-	FLinearColor InvincibleColor = FLinearColor::Green;
+	float CurrentMana = 0.f;	
+	float CurrentMaxMana = 0.f;
 };

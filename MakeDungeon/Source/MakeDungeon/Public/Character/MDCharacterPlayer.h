@@ -7,7 +7,11 @@
 #include "Abilities/GameplayAbilityTypes.h"
 #include "MDCharacterPlayer.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnGameplayTagChanged);
+
 class USpringArmComponent;
+class UMDHUDWidget;
+
 /**
  * 
  */
@@ -19,24 +23,30 @@ class MAKEDUNGEON_API AMDCharacterPlayer : public AMDCharacterBase
 public:
 	AMDCharacterPlayer();
 
-	virtual void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
+	virtual void BeginPlay() override;
 
 	virtual FVector GetAttackLocation() const override;
 	virtual FRotator GetAttackDirection() const override;
 
 	USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
+	void SetCurrentWeapon(const FGameplayTag& Tag);
+
 	virtual void StopMovement() override;
 
 	void SwapWeapon(FGameplayTag Tag, class UEnhancedInputLocalPlayerSubsystem* SubSysyem);
 
 protected:
+	virtual void SetDead() override;
+
 	virtual void OnOutOfHealth() override;
 
 	//Temp
 	void EquipWeapon(FGameplayTag Tag);
-	void UnequipWeapon(const FGameplayEventData* EventData);
+
+public:
+	FOnGameplayTagChanged OnGameplayTagChanged;
 
 // Camera Section
 protected:

@@ -74,3 +74,9 @@ void UMDCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffectMo
 
 	bOutOfHealth = (GetHealth() <= 0.f);
 }
+
+void UMDCharacterAttributeSet::Revive()
+{
+	bOutOfHealth = false;
+	SetHealth(GetMaxHealth());
+}

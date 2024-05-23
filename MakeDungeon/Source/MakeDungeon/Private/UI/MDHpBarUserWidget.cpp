@@ -8,6 +8,19 @@
 #include "Components/TextBlock.h"
 #include "Tags/MDGameplayTag.h"
 
+void UMDHpBarUserWidget::UpdateHpBar()
+{
+	if (PbHpBar)
+	{
+		PbHpBar->SetPercent(CurrentHealth / CurrentMaxHealth);
+	}
+
+	if (TxtHpStat)
+	{
+		TxtHpStat->SetText(FText::FromString(FString::Printf(TEXT("%.0f/%0.f"), CurrentHealth, CurrentMaxHealth)));
+	}
+}
+
 void UMDHpBarUserWidget::SetAbilitySystemComponent(AActor* InOwner)
 {
 	Super::SetAbilitySystemComponent(InOwner);
@@ -28,13 +41,10 @@ void UMDHpBarUserWidget::SetAbilitySystemComponent(AActor* InOwner)
 			UpdateHpBar();
 		}
 
-		
 		if (CurrentMaxHealth > 0.f)
 		{
 			UpdateHpBar();
 		}
-
-		
 	}
 }
 
@@ -61,18 +71,5 @@ void UMDHpBarUserWidget::OnInvinsibleTagChanged(const FGameplayTag CallbackTag, 
 	{
 		PbHpBar->SetFillColorAndOpacity(HealthColor);
 		UpdateHpBar();
-	}
-}
-
-void UMDHpBarUserWidget::UpdateHpBar()
-{
-	if (PbHpBar)
-	{
-		PbHpBar->SetPercent(CurrentHealth / CurrentMaxHealth);
-	}
-
-	if (TxtHpStat)
-	{
-		TxtHpStat->SetText(FText::FromString(FString::Printf(TEXT("%.0f/%0.f"), CurrentHealth, CurrentMaxHealth)));
 	}
 }

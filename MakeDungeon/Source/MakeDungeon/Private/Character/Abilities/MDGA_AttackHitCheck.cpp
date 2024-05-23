@@ -91,7 +91,6 @@ void UMDGA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 			CueParam.EffectContext = CueContextHandle;
 
 			SourceASC->ExecuteGameplayCue(MDTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
-			SourceASC->AddGameplayCue(MDTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
 		}
 
 		FGameplayEffectSpecHandle DebuffEffectSpecHandle = MakeOutgoingGameplayEffectSpec(TargetDebuffEffect);

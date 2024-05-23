@@ -15,12 +15,19 @@
 #include "Tags/MDGameplayTag.h"
 #include "GameplayTagContainer.h"
 #include "Character/MDCharacterPlayer.h"
+#include "UI/MDHUDWidget.h"
 #include "../MakeDungeon.h"
 
 //#include "Item/MDWeaponBase.h"
 
 AMDPlayerController::AMDPlayerController()
 {
+	static ConstructorHelpers::FClassFinder<UMDHUDWidget> MDHUDWidgetRef(TEXT("/Game/MakeDungeon/UI/WBP_MDHUD.WBP_MDHUD_C"));
+	if(MDHUDWidgetRef.Class)
+	{
+		MDHUDWidgetClass = MDHUDWidgetRef.Class;
+	}
+
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
 	CachedDestination = FVector::ZeroVector;
@@ -30,6 +37,13 @@ AMDPlayerController::AMDPlayerController()
 void AMDPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	MDHUDWidget = CreateWidget<UMDHUDWidget>(this, MDHUDWidgetClass);
+	if (MDHUDWidget)
+	{
+		MDHUDWidget->AddToViewport();
+	}
+
 	UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	if (SubSystem)
 	{

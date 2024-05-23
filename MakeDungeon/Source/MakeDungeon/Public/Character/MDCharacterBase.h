@@ -56,6 +56,8 @@ public:
 	virtual void StopMovement() {}
 
 protected:
+	virtual void SetDead();
+
 	void InitWeapons();
 
 	UFUNCTION()
@@ -80,6 +82,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UMDWidgetComponent> HpBar;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UMDWidgetComponent> MpBar;
 
 private:
 	float TrackingSpeed;

@@ -20,7 +20,18 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 
 protected:
+	virtual void SetDead() override;
+
 	virtual void OnOutOfHealth() override;
+
+	// AI Section
+	virtual float GetAIPatrolRadius() override;
+	virtual float GetAIDetectRange() override;
+	virtual float GetAIAttackRange() override;
+	virtual float GetAITurnSpeed() override;
+
+	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
+	virtual void AttackByAI() override;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
@@ -29,10 +40,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	float Level;
 
-// AI Section
-	virtual float GetAIPatrolRadius() override;
-	virtual float GetAIDetectRange() override;
-	virtual float GetAIAttackRange() override;
-	virtual float GetAITurnSpeed() override;
+	FAICharacterAttackFinished OnAttackFinished;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTag AttackTriggerGameplayTag;
+
+private:
 };

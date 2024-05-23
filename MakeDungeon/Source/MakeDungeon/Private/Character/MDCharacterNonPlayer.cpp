@@ -3,8 +3,10 @@
 
 #include "Character/MDCharacterNonPlayer.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include "Character/Abilities/AttributeSets/MDCharacterAttributeSet.h"
 #include "AI/MDAIController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AMDCharacterNonPlayer::AMDCharacterNonPlayer()
 {
@@ -22,7 +24,13 @@ void AMDCharacterNonPlayer::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 
 	ASC->InitAbilityActorInfo(this, this);
-	//AttributeSet->OnOutOfHealth.AddDynamic(this, &ThisClass::OnOutOfHealth);
+	AttributeSet->OnOutOfHealth.AddDynamic(this, &ThisClass::OnOutOfHealth);
+
+	for (const auto& StartAbility : CharacterAbilities)
+	{
+		FGameplayAbilitySpec StartSpec(StartAbility);
+		ASC->GiveAbility(StartSpec);
+	}
 
 	FGameplayEffectContextHandle EffectContextHandle = ASC->MakeEffectContext();
 	EffectContextHandle.AddSourceObject(this);
@@ -31,6 +39,22 @@ void AMDCharacterNonPlayer::PossessedBy(AController* NewController)
 	{
 		ASC->BP_ApplyGameplayEffectSpecToSelf(EffectSpecHandle);
 	}
+}
+
+void AMDCharacterNonPlayer::SetDead()
+{
+	Super::SetDead();
+
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+	GetMesh()->SetSimulatePhysics(true);
+
+	FTimerHandle DeadTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda(
+		[&]()
+		{
+			Destroy();
+		}
+	), 5.f, false);
 }
 
 void AMDCharacterNonPlayer::OnOutOfHealth()
@@ -50,10 +74,36 @@ float AMDCharacterNonPlayer::GetAIDetectRange()
 
 float AMDCharacterNonPlayer::GetAIAttackRange()
 {
-	return 0.0f;
+	return AttributeSet->GetAttackRange() + AttributeSet->GetAttackRadius() * 2;
 }
 
 float AMDCharacterNonPlayer::GetAITurnSpeed()
 {
 	return 0.0f;
+}
+
+void AMDCharacterNonPlayer::SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished)
+{
+	OnAttackFinished = InOnAttackFinished;
+}
+
+void AMDCharacterNonPlayer::AttackByAI()
+{
+	//공격 로직 구현
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
+	FGameplayEventData PayloadData;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, AttackTriggerGameplayTag, PayloadData);
+
+	//공격이 끝나면 실행
+	FTimerHandle AttackTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, FTimerDelegate::CreateLambda(
+		[&]()
+		{
+			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+			OnAttackFinished.ExecuteIfBound();
+		}
+	), 2.f, false);
+	
 }

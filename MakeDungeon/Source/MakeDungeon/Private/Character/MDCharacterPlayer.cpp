@@ -13,6 +13,9 @@
 #include "Tags/MDGameplayTag.h"
 #include "Player/MDPlayerController.h"
 #include "Character/Abilities/AttributeSets/MDCharacterAttributeSet.h"
+#include "UI/MDWidgetComponent.h"
+#include "UI/MDHUDWidget.h"
+#include "UI/MDCharacterStatWidget.h"
 #include "../MakeDungeon.h"
 
 
@@ -37,14 +40,6 @@ AMDCharacterPlayer::AMDCharacterPlayer()
 	//PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
-void AMDCharacterPlayer::BeginPlay()
-{
-	Super::BeginPlay();
-
-	EquipWeapon(MDTAG_WEAPON_TWOHANDEDSWORD);
-}
-
-
 void AMDCharacterPlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -55,7 +50,7 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 		ASC = PS->GetAbilitySystemComponent();
 		AttributeSet = PS->GetAttributeSet();
 		ASC->InitAbilityActorInfo(PS, this);
-		//AttributeSet->OnOutOfHealth.AddDynamic(this, &ThisClass::OnOutOfHealth)
+		AttributeSet->OnOutOfHealth.AddDynamic(this, &ThisClass::OnOutOfHealth);
 		
 		for (const auto& StartAbility : CharacterAbilities)
 		{
@@ -72,6 +67,13 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 		APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
 		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 	}
+}
+
+void AMDCharacterPlayer::BeginPlay()
+{
+	Super::BeginPlay();
+
+	EquipWeapon(MDTAG_WEAPON_TWOHANDEDSWORD);
 }
 
 FVector AMDCharacterPlayer::GetAttackLocation() const
@@ -95,6 +97,15 @@ FRotator AMDCharacterPlayer::GetAttackDirection() const
 	StartPoint.Z = 0.0;
 
 	return FRotationMatrix::MakeFromX(MouseLocation - StartPoint).Rotator();
+}
+
+void AMDCharacterPlayer::SetCurrentWeapon(const FGameplayTag& Tag)
+{
+	if (CurrentWeapon != Tag)
+	{
+		CurrentWeapon = Tag;
+		OnGameplayTagChanged.Broadcast();
+	}
 }
 
 void AMDCharacterPlayer::StopMovement()
@@ -121,7 +132,8 @@ void AMDCharacterPlayer::SwapWeapon(FGameplayTag Tag, UEnhancedInputLocalPlayerS
 			Weapons[CurrentWeapon]->SetHiddenInGame(true);
 			//Off Current
 
-			CurrentWeapon = Tag;
+			SetCurrentWeapon(Tag);
+
 			//On New
 			SubSysyem->AddMappingContext(Weapons[CurrentWeapon]->GetMappingContext(), 1);
 			ASC->AddLooseGameplayTag(CurrentWeapon);
@@ -134,6 +146,30 @@ void AMDCharacterPlayer::SwapWeapon(FGameplayTag Tag, UEnhancedInputLocalPlayerS
 	}
 }
 
+void AMDCharacterPlayer::SetDead()
+{
+	Super::SetDead();
+
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		DisableInput(PlayerController);
+	}
+
+	FTimerHandle DeadTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda(
+		[&]()
+		{
+			EnableInput(PlayerController);
+			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+			SetActorEnableCollision(true);
+			HpBar->SetHiddenInGame(false);
+			MpBar->SetHiddenInGame(false);
+			AttributeSet->Revive();
+		}
+	), 5.f, false);
+}
+
 void AMDCharacterPlayer::OnOutOfHealth()
 {
 	Super::OnOutOfHealth();
@@ -141,7 +177,7 @@ void AMDCharacterPlayer::OnOutOfHealth()
 
 void AMDCharacterPlayer::EquipWeapon(FGameplayTag Tag)
 {
-	CurrentWeapon = Tag;
+	SetCurrentWeapon(Tag);
 
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
 	if (PlayerController)
@@ -158,13 +194,4 @@ void AMDCharacterPlayer::EquipWeapon(FGameplayTag Tag)
 			}
 		}
 	}
-}
-
-void AMDCharacterPlayer::UnequipWeapon(const FGameplayEventData* EventData)
-{
-	/*FGameplayAbilitySpec* SkillAbilitySpec = ASC->FindAbilitySpecFromClass(Class);
-	if (SkillAbilitySpec)
-	{
-		ASC->ClearAbility(SkillAbilitySpec->Handle);
-	}*/
 }

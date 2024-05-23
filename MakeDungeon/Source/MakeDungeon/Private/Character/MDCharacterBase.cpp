@@ -62,6 +62,18 @@ AMDCharacterBase::AMDCharacterBase()
 		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
+	MpBar = CreateDefaultSubobject<UMDWidgetComponent>(TEXT("Widget2"));
+	MpBar->SetupAttachment(GetMesh());
+	MpBar->SetRelativeLocation(FVector(0.f, 0.f, 180.f));
+	static ConstructorHelpers::FClassFinder<UUserWidget> MpBarWidgetRef(TEXT("/Game/MakeDungeon/UI/WBP_MpBar.WBP_MpBar_C"));
+	if (MpBarWidgetRef.Class)
+	{
+		MpBar->SetWidgetClass(MpBarWidgetRef.Class);
+		MpBar->SetWidgetSpace(EWidgetSpace::Screen);
+		MpBar->SetDrawSize(FVector2D(200.f, 10.f));
+		MpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
 	TrackingSpeed = 20.f;
 	bIsTrackingTarget = false;
 }
@@ -104,6 +116,14 @@ FRotator AMDCharacterBase::GetAttackDirection() const
 	return FRotationMatrix::MakeFromX(GetActorForwardVector()).Rotator();
 }
 
+void AMDCharacterBase::SetDead()
+{
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	SetActorEnableCollision(false);
+	HpBar->SetHiddenInGame(true);
+	MpBar->SetHiddenInGame(true);
+}
+
 void AMDCharacterBase::InitWeapons()
 {
 	bool IsFirst = true;
@@ -130,4 +150,5 @@ void AMDCharacterBase::InitWeapons()
 
 void AMDCharacterBase::OnOutOfHealth()
 {
+	SetDead();
 }

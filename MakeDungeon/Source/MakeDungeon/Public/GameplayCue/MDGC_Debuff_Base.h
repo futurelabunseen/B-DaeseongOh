@@ -17,5 +17,9 @@ class MAKEDUNGEON_API AMDGC_Debuff_Base : public AGameplayCueNotify_Actor
 public:
 	AMDGC_Debuff_Base();
 
-	
+	virtual bool OnExecute_Implementation(AActor* Target, const FGameplayCueParameters& Parameters);
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameplayCue")
+	TObjectPtr<UParticleSystem> ParticleSystem;
 };

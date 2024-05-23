@@ -84,7 +84,7 @@ void UMDGA_Sword_ChargeSwing::InputReleased(const FGameplayAbilitySpecHandle Han
 
 	MDCharacter->SetIsCharged(false);
 
-	GetWorld()->GetTimerManager().SetTimer(AttackCheckTimerHandle, this, &UMDGA_Sword_ChargeSwing::SendGameplayEvent,
+	GetWorld()->GetTimerManager().SetTimer(AttackCheckTimerHandle, this, &UMDGA_Sword_ChargeSwing::AttackCheck,
 											AttackCheckTime, false);
 }
 
@@ -97,7 +97,7 @@ void UMDGA_Sword_ChargeSwing::EndAbility(const FGameplayAbilitySpecHandle Handle
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UMDGA_Sword_ChargeSwing::SendGameplayEvent()
+void UMDGA_Sword_ChargeSwing::AttackCheck()
 {
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(CurrentActorInfo->AvatarActor.Get());
 
