@@ -33,6 +33,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TSubclassOf<class UGameplayEffect> TargetDebuffEffect;
 
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	FGameplayTag WeaponDebuff;
+
 private:
 	uint8 bIsFirst : 1;
 };

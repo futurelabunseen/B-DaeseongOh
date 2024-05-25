@@ -76,6 +76,13 @@ void UMDGA_Bullet_HitAndSpread::OnBeginOverlap(UPrimitiveComponent* OverlappedCo
 			if (DebuffEffectSpecHandle.IsValid())
 			{
 				ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, DebuffEffectSpecHandle, TargetDataHandle);
+				
+				/*FGameplayEffectContextHandle CueContextHandle = UAbilitySystemBlueprintLibrary::GetEffectContext(EffectSpecHandle);
+				CueContextHandle.AddHitResult(SweepResult);
+				FGameplayCueParameters CueParam;
+				CueParam.EffectContext = CueContextHandle;
+				
+				TargetASC->ExecuteGameplayCue(WeaponDebuff, CueParam);*/
 			}
 
 			AMDProjectile* Projectile = Cast<AMDProjectile>(OverlappedComponent->GetOwner());

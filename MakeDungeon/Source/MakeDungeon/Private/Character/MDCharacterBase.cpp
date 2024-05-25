@@ -119,7 +119,7 @@ FRotator AMDCharacterBase::GetAttackDirection() const
 void AMDCharacterBase::SetDead()
 {
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-	SetActorEnableCollision(false);
+	//SetActorEnableCollision(false);
 	HpBar->SetHiddenInGame(true);
 	MpBar->SetHiddenInGame(true);
 }
