@@ -6,6 +6,9 @@
 #include "Abilities/GameplayAbility.h"
 #include "MDGA_AttackHitCheck.generated.h"
 
+class UGameplayEffect;
+class AMDTA_Trace;
+
 /**
  * 
  */
@@ -23,16 +26,16 @@ protected:
 	void OnTraceResultCallback(const FGameplayAbilityTargetDataHandle& TargetDataHandle);
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
-	TSubclassOf<class UGameplayEffect> AttackDamageEffect;
+	TSubclassOf<UGameplayEffect> AttackDamageEffect;
 	
 	UPROPERTY(EditAnywhere, Category = "GAS")
-	TSubclassOf<class UGameplayEffect> AttackBuffEffect;
+	TSubclassOf<UGameplayEffect> AttackBuffEffect;
 
 	float CurrentLevel;
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
-	TSubclassOf<class AMDTA_Trace> TargetActorClass;
+	TSubclassOf<AMDTA_Trace> TargetActorClass;
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
-	TSubclassOf<class UGameplayEffect> TargetDebuffEffect;
+	TArray<TSubclassOf<UGameplayEffect>> TargetDebuffEffects;
 };

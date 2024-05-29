@@ -74,10 +74,13 @@ void UMDGA_Bullet_Normal::OnBeginOverlap(UPrimitiveComponent* OverlappedComponen
 				MD_LOG(LogMD, Warning, TEXT("Hit!"));
 			}
 
-			FGameplayEffectSpecHandle DebuffEffectSpecHandle = MakeOutgoingGameplayEffectSpec(TargetDebuffEffect);
-			if (DebuffEffectSpecHandle.IsValid())
+			for (auto TargetDebuffEffect : TargetDebuffEffects)
 			{
-				ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, DebuffEffectSpecHandle, TargetDataHandle);
+				FGameplayEffectSpecHandle DebuffEffectSpecHandle = MakeOutgoingGameplayEffectSpec(TargetDebuffEffect);
+				if (DebuffEffectSpecHandle.IsValid())
+				{
+					ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, DebuffEffectSpecHandle, TargetDataHandle);
+				}
 			}
 		}
 	}

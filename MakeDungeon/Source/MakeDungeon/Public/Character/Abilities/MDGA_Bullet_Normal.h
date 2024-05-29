@@ -6,6 +6,8 @@
 #include "Abilities/GameplayAbility.h"
 #include "MDGA_Bullet_Normal.generated.h"
 
+class AMDProjectile;
+
 /**
  * 
  */
@@ -25,13 +27,15 @@ protected:
 
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	TSubclassOf<class AMDProjectile> ProjectileClass;
+	TSubclassOf<AMDProjectile> ProjectileClass;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TSubclassOf<UGameplayEffect> AttackDamageEffect;
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
-	TSubclassOf<class UGameplayEffect> TargetDebuffEffect;
+	TArray<TSubclassOf<UGameplayEffect>> TargetDebuffEffects;
+	
+	
 
 private:
 	float Range;

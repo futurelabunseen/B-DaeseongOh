@@ -68,21 +68,25 @@ void UMDGA_Bullet_HitAndSpread::OnBeginOverlap(UPrimitiveComponent* OverlappedCo
 				CueParam.EffectContext = CueContextHandle;
 
 				TargetASC->ExecuteGameplayCue(MDTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
+				//TargetASC->ExecuteGameplayCue(WeaponDebuff, CueParam);
 
 				MD_LOG(LogMD, Warning, TEXT("Hit!"));
 			}
 
-			FGameplayEffectSpecHandle DebuffEffectSpecHandle = MakeOutgoingGameplayEffectSpec(TargetDebuffEffect);
-			if (DebuffEffectSpecHandle.IsValid())
+			for(auto TargetDebuffEffect : TargetDebuffEffects)
 			{
-				ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, DebuffEffectSpecHandle, TargetDataHandle);
-				
-				/*FGameplayEffectContextHandle CueContextHandle = UAbilitySystemBlueprintLibrary::GetEffectContext(EffectSpecHandle);
-				CueContextHandle.AddHitResult(SweepResult);
-				FGameplayCueParameters CueParam;
-				CueParam.EffectContext = CueContextHandle;
-				
-				TargetASC->ExecuteGameplayCue(WeaponDebuff, CueParam);*/
+				FGameplayEffectSpecHandle DebuffEffectSpecHandle = MakeOutgoingGameplayEffectSpec(TargetDebuffEffect);
+				if (DebuffEffectSpecHandle.IsValid())
+				{
+					ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, DebuffEffectSpecHandle, TargetDataHandle);
+
+					/*FGameplayEffectContextHandle CueContextHandle = UAbilitySystemBlueprintLibrary::GetEffectContext(EffectSpecHandle);
+					CueContextHandle.AddHitResult(SweepResult);
+					FGameplayCueParameters CueParam;
+					CueParam.EffectContext = CueContextHandle;
+
+					TargetASC->ExecuteGameplayCue(WeaponDebuff, CueParam);*/
+				}
 			}
 
 			AMDProjectile* Projectile = Cast<AMDProjectile>(OverlappedComponent->GetOwner());

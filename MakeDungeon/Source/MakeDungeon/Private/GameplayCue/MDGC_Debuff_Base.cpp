@@ -2,32 +2,41 @@
 
 
 #include "GameplayCue/MDGC_Debuff_Base.h"
-#include "Particles/ParticleSystem.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
 AMDGC_Debuff_Base::AMDGC_Debuff_Base()
 {
-    ParticleSystem = CreateDefaultSubobject<UParticleSystem>(TEXT("ParticleSystem"));
 }
 
-bool AMDGC_Debuff_Base::OnExecute_Implementation(AActor* Target, const FGameplayCueParameters& Parameters)
-{
-	const FHitResult* HitResult = Parameters.EffectContext.GetHitResult();
-	if (HitResult)
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(Target, ParticleSystem, HitResult->ImpactPoint, FRotator::ZeroRotator, true);
-	}
-	else
-	{
-		for (const auto& TargetActor : Parameters.EffectContext.Get()->GetActors())
-		{
-			if (TargetActor.Get())
-			{
-				//Spawn || Activate
-				UGameplayStatics::SpawnEmitterAtLocation(Target, ParticleSystem, TargetActor.Get()->GetActorLocation(), FRotator::ZeroRotator, true);
-			}
-		}
-	}
-
-	return false;
-}
+//bool AMDGC_Debuff_Base::OnExecute_Implementation(AActor* Target, const FGameplayCueParameters& Parameters)
+//{
+//	const FHitResult* HitResult = Parameters.EffectContext.GetHitResult();
+//	if (HitResult)
+//	{
+//		NiagaraFX->Activate();
+//		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(Target, NiagaraFX->GetAsset(), HitResult->ImpactPoint, FRotator::ZeroRotator);
+//	}
+//	else
+//	{
+//		for (const auto& TargetActor : Parameters.EffectContext.Get()->GetActors())
+//		{
+//			if (TargetActor.Get())
+//			{
+//				//Spawn || Activate
+//				//UNiagaraFunctionLibrary::SpawnSystemAtLocation(Target, NiagaraFX, TargetActor.Get()->GetActorLocation(), FRotator::ZeroRotator);
+//				NiagaraFX->Activate();
+//			}
+//		}
+//	}
+//
+//	return false;
+//}
+//
+//bool AMDGC_Debuff_Base::OnRemove_Implementation(AActor* MyTarget, const FGameplayCueParameters& Parameters)
+//{
+//	NiagaraFX->Deactivate();
+//
+//	return false;
+//}

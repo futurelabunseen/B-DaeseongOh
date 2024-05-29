@@ -37,11 +37,20 @@ AMDCharacterBase::AMDCharacterBase()
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin'"));
+	/*if (CharacterMeshClass)
+	{
+		USkeletalMesh* CharacterMesh = CharacterMeshClass.GetDefaultObject();
+		if (CharacterMesh)
+		{
+			GetMesh()->SetSkeletalMesh(CharacterMesh);
+		}
+	}*/
+
+	/*static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin'"));
 	if (CharacterMeshRef.Object)
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
-	}
+	}*/
 	
 	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/MakeDungeon/Animation/ABP_MDCharacter.ABP_MDCharacter_C"));
 	if (AnimInstanceClassRef.Class)
@@ -52,19 +61,19 @@ AMDCharacterBase::AMDCharacterBase()
 	MWC = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
 	HpBar = CreateDefaultSubobject<UMDWidgetComponent>(TEXT("Widget"));
 	HpBar->SetupAttachment(GetMesh());
-	HpBar->SetRelativeLocation(FVector(0.f, 0.f, 200.f));
+	HpBar->SetRelativeLocation(FVector(0.f, 0.f, 250.f));
 	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/MakeDungeon/UI/WBP_HpBar.WBP_HpBar_C"));
 	if (HpBarWidgetRef.Class)
 	{
 		HpBar->SetWidgetClass(HpBarWidgetRef.Class);
 		HpBar->SetWidgetSpace(EWidgetSpace::Screen);
-		HpBar->SetDrawSize(FVector2D(200.f, 20.f));
+		HpBar->SetDrawSize(FVector2D(200.f, 15.f));
 		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
 	MpBar = CreateDefaultSubobject<UMDWidgetComponent>(TEXT("Widget2"));
 	MpBar->SetupAttachment(GetMesh());
-	MpBar->SetRelativeLocation(FVector(0.f, 0.f, 180.f));
+	MpBar->SetRelativeLocation(FVector(0.f, 0.f, 230.f));
 	static ConstructorHelpers::FClassFinder<UUserWidget> MpBarWidgetRef(TEXT("/Game/MakeDungeon/UI/WBP_MpBar.WBP_MpBar_C"));
 	if (MpBarWidgetRef.Class)
 	{
@@ -121,7 +130,7 @@ void AMDCharacterBase::SetDead()
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	//SetActorEnableCollision(false);
 	HpBar->SetHiddenInGame(true);
-	MpBar->SetHiddenInGame(true);
+	//MpBar->SetHiddenInGame(true);
 }
 
 void AMDCharacterBase::InitWeapons()

@@ -38,11 +38,11 @@ void AMDPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MDHUDWidget = CreateWidget<UMDHUDWidget>(this, MDHUDWidgetClass);
+	/*MDHUDWidget = CreateWidget<UMDHUDWidget>(this, MDHUDWidgetClass);
 	if (MDHUDWidget)
 	{
 		MDHUDWidget->AddToViewport();
-	}
+	}*/
 
 	UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	if (SubSystem)

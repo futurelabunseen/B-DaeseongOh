@@ -6,6 +6,9 @@
 #include "Abilities/GameplayAbility.h"
 #include "MDGA_Bullet_HitAndSpread.generated.h"
 
+class AMDProjectile;
+class UGameplayEffect;
+
 /**
  * 
  */
@@ -25,13 +28,13 @@ protected:
 
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	TSubclassOf<class AMDProjectile> ProjectileClass;
+	TSubclassOf<AMDProjectile> ProjectileClass;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TSubclassOf<UGameplayEffect> AttackDamageEffect;
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
-	TSubclassOf<class UGameplayEffect> TargetDebuffEffect;
+	TArray<TSubclassOf<UGameplayEffect>> TargetDebuffEffects;
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	FGameplayTag WeaponDebuff;

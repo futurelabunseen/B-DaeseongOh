@@ -6,6 +6,8 @@
 #include "Abilities/GameplayAbility.h"
 #include "MDGA_Bow_PiercingArrow.generated.h"
 
+class AMDProjectile;
+
 /**
  * 
  */
@@ -27,10 +29,13 @@ protected:
 
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	TSubclassOf<class AMDProjectile> ProjectileClass;
+	TSubclassOf<AMDProjectile> ProjectileClass;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TSubclassOf<UGameplayEffect> AttackDamageEffect;
+
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	TArray<TSubclassOf<UGameplayEffect>> TargetDebuffEffects;
 
 private:
 	uint8 AttackCount = 1;

@@ -7,6 +7,8 @@
 #include "GameplayEffectTypes.h"
 #include "MDCharacterStatWidget.generated.h"
 
+class UTextBlock;
+
 /**
  * 
  */
@@ -29,13 +31,13 @@ protected:
 
 protected:
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UTextBlock> TxtHpStat;
+	TObjectPtr<UTextBlock> TxtHpStat;
 	
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UTextBlock> TxtMpStat;
+	TObjectPtr<UTextBlock> TxtMpStat;
 
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UTextBlock> TxtCurrentWeapon;
+	TObjectPtr<UTextBlock> TxtCurrentWeapon;
 
 	float CurrentHealth = 0.f;
 	float CurrentMaxHealth = 0.f;

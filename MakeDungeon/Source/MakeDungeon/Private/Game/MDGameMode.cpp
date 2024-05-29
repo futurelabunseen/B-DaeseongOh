@@ -3,6 +3,7 @@
 
 #include "Game/MDGameMode.h"
 #include "Player/MDPlayerController.h"
+#include "UI/MDLogoWidget.h"
 
 AMDGameMode::AMDGameMode()
 {
@@ -13,8 +14,28 @@ AMDGameMode::AMDGameMode()
 	}
 
 	static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerBPClass(TEXT("/Game/MakeDungeon/Blueprints/BP_MDPlayerController.BP_MDPlayerController_C"));
-	if (PlayerControllerBPClass.Class != NULL)
+	if (PlayerControllerBPClass.Class != nullptr)
 	{
 		PlayerControllerClass = PlayerControllerBPClass.Class;
+	}
+
+	static ConstructorHelpers::FClassFinder<UMDLogoWidget> LogoSceneWidgetClass(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/MakeDungeon/UI/WBP_Logo.WBP_Logo_C'"));
+	if (LogoSceneWidgetClass.Class != nullptr)
+	{
+		LogoWidgetClass = LogoSceneWidgetClass.Class;
+	}
+}
+
+void AMDGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (IsValid(LogoWidgetClass))
+	{
+		LogoWidget = Cast<UMDLogoWidget>(CreateWidget(GetWorld(), LogoWidgetClass));
+		if (IsValid(LogoWidget))
+		{
+			LogoWidget->AddToViewport();
+		}
 	}
 }
