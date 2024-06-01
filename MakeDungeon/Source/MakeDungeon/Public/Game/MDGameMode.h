@@ -23,6 +23,6 @@ protected:
 	virtual void BeginPlay() override;
 
 protected:
-	TSubclassOf<UUserWidget> LogoWidgetClass;
+	TSubclassOf<UMDLogoWidget> LogoWidgetClass;
 	TObjectPtr<UMDLogoWidget> LogoWidget;
 };

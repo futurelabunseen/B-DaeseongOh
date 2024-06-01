@@ -22,7 +22,8 @@
 
 AMDPlayerController::AMDPlayerController()
 {
-	static ConstructorHelpers::FClassFinder<UMDHUDWidget> MDHUDWidgetRef(TEXT("/Game/MakeDungeon/UI/WBP_MDHUD.WBP_MDHUD_C"));
+	static ConstructorHelpers::FClassFinder<UMDHUDWidget> MDHUDWidgetRef(TEXT(
+								"/Game/MakeDungeon/UI/WBP_MDHUD.WBP_MDHUD_C"));
 	if(MDHUDWidgetRef.Class)
 	{
 		MDHUDWidgetClass = MDHUDWidgetRef.Class;
@@ -38,11 +39,11 @@ void AMDPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*MDHUDWidget = CreateWidget<UMDHUDWidget>(this, MDHUDWidgetClass);
+	MDHUDWidget = CreateWidget<UMDHUDWidget>(this, MDHUDWidgetClass);
 	if (MDHUDWidget)
 	{
 		MDHUDWidget->AddToViewport();
-	}*/
+	}
 
 	UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	if (SubSystem)

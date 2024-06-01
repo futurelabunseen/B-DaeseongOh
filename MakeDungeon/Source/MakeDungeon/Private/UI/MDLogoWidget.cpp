@@ -10,11 +10,14 @@ void UMDLogoWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	BtnStart = Cast<UButton>(GetWidgetFromName(TEXT("StartButton")));
-	BtnEnd = Cast<UButton>(GetWidgetFromName(TEXT("EndButton")));
-
-	BtnStart->OnClicked.AddDynamic(this, &UMDLogoWidget::StartButtonCallback);
-	BtnEnd->OnClicked.AddDynamic(this, &UMDLogoWidget::EndButtonCallback);
+	if(BtnStart)
+	{
+		BtnStart->OnClicked.AddDynamic(this, &UMDLogoWidget::StartButtonCallback);
+	}
+	if(BtnEnd)
+	{
+		BtnEnd->OnClicked.AddDynamic(this, &UMDLogoWidget::EndButtonCallback);
+	}
 }
 
 void UMDLogoWidget::StartButtonCallback()

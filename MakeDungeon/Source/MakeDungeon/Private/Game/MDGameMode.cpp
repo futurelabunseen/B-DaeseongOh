@@ -19,10 +19,11 @@ AMDGameMode::AMDGameMode()
 		PlayerControllerClass = PlayerControllerBPClass.Class;
 	}
 
-	static ConstructorHelpers::FClassFinder<UMDLogoWidget> LogoSceneWidgetClass(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/MakeDungeon/UI/WBP_Logo.WBP_Logo_C'"));
-	if (LogoSceneWidgetClass.Class != nullptr)
+	static ConstructorHelpers::FClassFinder<UMDLogoWidget> LogoWidgetRef(TEXT(
+										"/Game/MakeDungeon/UI/WBP_Logo.WBP_Logo_C"));
+	if (LogoWidgetRef.Class)
 	{
-		LogoWidgetClass = LogoSceneWidgetClass.Class;
+		LogoWidgetClass = LogoWidgetRef.Class;
 	}
 }
 
