@@ -52,6 +52,9 @@ void UMDGA_Sword_PrimaryAttack::EndAbility(const FGameplayAbilitySpecHandle Hand
 	CurrentCombo = 0;
 	HasNextAttackInput = false;
 
+	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
+	MDCharacter->SetIsTrackingTarget(false);
+
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 

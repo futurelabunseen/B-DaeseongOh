@@ -22,6 +22,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	FString GetCurrentLevelName();
+
 protected:
 	TSubclassOf<UMDLogoWidget> LogoWidgetClass;
 	TObjectPtr<UMDLogoWidget> LogoWidget;

@@ -32,31 +32,7 @@ AMDCharacterBase::AMDCharacterBase()
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
-	// Mesh
-	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
-
-	/*if (CharacterMeshClass)
-	{
-		USkeletalMesh* CharacterMesh = CharacterMeshClass.GetDefaultObject();
-		if (CharacterMesh)
-		{
-			GetMesh()->SetSkeletalMesh(CharacterMesh);
-		}
-	}*/
-
-	/*static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin'"));
-	if (CharacterMeshRef.Object)
-	{
-		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
-	}*/
 	
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/MakeDungeon/Animation/ABP_MDCharacter.ABP_MDCharacter_C"));
-	if (AnimInstanceClassRef.Class)
-	{
-		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
-	}
 
 	MWC = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
 	HpBar = CreateDefaultSubobject<UMDWidgetComponent>(TEXT("Widget"));

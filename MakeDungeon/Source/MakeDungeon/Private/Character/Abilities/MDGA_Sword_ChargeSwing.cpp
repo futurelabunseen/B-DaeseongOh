@@ -8,13 +8,13 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Abilities/GameplayAbility.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "Animation/MDAnimInstance.h"
 #include "Tags/MDGameplayTag.h"
 #include "../MakeDungeon.h"
 
 UMDGA_Sword_ChargeSwing::UMDGA_Sword_ChargeSwing()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-
 }
 
 void UMDGA_Sword_ChargeSwing::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -23,9 +23,9 @@ void UMDGA_Sword_ChargeSwing::ActivateAbility(const FGameplayAbilitySpecHandle H
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
 
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
-
+	
 	// For Anim
-	MDCharacter->SetIsCharged(true);
+	MDCharacter->SetIsCharging(true);
 	UMDAnimInstance* AnimInst = Cast<UMDAnimInstance>(ActorInfo->GetAnimInstance());
 	if (AnimInst)
 	{
@@ -82,10 +82,10 @@ void UMDGA_Sword_ChargeSwing::InputReleased(const FGameplayAbilitySpecHandle Han
 	SpawnLocation = MDCharacter->GetActorLocation() + MDCharacter->GetActorForwardVector() * Radius * 0.8f;
 	//DrawDebugSphere(GetWorld(), SpawnLocation, Radius, 16, FColor::Green, false, 1.f);
 
-	MDCharacter->SetIsCharged(false);
+	MDCharacter->SetIsCharging(false);
 
 	GetWorld()->GetTimerManager().SetTimer(AttackCheckTimerHandle, this, &UMDGA_Sword_ChargeSwing::AttackCheck,
-											AttackCheckTime, false);
+		AttackCheckTime, false);
 }
 
 void UMDGA_Sword_ChargeSwing::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)

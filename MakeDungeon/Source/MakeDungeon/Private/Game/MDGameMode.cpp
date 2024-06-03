@@ -31,12 +31,24 @@ void AMDGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (IsValid(LogoWidgetClass))
+	if (GetCurrentLevelName() == TEXT("Logo"))
 	{
-		LogoWidget = Cast<UMDLogoWidget>(CreateWidget(GetWorld(), LogoWidgetClass));
-		if (IsValid(LogoWidget))
+		if (IsValid(LogoWidgetClass))
 		{
-			LogoWidget->AddToViewport();
+			LogoWidget = Cast<UMDLogoWidget>(CreateWidget(GetWorld(), LogoWidgetClass));
+			if (IsValid(LogoWidget))
+			{
+				LogoWidget->AddToViewport();
+			}
 		}
 	}
+}
+
+FString AMDGameMode::GetCurrentLevelName()
+{
+	FString LevelNameWithPath = GetWorld()->GetMapName();
+	int32 LastUnderbarIndex;
+	LevelNameWithPath.FindLastChar('_', LastUnderbarIndex);
+	
+	return LevelNameWithPath.Mid(LastUnderbarIndex + 1);
 }

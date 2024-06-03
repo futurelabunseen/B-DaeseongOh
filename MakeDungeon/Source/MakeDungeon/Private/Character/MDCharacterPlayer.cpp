@@ -24,6 +24,22 @@ AMDCharacterPlayer::AMDCharacterPlayer()
 	ASC = nullptr;
 	AttributeSet = nullptr;
 
+	// Mesh
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("//Script/Engine.SkeletalMesh'/Game/Private/Pirate/Mesh_UE5/Full/SKM_Pirate_Full_02.SKM_Pirate_Full_02'"));
+	if (CharacterMeshRef.Object)
+	{
+		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
+	}
+
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/MakeDungeon/Animation/ABP_MDCharacter.ABP_MDCharacter_C"));
+	if (AnimInstanceClassRef.Class)
+	{
+		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
+	}
+
 	// Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -65,7 +81,7 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 		}
 	
 		APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
-		//PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
+		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 	}
 }
 
@@ -117,31 +133,34 @@ void AMDCharacterPlayer::SwapWeapon(FGameplayTag Tag, UEnhancedInputLocalPlayerS
 {
 	if (Tag != CurrentWeapon)
 	{
-		UMDWeaponBase* Weapon = Weapons.Find(Tag)->Get(); 
-		if (Weapon)
+		if (!ASC->HasAllMatchingGameplayTags(MDTAG_WEAPON_ATTACK.GetSingleTagContainer()))
 		{
-			FGameplayTagContainer CurrentOwnedTags;
-			ASC->GetOwnedGameplayTags(CurrentOwnedTags);
-			
-			if (CurrentOwnedTags.HasTag(CurrentWeapon))
+			UMDWeaponBase* Weapon = Weapons.Find(Tag)->Get();
+			if (Weapon)
 			{
-				ASC->RemoveLooseGameplayTag(CurrentWeapon);
+				FGameplayTagContainer CurrentOwnedTags;
+				ASC->GetOwnedGameplayTags(CurrentOwnedTags);
+
+				if (CurrentOwnedTags.HasTag(CurrentWeapon))
+				{
+					ASC->RemoveLooseGameplayTag(CurrentWeapon);
+				}
+
+				SubSysyem->RemoveMappingContext(Weapons[CurrentWeapon]->GetMappingContext());
+				Weapons[CurrentWeapon]->SetHiddenInGame(true);
+				//Off Current
+
+				SetCurrentWeapon(Tag);
+
+				//On New
+				SubSysyem->AddMappingContext(Weapons[CurrentWeapon]->GetMappingContext(), 1);
+				ASC->AddLooseGameplayTag(CurrentWeapon);
+				Weapons[CurrentWeapon]->SetHiddenInGame(false);
 			}
-
-			SubSysyem->RemoveMappingContext(Weapons[CurrentWeapon]->GetMappingContext());
-			Weapons[CurrentWeapon]->SetHiddenInGame(true);
-			//Off Current
-
-			SetCurrentWeapon(Tag);
-
-			//On New
-			SubSysyem->AddMappingContext(Weapons[CurrentWeapon]->GetMappingContext(), 1);
-			ASC->AddLooseGameplayTag(CurrentWeapon);
-			Weapons[CurrentWeapon]->SetHiddenInGame(false);
-		}
-		else
-		{
-			MD_LOG(LogMD, Error, TEXT("No Weapon"));
+			else
+			{
+				MD_LOG(LogMD, Error, TEXT("No Weapon"));
+			}
 		}
 	}
 }

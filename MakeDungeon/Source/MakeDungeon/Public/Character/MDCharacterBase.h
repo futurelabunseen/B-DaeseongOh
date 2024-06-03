@@ -48,10 +48,10 @@ public:
 	FORCEINLINE void SetIsTrackingTarget(bool IsTrackingTarget) { bIsTrackingTarget = IsTrackingTarget; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE bool IsCharged() { return bIsCharged; }
+	FORCEINLINE bool IsCharging() { return bIsCharging; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE void SetIsCharged(bool IsCharged) { bIsCharged = IsCharged; }
+	FORCEINLINE void SetIsCharging(bool IsCharging) { bIsCharging = IsCharging; }
 
 	virtual void StopMovement() {}
 
@@ -89,5 +89,5 @@ protected:
 private:
 	float TrackingSpeed;
 	uint8 bIsTrackingTarget : 1;
-	uint8 bIsCharged : 1;
+	uint8 bIsCharging : 1;
 };

@@ -27,7 +27,7 @@ void UMDGA_Bow_MultiShot::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
 
 	// For Anim
-	MDCharacter->SetIsCharged(true);
+	MDCharacter->SetIsCharging(true);
 	UMDAnimInstance* AnimInst = Cast<UMDAnimInstance>(ActorInfo->GetAnimInstance());
 	if (AnimInst)
 	{
@@ -89,7 +89,7 @@ void UMDGA_Bow_MultiShot::InputReleased(const FGameplayAbilitySpecHandle Handle,
 void UMDGA_Bow_MultiShot::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(CurrentActorInfo->AvatarActor.Get());
-	MDCharacter->SetIsCharged(false);
+	MDCharacter->SetIsCharging(false);
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

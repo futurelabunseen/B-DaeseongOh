@@ -43,6 +43,8 @@ protected:
 	void GASInputPressed(FGameplayTag Tag);
 	void GASInputReleased(FGameplayTag Tag);
 
+	bool IsMatchLevel(const FString& InLevelName);
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	float ShortPressThreshold;

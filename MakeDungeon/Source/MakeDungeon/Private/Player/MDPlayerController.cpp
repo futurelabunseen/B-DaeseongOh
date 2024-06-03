@@ -39,10 +39,13 @@ void AMDPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	MDHUDWidget = CreateWidget<UMDHUDWidget>(this, MDHUDWidgetClass);
-	if (MDHUDWidget)
+	if(IsMatchLevel(TEXT("Stage01")))
 	{
-		MDHUDWidget->AddToViewport();
+		MDHUDWidget = CreateWidget<UMDHUDWidget>(this, MDHUDWidgetClass);
+		if (MDHUDWidget)
+		{
+			MDHUDWidget->AddToViewport();
+		}
 	}
 
 	UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
@@ -237,4 +240,14 @@ void AMDPlayerController::GASInputReleased(FGameplayTag Tag)
 			}
 		}
 	}
+}
+
+bool AMDPlayerController::IsMatchLevel(const FString& InLevelName)
+{
+	FString LevelNameWithPath = GetWorld()->GetMapName();
+	int32 LastUnderbarIndex;
+	LevelNameWithPath.FindLastChar('_', LastUnderbarIndex);
+	FString LevelName = LevelNameWithPath.Mid(LastUnderbarIndex + 1);
+	
+	return LevelName.Equals(InLevelName);
 }
