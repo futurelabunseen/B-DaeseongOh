@@ -43,20 +43,8 @@ AMDCharacterBase::AMDCharacterBase()
 	{
 		HpBar->SetWidgetClass(HpBarWidgetRef.Class);
 		HpBar->SetWidgetSpace(EWidgetSpace::Screen);
-		HpBar->SetDrawSize(FVector2D(200.f, 15.f));
+		HpBar->SetDrawSize(FVector2D(200.f, 30.f));
 		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
-
-	MpBar = CreateDefaultSubobject<UMDWidgetComponent>(TEXT("Widget2"));
-	MpBar->SetupAttachment(GetMesh());
-	MpBar->SetRelativeLocation(FVector(0.f, 0.f, 230.f));
-	static ConstructorHelpers::FClassFinder<UUserWidget> MpBarWidgetRef(TEXT("/Game/MakeDungeon/UI/WBP_MpBar.WBP_MpBar_C"));
-	if (MpBarWidgetRef.Class)
-	{
-		MpBar->SetWidgetClass(MpBarWidgetRef.Class);
-		MpBar->SetWidgetSpace(EWidgetSpace::Screen);
-		MpBar->SetDrawSize(FVector2D(200.f, 10.f));
-		MpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
 	TrackingSpeed = 20.f;
@@ -89,6 +77,9 @@ void AMDCharacterBase::Tick(float DeltaSeconds)
 		FRotator TargetRotator = GetAttackDirection();
 		SetActorRotation(FMath::RInterpTo(GetActorRotation(), TargetRotator, DeltaSeconds, TrackingSpeed));
 	}
+	FVector Start = GetActorLocation();
+	FVector End = GetActorLocation() + GetActorForwardVector() * 100.f;
+	DrawDebugDirectionalArrow(GetWorld(), Start, End, 100.f, FColor::Blue);
 }
 
 UAbilitySystemComponent* AMDCharacterBase::GetAbilitySystemComponent() const
@@ -98,7 +89,7 @@ UAbilitySystemComponent* AMDCharacterBase::GetAbilitySystemComponent() const
 
 FRotator AMDCharacterBase::GetAttackDirection() const
 {
-	return FRotationMatrix::MakeFromX(GetActorForwardVector()).Rotator();
+	return FRotationMatrix::MakeFromZ(GetMesh()->GetForwardVector()).Rotator();
 }
 
 void AMDCharacterBase::SetDead()
@@ -106,7 +97,6 @@ void AMDCharacterBase::SetDead()
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	//SetActorEnableCollision(false);
 	HpBar->SetHiddenInGame(true);
-	//MpBar->SetHiddenInGame(true);
 }
 
 void AMDCharacterBase::InitWeapons()

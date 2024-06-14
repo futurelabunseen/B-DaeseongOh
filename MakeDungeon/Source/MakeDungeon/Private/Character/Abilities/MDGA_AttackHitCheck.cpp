@@ -10,6 +10,10 @@
 #include "../MakeDungeon.h"
 #include "Tags/MDGameplayTag.h"
 
+#include "GameFramework/Character.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+
 UMDGA_AttackHitCheck::UMDGA_AttackHitCheck()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
@@ -20,7 +24,7 @@ void UMDGA_AttackHitCheck::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	CurrentLevel = TriggerEventData->EventMagnitude;
-	FVector SpawnLocation(FVector::ZeroVector);
+	SpawnLocation = FVector::ZeroVector;
 
 	if (TriggerEventData->ContextHandle.HasOrigin())
 	{
@@ -35,6 +39,25 @@ void UMDGA_AttackHitCheck::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 
 void UMDGA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {
+	if(NiagaraFX)
+	{
+		ACharacter* Character = Cast<ACharacter>(GetAvatarActorFromActorInfo());
+		if(Character)
+		{
+			FVector Origin;
+			if (!SpawnLocation.IsZero())
+			{
+				Origin = SpawnLocation;
+			}
+			else
+			{
+				Origin = Character->GetMesh()->GetSocketLocation(FName("weapon_r"));
+			}
+			Origin.Z += 45.0;
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, NiagaraFX, Origin, FRotator::ZeroRotator, FVector(VFXScale));
+		}
+	}
+
 	if (UAbilitySystemBlueprintLibrary::TargetDataHasHitResult(TargetDataHandle, 0))
 	{
 		FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, 0);
@@ -60,7 +83,7 @@ void UMDGA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 			FGameplayCueParameters CueParam;
 			CueParam.EffectContext = CueContextHandle;
 
-			TargetASC->ExecuteGameplayCue(MDTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
+			TargetASC->ExecuteGameplayCue(HitEffectTag, CueParam);
 		}
 
 		FGameplayEffectSpecHandle BuffEffectSpecHandle = MakeOutgoingGameplayEffectSpec(AttackBuffEffect);
@@ -93,7 +116,7 @@ void UMDGA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 			FGameplayCueParameters CueParam;
 			CueParam.EffectContext = CueContextHandle;
 
-			SourceASC->ExecuteGameplayCue(MDTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
+			SourceASC->ExecuteGameplayCue(HitEffectTag, CueParam);
 		}
 
 		for (auto TargetDebuffEffect : TargetDebuffEffects)

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "GameplayTagContainer.h"
 #include "MDGA_Bullet_HitAndSpread.generated.h"
 
 class AMDProjectile;
@@ -38,6 +39,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	FGameplayTag WeaponDebuff;
+
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	FGameplayTag HitEffectTag;
 
 private:
 	uint8 bIsFirst : 1;

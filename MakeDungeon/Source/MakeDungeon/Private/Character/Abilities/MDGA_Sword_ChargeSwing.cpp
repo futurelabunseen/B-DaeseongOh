@@ -9,6 +9,7 @@
 #include "Abilities/GameplayAbility.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Animation/MDAnimInstance.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Tags/MDGameplayTag.h"
 #include "../MakeDungeon.h"
 
@@ -46,13 +47,15 @@ void UMDGA_Sword_ChargeSwing::ActivateAbility(const FGameplayAbilitySpecHandle H
 	// For Attack
 	SpawnLocation = MDCharacter->GetActorLocation();
 
+	MDCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
 	MDCharacter->SetIsTrackingTarget(true);
 }
 
 void UMDGA_Sword_ChargeSwing::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
-
+	MDCharacter->SetIsCharging(true);
 	// For Effect
 	FGameplayEffectSpecHandle SkillUpdateEffectHandle = MakeOutgoingGameplayEffectSpec(SkillUpdateEffect);
 	if (SkillUpdateEffectHandle.IsValid())
@@ -83,9 +86,11 @@ void UMDGA_Sword_ChargeSwing::InputReleased(const FGameplayAbilitySpecHandle Han
 	//DrawDebugSphere(GetWorld(), SpawnLocation, Radius, 16, FColor::Green, false, 1.f);
 
 	MDCharacter->SetIsCharging(false);
+}
 
-	GetWorld()->GetTimerManager().SetTimer(AttackCheckTimerHandle, this, &UMDGA_Sword_ChargeSwing::AttackCheck,
-		AttackCheckTime, false);
+void UMDGA_Sword_ChargeSwing::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
+{
+	EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility, false);
 }
 
 void UMDGA_Sword_ChargeSwing::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
@@ -94,20 +99,7 @@ void UMDGA_Sword_ChargeSwing::EndAbility(const FGameplayAbilitySpecHandle Handle
 
 	BP_RemoveGameplayEffectFromOwnerWithGrantedTags(MDTAG_EVENT_CHARACTER_TRACESKILL.GetSingleTagContainer());
 
+	MDCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-}
-
-void UMDGA_Sword_ChargeSwing::AttackCheck()
-{
-	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(CurrentActorInfo->AvatarActor.Get());
-
-	UAbilitySystemComponent* ASC = MDCharacter->GetAbilitySystemComponent();
-
-	FGameplayEventData PayloadData;
-	PayloadData.ContextHandle = ASC->MakeEffectContext();
-	PayloadData.ContextHandle.AddOrigin(SpawnLocation);
-
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActorFromActorInfo(), TriggerGameplayTag, PayloadData);
-
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 }

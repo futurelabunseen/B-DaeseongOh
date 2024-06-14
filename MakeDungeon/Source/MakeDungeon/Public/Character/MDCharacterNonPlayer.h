@@ -32,6 +32,9 @@ protected:
 
 	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
 	virtual void AttackByAI() override;
+	
+	UFUNCTION()
+	void AttackAIFinish();
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")

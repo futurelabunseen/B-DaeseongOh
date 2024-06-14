@@ -69,8 +69,10 @@ FGameplayAbilityTargetDataHandle AMDTA_Trace::MakeTargetData() const
 
 	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, CCHANNEL_MDACTION, FCollisionShape::MakeSphere(AttackRadius), Params);
 
+	ACharacter* HitActor = Cast<ACharacter>(OutHitResult.GetActor());
+
 	FGameplayAbilityTargetDataHandle DataHandle;
-	if (HitDetected)
+	if (HitActor && HitDetected)
 	{
 		FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(OutHitResult);
 		DataHandle.Add(TargetData);

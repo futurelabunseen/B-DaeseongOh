@@ -34,7 +34,8 @@ FGameplayAbilityTargetDataHandle AMDTA_AISphereTrace::MakeTargetData() const
 	const float AttackRadius = AttributeSet->GetAttackRadius();
 
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(AMDTA_AISphereTrace), false, Character);
-	const FVector Start = Character->GetActorLocation();
+	const FVector Forward = Character->GetActorForwardVector();
+	const FVector Start = Character->GetActorLocation() + Forward * AttackRange;
 	const FVector End = Start + AttackRange;
 
 	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, CCHANNEL_MDACTION, FCollisionShape::MakeSphere(AttackRadius), Params);
@@ -43,22 +44,17 @@ FGameplayAbilityTargetDataHandle AMDTA_AISphereTrace::MakeTargetData() const
 	if (HitDetected)
 	{
 		FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(OutHitResult);
-		AMDCharacterPlayer* TargetCharacter = Cast<AMDCharacterPlayer>(TargetData->GetHitResult()->GetActor());
-		if(TargetCharacter)
-		{
-			DataHandle.Add(TargetData);
-		}
+		DataHandle.Add(TargetData);
+	}
 
 #if ENABLE_DRAW_DEBUG
 
-		if (bShowDebug)
-		{
-			FColor DrawColor = TargetCharacter ? FColor::Green : FColor::Red;
-			DrawDebugSphere(GetWorld(), Start, AttackRadius, 16, DrawColor, false, 5.f);
-		}
-#endif
-
+	if (bShowDebug)
+	{
+		FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
+		//DrawDebugSphere(GetWorld(), Start, AttackRadius, 16, DrawColor, false, 5.f);
 	}
+#endif
 
 	return DataHandle;
 }

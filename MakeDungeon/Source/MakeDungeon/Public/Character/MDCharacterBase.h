@@ -40,6 +40,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	virtual FVector GetAttackLocation() const { return FVector(); }
+
 	UFUNCTION(BlueprintCallable)
 	virtual FRotator GetAttackDirection() const;
 	
@@ -63,6 +64,7 @@ protected:
 	UFUNCTION()
 	virtual void OnOutOfHealth();
 
+protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TObjectPtr<UAbilitySystemComponent> ASC;
 
@@ -72,7 +74,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UMDCharacterAttributeSet> AttributeSet;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TMap<FGameplayTag, TObjectPtr<UMDWeaponBase>> Weapons;
 
 	FGameplayTag CurrentWeapon;
@@ -82,9 +84,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UMDWidgetComponent> HpBar;
-
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UMDWidgetComponent> MpBar;
 
 private:
 	float TrackingSpeed;

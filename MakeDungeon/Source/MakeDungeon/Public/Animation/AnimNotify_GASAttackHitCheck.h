@@ -27,4 +27,10 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	float ComboAttackLevel;
+
+	UPROPERTY(EditAnywhere)
+	FRotator CustomRotator;
+
+private:
+	FVector SpawnLocation;
 };

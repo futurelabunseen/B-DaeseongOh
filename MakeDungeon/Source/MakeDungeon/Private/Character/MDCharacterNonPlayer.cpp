@@ -8,6 +8,7 @@
 #include "AI/MDAIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Character/Abilities/MDGA_AI_Attack.h"
 
 AMDCharacterNonPlayer::AMDCharacterNonPlayer()
 {
@@ -46,6 +47,11 @@ void AMDCharacterNonPlayer::PossessedBy(AController* NewController)
 	for (const auto& StartAbility : CharacterAbilities)
 	{
 		FGameplayAbilitySpec StartSpec(StartAbility);
+		/*if (StartSpec.Ability->AbilityTags.HasAny(FGameplayTag::RequestGameplayTag(FName("NonPlayer.Attack")).GetSingleTagContainer()))
+		{
+			UMDGA_AI_Attack* AIAttackAbility = Cast<UMDGA_AI_Attack>(StartSpec.Ability);
+			AIAttackAbility->OnAbilityExecuted.AddDynamic(this, &AMDCharacterNonPlayer::AttackAIFinish);
+		}*/
 		ASC->GiveAbility(StartSpec);
 	}
 
@@ -92,7 +98,7 @@ float AMDCharacterNonPlayer::GetAIPatrolRadius()
 
 float AMDCharacterNonPlayer::GetAIDetectRange()
 {
-	return 400.0f;
+	return 5000.0f;
 }
 
 float AMDCharacterNonPlayer::GetAIAttackRange()
@@ -113,20 +119,39 @@ void AMDCharacterNonPlayer::SetAIAttackDelegate(const FAICharacterAttackFinished
 void AMDCharacterNonPlayer::AttackByAI()
 {
 	//공격 로직 구현
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-
+	
 	FGameplayEventData PayloadData;
-
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, AttackTriggerGameplayTag, PayloadData);
+	
+	/*TArray<FGameplayAbilitySpec> ActivatableAbilities = ASC->GetActivatableAbilities();
+
+	for (auto& Spec : ActivatableAbilities)
+	{
+		if (Spec.Ability && Spec.Ability->AbilityTags.HasTag(AttackTriggerGameplayTag))
+		{
+			if (Spec.IsActive())
+			{
+				UMDGA_AI_Attack* AIAttackAbility = Cast<UMDGA_AI_Attack>(Spec.Ability);
+				AIAttackAbility->OnAbilityExecuted.AddDynamic(this, &AMDCharacterNonPlayer::AttackAIFinish);
+				ASC->TryActivateAbility(Spec.Handle);
+			}
+		}
+	}*/
 
 	//공격이 끝나면 실행
-	FTimerHandle AttackTimerHandle;
+	/*FTimerHandle AttackTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(AttackTimerHandle, FTimerDelegate::CreateLambda(
 		[&]()
 		{
 			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 			OnAttackFinished.ExecuteIfBound();
 		}
-	), 2.f, false);
+	), 2.f, false);*/
 	
+}
+
+void AMDCharacterNonPlayer::AttackAIFinish()
+{
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	OnAttackFinished.ExecuteIfBound();
 }

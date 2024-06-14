@@ -3,6 +3,8 @@
 
 #include "Animation/AnimNotify_GASAttackHitCheck.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+#include "Character/MDCharacterBase.h"
 
 UAnimNotify_GASAttackHitCheck::UAnimNotify_GASAttackHitCheck()
 {
@@ -20,12 +22,19 @@ void UAnimNotify_GASAttackHitCheck::Notify(USkeletalMeshComponent* MeshComp, UAn
 
 	if (MeshComp)
 	{
-		AActor* OwnerActor = MeshComp->GetOwner();
-		if (OwnerActor)
+		AMDCharacterBase* MDCharacter = Cast<AMDCharacterBase>(MeshComp->GetOwner());
+		if (MDCharacter)
 		{
+			UAbilitySystemComponent* ASC = MDCharacter->GetAbilitySystemComponent();
+
 			FGameplayEventData PayloadData;
+			PayloadData.ContextHandle = ASC->MakeEffectContext();
+			PayloadData.ContextHandle.AddOrigin(SpawnLocation);
 			PayloadData.EventMagnitude = ComboAttackLevel;
-			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OwnerActor, TriggerGameplayTag, PayloadData);
+			
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(MDCharacter, TriggerGameplayTag, PayloadData);
+
+			
 		}
 	}
 }

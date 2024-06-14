@@ -13,7 +13,6 @@
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Tags/MDGameplayTag.h"
-#include "GameplayTagContainer.h"
 #include "Character/MDCharacterPlayer.h"
 #include "UI/MDHUDWidget.h"
 #include "../MakeDungeon.h"
@@ -80,6 +79,7 @@ void AMDPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(InputData->SkillAction_01, ETriggerEvent::Completed, this, &AMDPlayerController::GASInputReleased, MDTAG_WEAPON_SKILL_01);
 		EnhancedInputComponent->BindAction(InputData->SkillAction_02, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_WEAPON_SKILL_02);
 		EnhancedInputComponent->BindAction(InputData->SkillAction_03, ETriggerEvent::Triggered, this, &AMDPlayerController::GASInputPressed, MDTAG_WEAPON_SKILL_03);
+		EnhancedInputComponent->BindAction(InputData->SkillAction_03, ETriggerEvent::Completed, this, &AMDPlayerController::GASInputReleased, MDTAG_WEAPON_SKILL_03);
 	}
 }
 

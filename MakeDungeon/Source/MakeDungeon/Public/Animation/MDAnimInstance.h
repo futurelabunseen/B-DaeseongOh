@@ -36,9 +36,6 @@ protected:
 	FGameplayTag WeaponType;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = GAS)
-	TObjectPtr<class UAbilitySystemComponent> ASC;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = GAS)
 	FGameplayTagContainer CurrentOwnedTags;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)

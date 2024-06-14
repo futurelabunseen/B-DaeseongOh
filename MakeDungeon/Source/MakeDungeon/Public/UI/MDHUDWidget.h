@@ -25,7 +25,6 @@ public:
 	UMDCharacterStatWidget* GetStatWidget() { return CharacterStat; }
 	
 	void UpdateHpBar(const FOnAttributeChangeData& ChangeData);
-	void UpdateMpBar(const FOnAttributeChangeData& ChangeData);
 	void UpdateStat(const FOnAttributeChangeData& ChangeData);
 
 protected:
@@ -34,9 +33,6 @@ protected:
 protected:
 	UPROPERTY()
 	TObjectPtr<UMDHpBarUserWidget> HpBar;
-
-	UPROPERTY()
-	TObjectPtr<UMDMpBarUserWidget> MpBar;
 
 	UPROPERTY()
 	TObjectPtr<UMDCharacterStatWidget> CharacterStat;

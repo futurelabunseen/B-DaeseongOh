@@ -18,7 +18,6 @@
 #include "UI/MDCharacterStatWidget.h"
 #include "../MakeDungeon.h"
 
-
 AMDCharacterPlayer::AMDCharacterPlayer()
 {
 	ASC = nullptr;
@@ -103,16 +102,27 @@ FVector AMDCharacterPlayer::GetAttackLocation() const
 
 FRotator AMDCharacterPlayer::GetAttackDirection() const
 {
-	FHitResult HitResult;
-	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
-	PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, HitResult);
-	FVector MouseLocation = HitResult.Location;
-	MouseLocation.Z = 0.0;
+	FRotator ResultRotator;
 
-	FVector StartPoint = GetActorLocation();
-	StartPoint.Z = 0.0;
+	if (IsTrackingTarget())
+	{
+		FHitResult HitResult;
+		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+		PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, HitResult);
+		FVector MouseLocation = HitResult.Location;
+		MouseLocation.Z = 0.0;
 
-	return FRotationMatrix::MakeFromX(MouseLocation - StartPoint).Rotator();
+		FVector StartPoint = GetActorLocation();
+		StartPoint.Z = 0.0;
+
+		ResultRotator = FRotationMatrix::MakeFromX(MouseLocation - StartPoint).Rotator();
+	}
+	else
+	{
+		ResultRotator = Super::GetAttackDirection();
+	}
+
+	return ResultRotator;
 }
 
 void AMDCharacterPlayer::SetCurrentWeapon(const FGameplayTag& Tag)
@@ -183,7 +193,6 @@ void AMDCharacterPlayer::SetDead()
 			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 			SetActorEnableCollision(true);
 			HpBar->SetHiddenInGame(false);
-			MpBar->SetHiddenInGame(false);
 			AttributeSet->Revive();
 		}
 	), 5.f, false);

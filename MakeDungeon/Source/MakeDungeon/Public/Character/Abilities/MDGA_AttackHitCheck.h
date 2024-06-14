@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "GameplayTagContainer.h"
 #include "MDGA_AttackHitCheck.generated.h"
 
 class UGameplayEffect;
 class AMDTA_Trace;
+class UNiagaraSystem;
 
 /**
  * 
@@ -38,4 +40,16 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TArray<TSubclassOf<UGameplayEffect>> TargetDebuffEffects;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GAS")
+	TObjectPtr<UNiagaraSystem> NiagaraFX;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
+	FVector SpawnLocation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GAS")
+	float VFXScale;
+
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	FGameplayTag HitEffectTag;
 };

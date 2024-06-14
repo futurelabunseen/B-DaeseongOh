@@ -41,7 +41,7 @@ FGameplayAbilityTargetDataHandle AMDTA_SphereMultiTrace::MakeTargetData() const
 	}
 	else
 	{
-		Origin = Character->GetMesh()->GetSocketLocation(FName("Weapon_R_Muzzle"));
+		Origin = Character->GetMesh()->GetSocketLocation(FName("weapon_r"));
 	}
 
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(AMDTA_SphereMultiTrace), false, Character);
@@ -51,9 +51,10 @@ FGameplayAbilityTargetDataHandle AMDTA_SphereMultiTrace::MakeTargetData() const
 	for (const FOverlapResult& Overlap : Overlaps)
 	{
 		AActor* HitActor = Overlap.OverlapObjectHandle.FetchActor<AActor>();
-		if (HitActor && !HitActors.Contains(HitActor))
+		ACharacter* HitCharacter = Cast<ACharacter>(HitActor);
+		if (HitCharacter && !HitActors.Contains(HitCharacter))
 		{
-			HitActors.Add(HitActor);
+			HitActors.Add(HitCharacter);
 		}
 	}
 
@@ -65,7 +66,7 @@ FGameplayAbilityTargetDataHandle AMDTA_SphereMultiTrace::MakeTargetData() const
 	if (bShowDebug)
 	{
 		FColor DrawColor = HitActors.Num() > 0 ? FColor::Green : FColor::Red;
-		DrawDebugSphere(GetWorld(), Origin, SkillRadius, 16,DrawColor, false, 5.f);
+		//DrawDebugSphere(GetWorld(), Origin, SkillRadius, 16,DrawColor, false, 5.f);
 	}
 #endif
 

@@ -24,6 +24,8 @@ protected:
 	virtual void OnHealthChanged(const FOnAttributeChangeData& ChangeData);
 	virtual void OnMaxHealthChanged(const FOnAttributeChangeData& ChangeData);
 	virtual void OnInvinsibleTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+	virtual void OnManaChanged(const FOnAttributeChangeData& ChangeData);
+	virtual void OnMaxManaChanged(const FOnAttributeChangeData& ChangeData);
 
 protected:
 	UPROPERTY(meta = (BindWidget))
@@ -32,9 +34,18 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> TxtHpStat;
 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UProgressBar> PbMpBar;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTextBlock> TxtMpStat;
+
 	float CurrentHealth = 0.f;
 	float CurrentMaxHealth = 0.1f;
+	float CurrentMana= 0.f;
+	float CurrentMaxMana = 0.1f;
 
 	FLinearColor HealthColor = FLinearColor::Red;
 	FLinearColor InvincibleColor = FLinearColor::Green;
+	FLinearColor ManaColor = FLinearColor::Blue;
 };

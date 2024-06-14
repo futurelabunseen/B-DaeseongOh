@@ -31,8 +31,6 @@ void UMDGA_Sword_PrimaryAttack::ActivateAbility(const FGameplayAbilitySpecHandle
 
 		MDCharacter->StopMovement();
 	}
-
-	MDCharacter->SetIsTrackingTarget(true);
 }
 
 void UMDGA_Sword_PrimaryAttack::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
@@ -53,7 +51,6 @@ void UMDGA_Sword_PrimaryAttack::EndAbility(const FGameplayAbilitySpecHandle Hand
 	HasNextAttackInput = false;
 
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
-	MDCharacter->SetIsTrackingTarget(false);
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

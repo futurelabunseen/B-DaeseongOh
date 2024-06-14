@@ -30,8 +30,6 @@ void UMDGA_Bow_PrimaryAttack::ActivateAbility(const FGameplayAbilitySpecHandle H
 
 		MDCharacter->StopMovement();
 	}
-
-	MDCharacter->SetIsTrackingTarget(true);
 }
 
 void UMDGA_Bow_PrimaryAttack::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)

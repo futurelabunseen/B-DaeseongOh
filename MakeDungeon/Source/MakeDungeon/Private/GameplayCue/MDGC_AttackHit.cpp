@@ -8,16 +8,6 @@
 
 UMDGC_AttackHit::UMDGC_AttackHit()
 {
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> HitEffectRef(TEXT("/Script/Engine.ParticleSystem'/Game/StarterContent/Particles/P_Explosion.P_Explosion'"));
-	if (HitEffectRef.Object)
-	{
-		ParticleSystem = HitEffectRef.Object;	
-	}
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraRef(TEXT("/Script/Niagara.NiagaraSystem'/Game/MakeDungeon/FX/Temp.Temp'"));
-	if (NiagaraRef.Object)
-	{
-		NiagaraFX = NiagaraRef.Object;
-	}
 }
 
 bool UMDGC_AttackHit::OnExecute_Implementation(AActor* Target, const FGameplayCueParameters& Parameters) const

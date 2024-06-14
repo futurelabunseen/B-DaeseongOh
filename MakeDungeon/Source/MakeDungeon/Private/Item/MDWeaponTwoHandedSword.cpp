@@ -11,6 +11,6 @@ void UMDWeaponTwoHandedSword::InitWeapon(AMDCharacterBase* InCharacter)
 {
 	Super::InitWeapon(InCharacter);
 
-	AddLocalRotation(FRotator(0.0, 0.0, 180));
-	AddLocalOffset(FVector(0.0, 0.0, -183));
+	AddLocalRotation(FRotator(0.0, 0.0, 180.0));
+	AddLocalOffset(FVector(0.0, 0.0, -183.0));
 }

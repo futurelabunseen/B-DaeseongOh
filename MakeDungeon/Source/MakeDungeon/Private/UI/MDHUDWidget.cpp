@@ -19,11 +19,6 @@ void UMDHUDWidget::UpdateHpBar(const FOnAttributeChangeData& ChangeData)
 	HpBar->UpdateHpBar();
 }
 
-void UMDHUDWidget::UpdateMpBar(const FOnAttributeChangeData& ChangeData)
-{
-	MpBar->UpdateMpBar();
-}
-
 void UMDHUDWidget::UpdateStat(const FOnAttributeChangeData& ChangeData)
 {
 	CharacterStat->UpdateStat();
@@ -36,9 +31,6 @@ void UMDHUDWidget::NativeConstruct()
 	HpBar = Cast<UMDHpBarUserWidget>(GetWidgetFromName(TEXT("WidgetHpBar")));
 	ensure(HpBar);
 
-	MpBar = Cast<UMDMpBarUserWidget>(GetWidgetFromName(TEXT("WidgetMpBar")));
-	ensure(MpBar);
-
 	CharacterStat = Cast<UMDCharacterStatWidget>(GetWidgetFromName(TEXT("WidgetCharacterStat")));
 	ensure(CharacterStat);
 
@@ -47,7 +39,6 @@ void UMDHUDWidget::NativeConstruct()
 	{
 		//MDPlayer->SetupHUDWidget(this);
 		HpBar->SetAbilitySystemComponent(MDPlayer);
-		MpBar->SetAbilitySystemComponent(MDPlayer);
 		CharacterStat->SetAbilitySystemComponent(MDPlayer);
 	}
 }

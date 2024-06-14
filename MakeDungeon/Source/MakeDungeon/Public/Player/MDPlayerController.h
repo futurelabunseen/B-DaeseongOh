@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "GameplayTagContainer.h"
 #include "MDPlayerController.generated.h"
 
 class UMDInputData;
 struct FInputActionValue;
 class UAbilitySystemComponent;
-struct FGameplayTag;
 class UMDHUDWidget;
 
 /**

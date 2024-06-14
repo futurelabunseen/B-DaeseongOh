@@ -19,6 +19,16 @@ void UMDHpBarUserWidget::UpdateHpBar()
 	{
 		TxtHpStat->SetText(FText::FromString(FString::Printf(TEXT("%.0f/%0.f"), CurrentHealth, CurrentMaxHealth)));
 	}
+
+	if (PbMpBar)
+	{
+		PbMpBar->SetPercent(CurrentMana / CurrentMaxMana);
+	}
+	
+	if (TxtMpStat)
+	{
+		TxtMpStat->SetText(FText::FromString(FString::Printf(TEXT("%.0f/%0.f"), CurrentMana, CurrentMaxMana)));
+	}
 }
 
 void UMDHpBarUserWidget::SetAbilitySystemComponent(AActor* InOwner)
@@ -29,19 +39,29 @@ void UMDHpBarUserWidget::SetAbilitySystemComponent(AActor* InOwner)
 	{
 		ASC->GetGameplayAttributeValueChangeDelegate(UMDCharacterAttributeSet::GetHealthAttribute()).AddUObject(this, &UMDHpBarUserWidget::OnHealthChanged);
 		ASC->GetGameplayAttributeValueChangeDelegate(UMDCharacterAttributeSet::GetMaxHealthAttribute()).AddUObject(this, &UMDHpBarUserWidget::OnMaxHealthChanged);
+		ASC->GetGameplayAttributeValueChangeDelegate(UMDCharacterAttributeSet::GetManaAttribute()).AddUObject(this, &UMDHpBarUserWidget::OnManaChanged);
+		ASC->GetGameplayAttributeValueChangeDelegate(UMDCharacterAttributeSet::GetMaxManaAttribute()).AddUObject(this, &UMDHpBarUserWidget::OnMaxManaChanged);
 		ASC->RegisterGameplayTagEvent(MDTAG_CHARACTER_INVINCIBLE, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &UMDHpBarUserWidget::OnInvinsibleTagChanged);
 
 		PbHpBar->SetFillColorAndOpacity(HealthColor);
+		PbMpBar->SetFillColorAndOpacity(ManaColor);
 
 		const UMDCharacterAttributeSet* CurrentAttributeSet = ASC->GetSet<UMDCharacterAttributeSet>();
 		if (CurrentAttributeSet)
 		{
 			CurrentHealth = CurrentAttributeSet->GetHealth();
 			CurrentMaxHealth = CurrentAttributeSet->GetMaxHealth();
+			CurrentMana = CurrentAttributeSet->GetMana();
+			CurrentMaxMana = CurrentAttributeSet->GetMaxMana();
 			UpdateHpBar();
 		}
 
 		if (CurrentMaxHealth > 0.f)
+		{
+			UpdateHpBar();
+		}
+
+		if (CurrentMaxMana > 0.f)
 		{
 			UpdateHpBar();
 		}
@@ -72,4 +92,16 @@ void UMDHpBarUserWidget::OnInvinsibleTagChanged(const FGameplayTag CallbackTag, 
 		PbHpBar->SetFillColorAndOpacity(HealthColor);
 		UpdateHpBar();
 	}
+}
+
+void UMDHpBarUserWidget::OnManaChanged(const FOnAttributeChangeData& ChangeData)
+{
+	CurrentMana = ChangeData.NewValue;
+	UpdateHpBar();
+}
+
+void UMDHpBarUserWidget::OnMaxManaChanged(const FOnAttributeChangeData& ChangeData)
+{
+	CurrentMaxMana = ChangeData.NewValue;
+	UpdateHpBar();
 }

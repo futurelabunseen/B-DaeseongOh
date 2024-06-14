@@ -28,6 +28,9 @@ void UMDGA_Bullet_Normal::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 
 	FRotator Direction = SpawnInstigator->GetAttackDirection();
 
+	DirectionYaw = TriggerEventData->EventMagnitude;
+	Direction.Yaw += DirectionYaw;
+
 	AMDProjectile* SpawnProjectile = nullptr;
 	SpawnProjectile = AMDProjectile::ShootProjectile(GetWorld(), ProjectileClass, GetOwningActorFromActorInfo(),
 		SpawnInstigator, SpawnInstigator->GetActorLocation(), Direction, 3000.f, EProjectileType::Normal);
@@ -36,8 +39,6 @@ void UMDGA_Bullet_Normal::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 	{
 		SpawnProjectile->GetCollisionComp()->OnComponentBeginOverlap.AddDynamic(this, &UMDGA_Bullet_Normal::OnBeginOverlap);
 	}
-
-	SpawnInstigator->SetIsTrackingTarget(false);
 
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 }
@@ -69,7 +70,7 @@ void UMDGA_Bullet_Normal::OnBeginOverlap(UPrimitiveComponent* OverlappedComponen
 				FGameplayCueParameters CueParam;
 				CueParam.EffectContext = CueContextHandle;
 
-				TargetASC->ExecuteGameplayCue(MDTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
+				TargetASC->ExecuteGameplayCue(HitEffectTag, CueParam);
 
 				MD_LOG(LogMD, Warning, TEXT("Hit!"));
 			}

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "GameplayTagContainer.h"
 #include "MDGA_Bullet_Normal.generated.h"
 
 class AMDProjectile;
@@ -35,9 +36,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TArray<TSubclassOf<UGameplayEffect>> TargetDebuffEffects;
 	
-	
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	FGameplayTag HitEffectTag;
 
 private:
+	double DirectionYaw;
+
 	float Range;
 
 	FName SocketName;

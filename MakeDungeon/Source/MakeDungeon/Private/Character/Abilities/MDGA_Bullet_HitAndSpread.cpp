@@ -67,8 +67,7 @@ void UMDGA_Bullet_HitAndSpread::OnBeginOverlap(UPrimitiveComponent* OverlappedCo
 				FGameplayCueParameters CueParam;
 				CueParam.EffectContext = CueContextHandle;
 
-				TargetASC->ExecuteGameplayCue(MDTAG_GAMEPLAYCUE_CHARACTER_ATTACKHIT, CueParam);
-				//TargetASC->ExecuteGameplayCue(WeaponDebuff, CueParam);
+				TargetASC->ExecuteGameplayCue(HitEffectTag, CueParam);
 
 				MD_LOG(LogMD, Warning, TEXT("Hit!"));
 			}
@@ -79,13 +78,6 @@ void UMDGA_Bullet_HitAndSpread::OnBeginOverlap(UPrimitiveComponent* OverlappedCo
 				if (DebuffEffectSpecHandle.IsValid())
 				{
 					ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, DebuffEffectSpecHandle, TargetDataHandle);
-
-					/*FGameplayEffectContextHandle CueContextHandle = UAbilitySystemBlueprintLibrary::GetEffectContext(EffectSpecHandle);
-					CueContextHandle.AddHitResult(SweepResult);
-					FGameplayCueParameters CueParam;
-					CueParam.EffectContext = CueContextHandle;
-
-					TargetASC->ExecuteGameplayCue(WeaponDebuff, CueParam);*/
 				}
 			}
 
@@ -108,9 +100,9 @@ void UMDGA_Bullet_HitAndSpread::OnBeginOverlap(UPrimitiveComponent* OverlappedCo
 
 				TArray<AActor*> ResultActors;
 
-				UKismetSystemLibrary::SphereOverlapActors(GetWorld(), StartLocation, 700.f,
+				UKismetSystemLibrary::SphereOverlapActors(GetWorld(), StartLocation, 1000.f,
 					ObjectTypes, ClassFilter, ActorToIgnore, ResultActors);
-				DrawDebugSphere(GetWorld(), StartLocation, 700.f, 16, FColor::Blue, false, 2.f);
+				//DrawDebugSphere(GetWorld(), StartLocation, 700.f, 16, FColor::Blue, false, 2.f);
 
 				AMDCharacterBase* SpawnInstigator = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
 				AMDProjectile* SpawnedProjectile = nullptr;
