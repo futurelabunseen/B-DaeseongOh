@@ -10,13 +10,34 @@
 #include "Player/MDPlayerState.h"
 #include "AbilitySystemComponent.h"
 #include "Item/MDWeaponBase.h"
+#include "Tags/MDGameplayTag.h"
+#include "Player/MDPlayerController.h"
+#include "Character/Abilities/AttributeSets/MDCharacterAttributeSet.h"
+#include "UI/MDWidgetComponent.h"
+#include "UI/MDHUDWidget.h"
+#include "UI/MDCharacterStatWidget.h"
 #include "../MakeDungeon.h"
-
 
 AMDCharacterPlayer::AMDCharacterPlayer()
 {
 	ASC = nullptr;
 	AttributeSet = nullptr;
+
+	// Mesh
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("//Script/Engine.SkeletalMesh'/Game/Private/Pirate/Mesh_UE5/Full/SKM_Pirate_Full_02.SKM_Pirate_Full_02'"));
+	if (CharacterMeshRef.Object)
+	{
+		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
+	}
+
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/MakeDungeon/Animation/ABP_MDCharacter.ABP_MDCharacter_C"));
+	if (AnimInstanceClassRef.Class)
+	{
+		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
+	}
 
 	// Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -32,7 +53,6 @@ AMDCharacterPlayer::AMDCharacterPlayer()
 	
 	//PrimaryActorTick.bCanEverTick = true;
 	//PrimaryActorTick.bStartWithTickEnabled = true;
-	
 }
 
 void AMDCharacterPlayer::PossessedBy(AController* NewController)
@@ -45,7 +65,8 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 		ASC = PS->GetAbilitySystemComponent();
 		AttributeSet = PS->GetAttributeSet();
 		ASC->InitAbilityActorInfo(PS, this);
-
+		AttributeSet->OnOutOfHealth.AddDynamic(this, &ThisClass::OnOutOfHealth);
+		
 		for (const auto& StartAbility : CharacterAbilities)
 		{
 			FGameplayAbilitySpec StartSpec(StartAbility);
@@ -61,7 +82,13 @@ void AMDCharacterPlayer::PossessedBy(AController* NewController)
 		APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
 		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));
 	}
-	Weapon->EquipWeapon(this);
+}
+
+void AMDCharacterPlayer::BeginPlay()
+{
+	Super::BeginPlay();
+
+	EquipWeapon(MDTAG_WEAPON_TWOHANDEDSWORD);
 }
 
 FVector AMDCharacterPlayer::GetAttackLocation() const
@@ -75,94 +102,36 @@ FVector AMDCharacterPlayer::GetAttackLocation() const
 
 FRotator AMDCharacterPlayer::GetAttackDirection() const
 {
-	FHitResult HitResult;
-	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
-	PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, HitResult);
-	FVector MouseLocation = HitResult.Location;
-	MouseLocation.Z = 0.0;
+	FRotator ResultRotator;
 
-	FVector StartPoint = GetActorLocation();
-	StartPoint.Z = 0.0;
-
-	return FRotationMatrix::MakeFromX(MouseLocation - StartPoint).Rotator();
-}
-
-void AMDCharacterPlayer::GASInputStarted(FGameplayTag Tag)
-{
-	FGameplayTagContainer TagContainer;
-	TagContainer.AddTag(Tag);
-
-	ASC->TryActivateAbilitiesByTag(TagContainer);
-}
-
-void AMDCharacterPlayer::GASInputPressed(FGameplayTag Tag)
-{
-	TArray<FGameplayAbilitySpec> ActivatableAbilities = ASC->GetActivatableAbilities();
-
-	for (auto& Spec : ActivatableAbilities)
+	if (IsTrackingTarget())
 	{
-		if (Spec.Ability && Spec.Ability->AbilityTags.HasTag(Tag))
-		{
-			if (Spec.IsActive())
-			{
-				ASC->AbilitySpecInputPressed(Spec);
-				//MD_LOG(LogMD, Log, TEXT("Pressed"));
-			}
-			else
-			{
-				ASC->TryActivateAbility(Spec.Handle);
-				MD_LOG(LogMD, Log, TEXT("Activate"));
-			}
-		}
+		FHitResult HitResult;
+		APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+		PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, HitResult);
+		FVector MouseLocation = HitResult.Location;
+		MouseLocation.Z = 0.0;
+
+		FVector StartPoint = GetActorLocation();
+		StartPoint.Z = 0.0;
+
+		ResultRotator = FRotationMatrix::MakeFromX(MouseLocation - StartPoint).Rotator();
+	}
+	else
+	{
+		ResultRotator = Super::GetAttackDirection();
 	}
 
-	//If Input TagContainer
-	/*FGameplayTagContainer TagContainer;
-	TagContainer.AddTag(Tag);
-
-	TArray<FGameplayAbilitySpec*> AbilitiesToActivate;
-	ASC->GetActivatableGameplayAbilitySpecsByAllMatchingTags(TagContainer, AbilitiesToActivate);
-
-	for (auto GameplayAbilitySpec : AbilitiesToActivate)
-	{
-		if (GameplayAbilitySpec->IsActive())
-		{
-			ASC->AbilitySpecInputPressed(*GameplayAbilitySpec);
-		}
-		else
-		{
-			ASC->TryActivateAbility(GameplayAbilitySpec->Handle);
-		}
-	}*/
+	return ResultRotator;
 }
 
-void AMDCharacterPlayer::GASInputReleased(FGameplayTag Tag)
+void AMDCharacterPlayer::SetCurrentWeapon(const FGameplayTag& Tag)
 {
-	TArray<FGameplayAbilitySpec> ActivatableAbilities = ASC->GetActivatableAbilities();
-
-	for (auto& Spec : ActivatableAbilities)
+	if (CurrentWeapon != Tag)
 	{
-		if (Spec.Ability && Spec.Ability->AbilityTags.HasTag(Tag))
-		{
-			if(Spec.IsActive())
-			{
-				ASC->AbilitySpecInputReleased(Spec);
-				//MD_LOG(LogMD, Log, TEXT("Released"));
-			}
-		}
+		CurrentWeapon = Tag;
+		OnGameplayTagChanged.Broadcast();
 	}
-
-	//If Input TagContainer
-	/*FGameplayTagContainer TagContainer;
-	TagContainer.AddTag(Tag);
-
-	TArray<FGameplayAbilitySpec*> AbilitiesToActivate;
-	ASC->GetActivatableGameplayAbilitySpecsByAllMatchingTags(TagContainer, AbilitiesToActivate);
-
-	for (auto GameplayAbilitySpec : AbilitiesToActivate)
-	{
-		ASC->AbilitySpecInputReleased(*GameplayAbilitySpec);
-	}*/
 }
 
 void AMDCharacterPlayer::StopMovement()
@@ -170,7 +139,87 @@ void AMDCharacterPlayer::StopMovement()
 	GetController()->StopMovement();
 }
 
-void AMDCharacterPlayer::BeginPlay()
+void AMDCharacterPlayer::SwapWeapon(FGameplayTag Tag, UEnhancedInputLocalPlayerSubsystem* SubSysyem)
 {
-	Super::BeginPlay();	
+	if (Tag != CurrentWeapon)
+	{
+		if (!ASC->HasAllMatchingGameplayTags(MDTAG_WEAPON_ATTACK.GetSingleTagContainer()))
+		{
+			UMDWeaponBase* Weapon = Weapons.Find(Tag)->Get();
+			if (Weapon)
+			{
+				FGameplayTagContainer CurrentOwnedTags;
+				ASC->GetOwnedGameplayTags(CurrentOwnedTags);
+
+				if (CurrentOwnedTags.HasTag(CurrentWeapon))
+				{
+					ASC->RemoveLooseGameplayTag(CurrentWeapon);
+				}
+
+				SubSysyem->RemoveMappingContext(Weapons[CurrentWeapon]->GetMappingContext());
+				Weapons[CurrentWeapon]->SetHiddenInGame(true);
+				//Off Current
+
+				SetCurrentWeapon(Tag);
+
+				//On New
+				SubSysyem->AddMappingContext(Weapons[CurrentWeapon]->GetMappingContext(), 1);
+				ASC->AddLooseGameplayTag(CurrentWeapon);
+				Weapons[CurrentWeapon]->SetHiddenInGame(false);
+			}
+			else
+			{
+				MD_LOG(LogMD, Error, TEXT("No Weapon"));
+			}
+		}
+	}
+}
+
+void AMDCharacterPlayer::SetDead()
+{
+	Super::SetDead();
+
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		DisableInput(PlayerController);
+	}
+
+	FTimerHandle DeadTimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda(
+		[&]()
+		{
+			EnableInput(PlayerController);
+			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+			SetActorEnableCollision(true);
+			HpBar->SetHiddenInGame(false);
+			AttributeSet->Revive();
+		}
+	), 5.f, false);
+}
+
+void AMDCharacterPlayer::OnOutOfHealth()
+{
+	Super::OnOutOfHealth();
+}
+
+void AMDCharacterPlayer::EquipWeapon(FGameplayTag Tag)
+{
+	SetCurrentWeapon(Tag);
+
+	APlayerController* PlayerController = CastChecked<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
+		if (LocalPlayer)
+		{
+			UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
+			if (Subsystem)
+			{
+				Subsystem->AddMappingContext(Weapons[CurrentWeapon]->GetMappingContext(), 1);
+				ASC->AddLooseGameplayTag(CurrentWeapon);
+				Weapons[CurrentWeapon]->SetHiddenInGame(false);
+			}
+		}
+	}
 }

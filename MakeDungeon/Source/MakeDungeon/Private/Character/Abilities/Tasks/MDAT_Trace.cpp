@@ -9,10 +9,11 @@ UMDAT_Trace::UMDAT_Trace()
 {
 }
 
-UMDAT_Trace* UMDAT_Trace::CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<AMDTA_Trace> TargetActorClass)
+UMDAT_Trace* UMDAT_Trace::CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<AMDTA_Trace> TargetActorClass, const FVector& SpawnLocation)
 {
 	UMDAT_Trace* NewTask = NewAbilityTask<UMDAT_Trace>(OwningAbility);
 	NewTask->TargetActorClass = TargetActorClass;
+	NewTask->SpawnLocation = SpawnLocation;
 	return NewTask;
 }
 
@@ -51,11 +52,12 @@ void UMDAT_Trace::FinalizeTargetActor()
 	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
 	if (ASC)
 	{
-		const FTransform SpawnTransform = ASC->GetAvatarActor()->GetTransform();
+		FTransform SpawnTransform = ASC->GetAvatarActor()->GetTransform();
+		SpawnTransform.SetLocation(SpawnLocation);
 		SpawnedTargetActor->FinishSpawning(SpawnTransform);
 
 		ASC->SpawnedTargetActors.Push(SpawnedTargetActor);
-		SpawnedTargetActor->StartTargeting(Ability);
+		SpawnedTargetActor->StartTargeting(Ability, SpawnLocation);
 		SpawnedTargetActor->ConfirmTargeting();
 	}
 }

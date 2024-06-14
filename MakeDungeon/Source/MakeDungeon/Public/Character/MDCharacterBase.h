@@ -13,6 +13,7 @@ class UGameplayAbility;
 class UMDCharacterAttributeSet;
 class UMDWeaponBase;
 class UMotionWarpingComponent;
+class UMDWidgetComponent;
 
 UCLASS()
 class MAKEDUNGEON_API AMDCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -23,17 +24,23 @@ public:
 	// Sets default values for this character's properties
 	AMDCharacterBase();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	TMap<FGameplayTag, TSubclassOf<UMDWeaponBase>> WeaponsInfo;
+
+	virtual void PreInitializeComponents() override;
+	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
 	//FORCEINLINE virtual UAnimMontage* GetAttackMontage() const { return AttackMontage; }
 	//FORCEINLINE class UMDAttackMontageData* GetAttackMontageData() const { return AttackMontageData; }
-	FORCEINLINE UMDWeaponBase* GetWeapon() const { return Weapon; }
-	FGameplayTag GetWeaponType() const;
+	FORCEINLINE UMDWeaponBase* GetWeapon() const { return Weapons[CurrentWeapon]; }
+	FORCEINLINE FGameplayTag GetWeaponType() const { return CurrentWeapon; }
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	
 	UFUNCTION(BlueprintCallable)
-	virtual FVector GetAttackLocation() const;
+	virtual FVector GetAttackLocation() const { return FVector(); }
+
 	UFUNCTION(BlueprintCallable)
 	virtual FRotator GetAttackDirection() const;
 	
@@ -42,22 +49,22 @@ public:
 	FORCEINLINE void SetIsTrackingTarget(bool IsTrackingTarget) { bIsTrackingTarget = IsTrackingTarget; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE bool IsCharged() { return bIsCharged; }
+	FORCEINLINE bool IsCharging() { return bIsCharging; }
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE void SetIsCharged(bool IsCharged) { bIsCharged = IsCharged; }
-
-	void SwapWeapon(FGameplayTag Tag);
+	FORCEINLINE void SetIsCharging(bool IsCharging) { bIsCharging = IsCharging; }
 
 	virtual void StopMovement() {}
 
 protected:
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<UAnimMontage> AttackMontage;
+	virtual void SetDead();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<class UMDWeaponAttackData> AttackMontageData;*/
+	void InitWeapons();
 
+	UFUNCTION()
+	virtual void OnOutOfHealth();
+
+protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TObjectPtr<UAbilitySystemComponent> ASC;
 
@@ -67,14 +74,19 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UMDCharacterAttributeSet> AttributeSet;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
-	TObjectPtr<UMDWeaponBase> Weapon;
+	UPROPERTY(BlueprintReadOnly)
+	TMap<FGameplayTag, TObjectPtr<UMDWeaponBase>> Weapons;
+
+	FGameplayTag CurrentWeapon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MotionWarping")
 	TObjectPtr<UMotionWarpingComponent> MWC;
 
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UMDWidgetComponent> HpBar;
+
 private:
 	float TrackingSpeed;
 	uint8 bIsTrackingTarget : 1;
-	uint8 bIsCharged : 1;
+	uint8 bIsCharging : 1;
 };

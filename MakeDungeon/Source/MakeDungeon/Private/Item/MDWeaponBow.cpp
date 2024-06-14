@@ -3,3 +3,11 @@
 
 #include "Item/MDWeaponBow.h"
 
+UMDWeaponBow::UMDWeaponBow()
+{
+}
+
+void UMDWeaponBow::InitWeapon(AMDCharacterBase* InCharacter)
+{
+	Super::InitWeapon(InCharacter);
+}

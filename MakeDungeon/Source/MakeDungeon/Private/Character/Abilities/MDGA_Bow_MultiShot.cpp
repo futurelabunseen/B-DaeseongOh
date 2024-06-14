@@ -3,7 +3,14 @@
 
 #include "Character/Abilities/MDGA_Bow_MultiShot.h"
 #include "Character/MDCharacterBase.h"
+#include "Character/MDProjectile.h"
+#include "Animation/MDAnimInstance.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+#include "Item/MDWeaponBow.h"
+#include "Tags/MDGameplayTag.h"
 #include "../MakeDungeon.h"
 
 UMDGA_Bow_MultiShot::UMDGA_Bow_MultiShot()
@@ -16,45 +23,57 @@ UMDGA_Bow_MultiShot::UMDGA_Bow_MultiShot()
 void UMDGA_Bow_MultiShot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-	OuterAngle = 60.0;
+	CommitAbility(Handle, ActorInfo, ActivationInfo);
+
+	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
+
+	// For Anim
+	MDCharacter->SetIsCharging(true);
+	UMDAnimInstance* AnimInst = Cast<UMDAnimInstance>(ActorInfo->GetAnimInstance());
+	if (AnimInst)
+	{
+		AnimInst->SetAnimPlaySpeed(AnimPlaySpeed);
+	}
+
+	UMDWeaponBow* MDBow = CastChecked<UMDWeaponBow>(MDCharacter->GetWeapon());
+
+	// For Attack
+	OuterAngle = MDBow->GetMultiShotMaxAngle();
 	DecreaseAngle = OuterAngle * 0.02;
 
-	AMDCharacterBase* MDCharacter = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
 	MDCharacter->SetIsTrackingTarget(true);
 }
 
 void UMDGA_Bow_MultiShot::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
+	// For Attack
+	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
+	MDCharacter->SetIsCharging(true);
 	OuterAngle = FMath::Clamp(OuterAngle - DecreaseAngle, 1.0, OuterAngle);
 	MD_LOG(LogMD, Log, TEXT("CurrentAngle : %lf"), OuterAngle);
 }
 
 void UMDGA_Bow_MultiShot::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
-	UWorld* SpawnWorld = GetWorld();
-	AActor* SpawnOwner = GetOwningActorFromActorInfo();
-	AMDCharacterBase* SpawnInstigator = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
-	FVector SpawnLocation = SpawnInstigator->GetActorLocation();
-	FRotator DirectionOrigin = SpawnInstigator->GetAttackDirection();
+	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
+	
+	// For Anim
 
-	FRotator DirectionSpawn[5] = { FRotator(DirectionOrigin.Pitch, DirectionOrigin.Yaw, DirectionOrigin.Roll), 
-									FRotator(DirectionOrigin.Pitch, DirectionOrigin.Yaw + OuterAngle * 0.5, DirectionOrigin.Roll),
-									FRotator(DirectionOrigin.Pitch, DirectionOrigin.Yaw + OuterAngle, DirectionOrigin.Roll),
-									FRotator(DirectionOrigin.Pitch, DirectionOrigin.Yaw + -(OuterAngle * 0.5), DirectionOrigin.Roll),
-									FRotator(DirectionOrigin.Pitch, DirectionOrigin.Yaw + -OuterAngle, DirectionOrigin.Roll) };
+	// For Attack
+	UMDWeaponBow* MDBow = CastChecked<UMDWeaponBow>(MDCharacter->GetWeapon());
+	MDBow->SetMultiShotCurrentAngle(OuterAngle);
 
-	AMDProjectile::ShootProjectile(SpawnWorld, ProjectileClass, SpawnOwner,
-		SpawnInstigator, SpawnLocation, DirectionSpawn[0], 1000.f, EProjectileType::Normal);
-	AMDProjectile::ShootProjectile(SpawnWorld, ProjectileClass, SpawnOwner,
-		SpawnInstigator, SpawnLocation, DirectionSpawn[1], 1000.f, EProjectileType::Normal);
-	AMDProjectile::ShootProjectile(SpawnWorld, ProjectileClass, SpawnOwner,
-		SpawnInstigator, SpawnLocation, DirectionSpawn[2], 1000.f, EProjectileType::Normal);
-	AMDProjectile::ShootProjectile(SpawnWorld, ProjectileClass, SpawnOwner,
-		SpawnInstigator, SpawnLocation, DirectionSpawn[3], 1000.f, EProjectileType::Normal);
-	AMDProjectile::ShootProjectile(SpawnWorld, ProjectileClass, SpawnOwner,
-		SpawnInstigator, SpawnLocation, DirectionSpawn[4], 1000.f, EProjectileType::Normal);
+	MDCharacter->SetIsTrackingTarget(false);
 
-	SpawnInstigator->SetIsTrackingTarget(false);
+	MDCharacter->SetIsCharging(false);
+}
 
-	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+void UMDGA_Bow_MultiShot::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
+{
+	EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility, false);
+}
+
+void UMDGA_Bow_MultiShot::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

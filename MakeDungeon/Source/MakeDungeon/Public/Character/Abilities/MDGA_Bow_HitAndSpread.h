@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
-#include "Character/MDProjectile.h"
 #include "MDGA_Bow_HitAndSpread.generated.h"
 
 /**
@@ -18,9 +17,16 @@ class MAKEDUNGEON_API UMDGA_Bow_HitAndSpread : public UGameplayAbility
 public:
 	UMDGA_Bow_HitAndSpread();
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	TSubclassOf<AMDProjectile> ProjectileClass;
-
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+	
+protected:
+	UFUNCTION()
+	void OnCompletedCallback();
 
+	UFUNCTION()
+	void OnInterruptedCallback();
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	TObjectPtr<UAnimMontage> Montage;
 };

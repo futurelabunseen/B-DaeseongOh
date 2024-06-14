@@ -20,7 +20,7 @@ public:
 	UMDAT_Trace();
 
 	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta = (DisplayName = "WaitForTrace", HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
-	static UMDAT_Trace* CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<AMDTA_Trace> TargetActorClass);
+	static UMDAT_Trace* CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<AMDTA_Trace> TargetActorClass, const FVector& SpawnLocation);
 	virtual void Activate() override;
 	virtual void OnDestroy(bool AbilityEnded) override;
 
@@ -40,4 +40,6 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<AMDTA_Trace> SpawnedTargetActor;
+
+	FVector SpawnLocation;
 };

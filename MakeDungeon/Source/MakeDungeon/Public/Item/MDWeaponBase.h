@@ -5,16 +5,23 @@
 #include "CoreMinimal.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameplayTagContainer.h"
-#include "Data/MDWeaponAttackData.h"
+#include "Data/MDComboAttackData.h"
 #include "MDWeaponBase.generated.h"
 
 class UGameplayAbility;
 class AMDCharacterBase;
 class UMDWeaponInputData;
+class UInputMappingContext;
 
-enum class EMDSkillMontage : uint8
+UENUM()
+enum class EMDAttackType : uint8
 {
-	Skill_01, Skill_02, Skill_03, Skill_04
+	None			UMETA(DisplayName = "None"),
+	PrimaryAttack	UMETA(DisplayName = "PrimaryAttack"), 
+	Skill_01		UMETA(DisplayName = "Skill_01"), 
+	Skill_02		UMETA(DisplayName = "Skill_02"), 
+	Skill_03		UMETA(DisplayName = "Skill_03"), 
+	Skill_04		UMETA(DisplayName = "Skill_04")
 };
 
 /**
@@ -28,22 +35,24 @@ class MAKEDUNGEON_API UMDWeaponBase : public USkeletalMeshComponent
 public:
 	UMDWeaponBase();
 
-	FORCEINLINE UAnimMontage* GetAttackMontage() const { return WeaponAttackData->AttackMontage; }
-	FORCEINLINE UMDWeaponAttackData* GetWeaponAttackData() const { return WeaponAttackData; }
-	FORCEINLINE UAnimMontage* GetSkillMontage(EMDSkillMontage MontageIndex = EMDSkillMontage::Skill_01) const { return WeaponAttackData->SkillMontage[static_cast<uint8>(MontageIndex)]; }
-	void SetWeaponAttackData(AMDCharacterBase* InCharacter, UMDWeaponAttackData* WeaponData);
+	FORCEINLINE UAnimMontage* GetMontage(FGameplayTag Tag) const { return Montage[Tag]; }
+	FORCEINLINE FGameplayTag GetWeaponType() const { return WeaponType; }
+	FORCEINLINE UInputMappingContext* GetMappingContext() const { return WeaponMappingContext; }
+	virtual void InitWeapon(AMDCharacterBase* InCharacter);
 
-	void EquipWeapon(AMDCharacterBase* InCharacter);
-	void UnequipWeapon(AMDCharacterBase* InCharacter);
-	
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputMappingContext> WeaponMappingContext;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<UMDWeaponAttackData> WeaponAttackData;
+	TMap<FGameplayTag, TObjectPtr<UAnimMontage>> Montage;
+
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	TArray<TSubclassOf<UGameplayAbility>> WeaponAbilities;
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TMap<FGameplayTag, TSubclassOf<UGameplayAbility>> WeaponInputAbilities;
 
-private:
-	UPROPERTY(EditAnywhere, Category = "Data")
-	TObjectPtr<UMDWeaponInputData> InputData;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Type")
+	FGameplayTag WeaponType;
 };

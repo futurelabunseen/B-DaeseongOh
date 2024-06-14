@@ -3,9 +3,9 @@
 
 #include "Character/Abilities/MDGA_Bow_HitAndSpread.h"
 #include "Character/MDCharacterBase.h"
-#include "Character/MDProjectile.h"
-#include "Kismet/KismetMathLibrary.h"
-
+#include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "Tags/MDGameplayTag.h"
+#include "../MakeDungeon.h"
 
 UMDGA_Bow_HitAndSpread::UMDGA_Bow_HitAndSpread()
 {
@@ -15,13 +15,30 @@ UMDGA_Bow_HitAndSpread::UMDGA_Bow_HitAndSpread()
 void UMDGA_Bow_HitAndSpread::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	CommitAbility(Handle, ActorInfo, ActivationInfo);
 
-	AMDCharacterBase* SpawnInstigator = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
-	
-	FRotator Direction = SpawnInstigator->GetAttackDirection();
+	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
 
-	AMDProjectile::ShootProjectile(GetWorld(), ProjectileClass, GetOwningActorFromActorInfo(),
-		SpawnInstigator, SpawnInstigator->GetActorLocation(), Direction, 1000.f, EProjectileType::Spread);
+	if (Montage)
+	{
+		MDCharacter->StopMovement();
+		UAbilityTask_PlayMontageAndWait* PlayAttackMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayAttack"), Montage);
+		PlayAttackMontageTask->OnCompleted.AddDynamic(this, &UMDGA_Bow_HitAndSpread::OnCompletedCallback);
+		PlayAttackMontageTask->OnInterrupted.AddDynamic(this, &UMDGA_Bow_HitAndSpread::OnInterruptedCallback);
+		PlayAttackMontageTask->ReadyForActivation();
+	}
+}
 
-	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+void UMDGA_Bow_HitAndSpread::OnCompletedCallback()
+{
+	bool bReplicatedEndAbility = true;
+	bool bWasCancelled = false;
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
+}
+
+void UMDGA_Bow_HitAndSpread::OnInterruptedCallback()
+{
+	bool bReplicatedEndAbility = true;
+	bool bWasCancelled = true;
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
 }

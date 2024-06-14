@@ -13,6 +13,8 @@
 		GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 		GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOutOfHealthDelegate);
+
 /**
  * 
  */
@@ -25,9 +27,10 @@ public:
 	
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	//virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
-	//virtual bool PreGameplayEffectExecute(struct FGameplayEffectModCallbackData& Data) override;
+	virtual bool PreGameplayEffectExecute(struct FGameplayEffectModCallbackData& Data) override;
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
+	void Revive();
 
 	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, AttackRange);
 	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, MaxAttackRange);
@@ -37,7 +40,12 @@ public:
 	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, MaxAttackRate);
 	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, Health);
 	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, MaxHealth);
+	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, Mana);
+	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, MaxMana);
 	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, Damage);
+
+public:
+	mutable FOutOfHealthDelegate OnOutOfHealth;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
@@ -64,8 +72,16 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData MaxHealth;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData Mana;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Health", meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData MaxMana;
+
 	UPROPERTY(BlueprintReadOnly, Category = "Damage", meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData Damage;
+
+	bool bOutOfHealth = false;
 
 	friend class UMDGE_AttackDamage;
 

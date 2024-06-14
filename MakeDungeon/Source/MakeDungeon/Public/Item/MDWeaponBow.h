@@ -14,4 +14,19 @@ class MAKEDUNGEON_API UMDWeaponBow : public UMDWeaponBase
 {
 	GENERATED_BODY()
 	
+public:
+	UMDWeaponBow();
+
+	float	GetMultiShotMaxAngle() const { return MultiShotMaxAngle; }
+	float	GetMultiShotCurrentAngle() const { return MultiShotCurrentAngle; }
+	void	SetMultiShotCurrentAngle(float Angle) { MultiShotCurrentAngle = Angle; }
+
+	virtual void InitWeapon(AMDCharacterBase* InCharacter) override;
+
+protected:
+	UPROPERTY(EditAnywhere)
+	float MultiShotMaxAngle;
+
+	UPROPERTY()
+	float MultiShotCurrentAngle;
 };

@@ -16,6 +16,13 @@ AMDTA_Trace::AMDTA_Trace()
 {
 }
 
+void AMDTA_Trace::StartTargeting(UGameplayAbility* Ability, const FVector& InSpawnLocation)
+{
+	StartTargeting(Ability);
+
+	SpawnLocation = InSpawnLocation;
+}
+
 void AMDTA_Trace::StartTargeting(UGameplayAbility* Ability)
 {
 	Super::StartTargeting(Ability);
@@ -55,15 +62,17 @@ FGameplayAbilityTargetDataHandle AMDTA_Trace::MakeTargetData() const
 	const float AttackRange = AttributeSet->GetAttackRange();
 	const float AttackRadius = AttributeSet->GetAttackRadius();
 
-	FCollisionQueryParams Params(SCENE_QUERY_STAT(UDTTA_Trace), false, Character);
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(UMDTA_Trace), false, Character);
 	const FVector Forward = Character->GetActorForwardVector();
 	const FVector Start = Character->GetActorLocation() + Forward * Character->GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + Forward * AttackRange;
 
 	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, CCHANNEL_MDACTION, FCollisionShape::MakeSphere(AttackRadius), Params);
 
+	ACharacter* HitActor = Cast<ACharacter>(OutHitResult.GetActor());
+
 	FGameplayAbilityTargetDataHandle DataHandle;
-	if (HitDetected)
+	if (HitActor && HitDetected)
 	{
 		FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(OutHitResult);
 		DataHandle.Add(TargetData);

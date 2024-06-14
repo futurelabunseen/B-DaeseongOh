@@ -38,7 +38,7 @@ void UMDAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 	if (Owner)
 	{
-		bIsCharging = Owner->IsCharged();
+		bIsCharging = Owner->IsCharging();
 		WeaponType = Owner->GetWeaponType();
 	}
 }

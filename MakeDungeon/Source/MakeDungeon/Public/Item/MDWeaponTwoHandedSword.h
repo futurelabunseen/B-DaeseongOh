@@ -14,4 +14,8 @@ class MAKEDUNGEON_API UMDWeaponTwoHandedSword : public UMDWeaponBase
 {
 	GENERATED_BODY()
 	
+public:
+	UMDWeaponTwoHandedSword();
+
+	virtual void InitWeapon(AMDCharacterBase* InCharacter) override;
 };

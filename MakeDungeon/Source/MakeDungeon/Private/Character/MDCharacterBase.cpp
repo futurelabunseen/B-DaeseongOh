@@ -8,6 +8,8 @@
 #include "Tags/MDGameplayTag.h"
 #include "Item/MDWeaponBase.h"
 #include "MotionWarpingComponent.h"
+#include "UI/MDWidgetComponent.h"
+#include "UI/MDUserWidget.h"
 
 // Sets default values
 AMDCharacterBase::AMDCharacterBase()
@@ -30,35 +32,40 @@ AMDCharacterBase::AMDCharacterBase()
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
-	// Mesh
-	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -100.f), FRotator(0.f, -90.f, 0.f));
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin'"));
-	if (CharacterMeshRef.Object)
-	{
-		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
-	}
 	
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/MakeDungeon/Animation/ABP_MDCharacter.ABP_MDCharacter_C"));
-	if (AnimInstanceClassRef.Class)
-	{
-		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
-	}
-
-	Weapon = CreateDefaultSubobject<UMDWeaponBase>(TEXT("Weapon"));
 
 	MWC = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
+	HpBar = CreateDefaultSubobject<UMDWidgetComponent>(TEXT("Widget"));
+	HpBar->SetupAttachment(GetMesh());
+	HpBar->SetRelativeLocation(FVector(0.f, 0.f, 250.f));
+	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/MakeDungeon/UI/WBP_HpBar.WBP_HpBar_C"));
+	if (HpBarWidgetRef.Class)
+	{
+		HpBar->SetWidgetClass(HpBarWidgetRef.Class);
+		HpBar->SetWidgetSpace(EWidgetSpace::Screen);
+		HpBar->SetDrawSize(FVector2D(200.f, 30.f));
+		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 
 	TrackingSpeed = 20.f;
 	bIsTrackingTarget = false;
+}
+
+void AMDCharacterBase::PreInitializeComponents()
+{
+	Super::PreInitializeComponents();
+}
+
+void AMDCharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
 }
 
 void AMDCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	InitWeapons();
 }
 
 void AMDCharacterBase::Tick(float DeltaSeconds)
@@ -70,18 +77,9 @@ void AMDCharacterBase::Tick(float DeltaSeconds)
 		FRotator TargetRotator = GetAttackDirection();
 		SetActorRotation(FMath::RInterpTo(GetActorRotation(), TargetRotator, DeltaSeconds, TrackingSpeed));
 	}
-}
-
-FGameplayTag AMDCharacterBase::GetWeaponType() const
-{
-	FGameplayTag CurentWeaponType = FGameplayTag();
-
-	if (UMDWeaponAttackData* WeaponData = Weapon->GetWeaponAttackData())
-	{
-		CurentWeaponType = WeaponData->WeaponType;
-	}
-
-	return CurentWeaponType;
+	FVector Start = GetActorLocation();
+	FVector End = GetActorLocation() + GetActorForwardVector() * 100.f;
+	DrawDebugDirectionalArrow(GetWorld(), Start, End, 100.f, FColor::Blue);
 }
 
 UAbilitySystemComponent* AMDCharacterBase::GetAbilitySystemComponent() const
@@ -89,24 +87,43 @@ UAbilitySystemComponent* AMDCharacterBase::GetAbilitySystemComponent() const
 	return ASC;
 }
 
-FVector AMDCharacterBase::GetAttackLocation() const
-{
-	return FVector();
-}
-
 FRotator AMDCharacterBase::GetAttackDirection() const
 {
-	return FRotationMatrix::MakeFromX(GetActorForwardVector()).Rotator();
+	return FRotationMatrix::MakeFromZ(GetMesh()->GetForwardVector()).Rotator();
 }
 
-void AMDCharacterBase::SwapWeapon(FGameplayTag Tag)
+void AMDCharacterBase::SetDead()
 {
-	if (MDTAG_WEAPON_TWOHANDEDSWORD == Tag)
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	//SetActorEnableCollision(false);
+	HpBar->SetHiddenInGame(true);
+}
+
+void AMDCharacterBase::InitWeapons()
+{
+	bool IsFirst = true;
+
+	for (auto& WeaponInfo : WeaponsInfo)
 	{
-		Weapon->SetWeaponAttackData(this, LoadObject<UMDWeaponAttackData>(NULL, TEXT("/Script/MakeDungeon.MDWeaponAttackData'/Game/MakeDungeon/Data/MD_Attack_TwoHandedSword.MD_Attack_TwoHandedSword'")));
+		if (IsFirst)
+		{
+			CurrentWeapon = WeaponInfo.Key;
+			IsFirst = false;
+		}
+
+		UMDWeaponBase* Weapon = nullptr;
+		Weapon = Cast<UMDWeaponBase>(AddComponentByClass(WeaponInfo.Value, true, FTransform::Identity, false));
+		if (Weapon)
+		{
+			Weapons.Add(WeaponInfo.Key, Weapon);
+			Weapon->InitWeapon(this);
+		}
 	}
-	else if (MDTAG_WEAPON_BOW == Tag)
-	{
-		Weapon->SetWeaponAttackData(this, LoadObject<UMDWeaponAttackData>(NULL, TEXT("/Script/MakeDungeon.MDWeaponAttackData'/Game/MakeDungeon/Data/MD_Attack_Bow.MD_Attack_Bow'")));
-	}
+
+	//ASC->AddLooseGameplayTag(CurrentWeapon);
+}
+
+void AMDCharacterBase::OnOutOfHealth()
+{
+	SetDead();
 }

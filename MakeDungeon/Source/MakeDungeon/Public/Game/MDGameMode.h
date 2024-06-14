@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "MDGameMode.generated.h"
 
+class UMDLogoWidget;
+
 /**
  * 
  */
@@ -16,4 +18,13 @@ class MAKEDUNGEON_API AMDGameMode : public AGameModeBase
 	
 public:
 	AMDGameMode();
+
+protected:
+	virtual void BeginPlay() override;
+
+	FString GetCurrentLevelName();
+
+protected:
+	TSubclassOf<UMDLogoWidget> LogoWidgetClass;
+	TObjectPtr<UMDLogoWidget> LogoWidget;
 };

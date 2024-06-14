@@ -17,10 +17,8 @@ class MAKEDUNGEON_API UMDGA_Sword_DoubleSmash : public UGameplayAbility
 public:
 	UMDGA_Sword_DoubleSmash();
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	TObjectPtr<UAnimMontage> SkillMontage;
-
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
 protected:
 	UFUNCTION()
@@ -29,4 +27,11 @@ protected:
 	UFUNCTION()
 	void OnInterruptedCallback();
 
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	TObjectPtr<UAnimMontage> Montage;
+
+	// For Effect
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSubclassOf<UGameplayEffect> SkillInitEffect;
 };
