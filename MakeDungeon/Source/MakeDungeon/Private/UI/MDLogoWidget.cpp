@@ -22,11 +22,11 @@ void UMDLogoWidget::NativeConstruct()
 
 void UMDLogoWidget::StartButtonCallback()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Stage01"));
+	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Village"));
 }
 
 void UMDLogoWidget::EndButtonCallback()
 {
-	UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), 
-										EQuitPreference::Quit, true);
+	UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->
+		GetFirstPlayerController(), EQuitPreference::Quit, true);
 }

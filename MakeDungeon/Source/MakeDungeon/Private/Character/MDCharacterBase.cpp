@@ -25,6 +25,7 @@ AMDCharacterBase::AMDCharacterBase()
 	// Capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
 	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_MDCAPSULE);
+	GetCapsuleComponent()->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 
 	// Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -32,23 +33,27 @@ AMDCharacterBase::AMDCharacterBase()
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
-	
+	GetMesh()->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 
 	MWC = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarping"));
-	HpBar = CreateDefaultSubobject<UMDWidgetComponent>(TEXT("Widget"));
-	HpBar->SetupAttachment(GetMesh());
-	HpBar->SetRelativeLocation(FVector(0.f, 0.f, 250.f));
-	static ConstructorHelpers::FClassFinder<UUserWidget> HpBarWidgetRef(TEXT("/Game/MakeDungeon/UI/WBP_HpBar.WBP_HpBar_C"));
-	if (HpBarWidgetRef.Class)
+	StatusBar = CreateDefaultSubobject<UMDWidgetComponent>(TEXT("Widget"));
+	StatusBar->SetupAttachment(GetMesh());
+	StatusBar->SetRelativeLocation(FVector(0.f, 0.f, 250.f));
+	static ConstructorHelpers::FClassFinder<UUserWidget> StatusBarWidgetRef(TEXT("/Game/MakeDungeon/UI/WBP_StatusBar.WBP_StatusBar_C"));
+	if (StatusBarWidgetRef.Class)
 	{
-		HpBar->SetWidgetClass(HpBarWidgetRef.Class);
-		HpBar->SetWidgetSpace(EWidgetSpace::Screen);
-		HpBar->SetDrawSize(FVector2D(200.f, 30.f));
-		HpBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		StatusBar->SetWidgetClass(StatusBarWidgetRef.Class);
+		StatusBar->SetWidgetSpace(EWidgetSpace::Screen);
+		StatusBar->SetDrawSize(FVector2D(200.f, 30.f));
+		StatusBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		StatusBar->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 	}
 
 	TrackingSpeed = 20.f;
 	bIsTrackingTarget = false;
+	bIsCharging = false;
+	bIsLooping = false;
+	bIsDead = false;
 }
 
 void AMDCharacterBase::PreInitializeComponents()
@@ -61,11 +66,27 @@ void AMDCharacterBase::PostInitializeComponents()
 	Super::PostInitializeComponents();
 }
 
+void AMDCharacterBase::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+}
+
 void AMDCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
 	InitWeapons();
+	FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+
+	for (const auto& Effect : PassiveEffects)
+	{
+		FGameplayEffectSpecHandle EffectSpecHandle = ASC->MakeOutgoingSpec(Effect, 0, EffectContext);
+		if (EffectSpecHandle.IsValid())
+		{
+			ASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+		}
+	}
 }
 
 void AMDCharacterBase::Tick(float DeltaSeconds)
@@ -79,7 +100,7 @@ void AMDCharacterBase::Tick(float DeltaSeconds)
 	}
 	FVector Start = GetActorLocation();
 	FVector End = GetActorLocation() + GetActorForwardVector() * 100.f;
-	DrawDebugDirectionalArrow(GetWorld(), Start, End, 100.f, FColor::Blue);
+	//DrawDebugDirectionalArrow(GetWorld(), Start, End, 100.f, FColor::Blue);
 }
 
 UAbilitySystemComponent* AMDCharacterBase::GetAbilitySystemComponent() const
@@ -87,7 +108,7 @@ UAbilitySystemComponent* AMDCharacterBase::GetAbilitySystemComponent() const
 	return ASC;
 }
 
-FRotator AMDCharacterBase::GetAttackDirection() const
+FRotator AMDCharacterBase::GetAttackDirection(bool GetCursorDirection) const
 {
 	return FRotationMatrix::MakeFromZ(GetMesh()->GetForwardVector()).Rotator();
 }
@@ -96,7 +117,8 @@ void AMDCharacterBase::SetDead()
 {
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	//SetActorEnableCollision(false);
-	HpBar->SetHiddenInGame(true);
+	StatusBar->SetHiddenInGame(true);
+	bIsDead = true;
 }
 
 void AMDCharacterBase::InitWeapons()
@@ -105,18 +127,18 @@ void AMDCharacterBase::InitWeapons()
 
 	for (auto& WeaponInfo : WeaponsInfo)
 	{
-		if (IsFirst)
-		{
-			CurrentWeapon = WeaponInfo.Key;
-			IsFirst = false;
-		}
-
 		UMDWeaponBase* Weapon = nullptr;
 		Weapon = Cast<UMDWeaponBase>(AddComponentByClass(WeaponInfo.Value, true, FTransform::Identity, false));
 		if (Weapon)
 		{
 			Weapons.Add(WeaponInfo.Key, Weapon);
 			Weapon->InitWeapon(this);
+		}
+
+		if (IsFirst)
+		{
+			CurrentWeapon = WeaponInfo.Key;
+			IsFirst = false;
 		}
 	}
 

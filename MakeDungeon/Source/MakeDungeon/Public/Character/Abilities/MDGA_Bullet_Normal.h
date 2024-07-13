@@ -5,9 +5,8 @@
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
 #include "GameplayTagContainer.h"
+#include "Character/MDProjectile.h"
 #include "MDGA_Bullet_Normal.generated.h"
-
-class AMDProjectile;
 
 /**
  * 
@@ -29,6 +28,9 @@ protected:
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TSubclassOf<AMDProjectile> ProjectileClass;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	EProjectileType ProjectileType;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TSubclassOf<UGameplayEffect> AttackDamageEffect;

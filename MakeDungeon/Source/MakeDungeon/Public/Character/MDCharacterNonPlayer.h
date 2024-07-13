@@ -18,6 +18,7 @@ public:
 	AMDCharacterNonPlayer();
 
 	virtual void PossessedBy(AController* NewController) override;
+	virtual void Tick(float DeltaSeconds) override;
 
 protected:
 	virtual void SetDead() override;
@@ -49,4 +50,6 @@ protected:
 	FGameplayTag AttackTriggerGameplayTag;
 
 private:
+	float DeadTime = 0.f;
+
 };

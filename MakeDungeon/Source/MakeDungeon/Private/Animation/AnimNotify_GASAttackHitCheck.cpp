@@ -31,6 +31,7 @@ void UAnimNotify_GASAttackHitCheck::Notify(USkeletalMeshComponent* MeshComp, UAn
 			PayloadData.ContextHandle = ASC->MakeEffectContext();
 			PayloadData.ContextHandle.AddOrigin(SpawnLocation);
 			PayloadData.EventMagnitude = ComboAttackLevel;
+			PayloadData.OptionalObject = Cast<UObject>(VFX);
 			
 			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(MDCharacter, TriggerGameplayTag, PayloadData);
 

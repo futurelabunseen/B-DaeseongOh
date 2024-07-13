@@ -66,7 +66,7 @@ FGameplayAbilityTargetDataHandle AMDTA_SphereMultiTrace::MakeTargetData() const
 	if (bShowDebug)
 	{
 		FColor DrawColor = HitActors.Num() > 0 ? FColor::Green : FColor::Red;
-		//DrawDebugSphere(GetWorld(), Origin, SkillRadius, 16,DrawColor, false, 5.f);
+		DrawDebugSphere(GetWorld(), Origin, SkillRadius, 16,DrawColor, false, 5.f);
 	}
 #endif
 

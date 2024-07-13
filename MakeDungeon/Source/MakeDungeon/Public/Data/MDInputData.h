@@ -39,7 +39,13 @@ public:
 	TObjectPtr<UInputAction> CameraZoomAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|PlayerDefault", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> InteractionAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|PlayerDefault", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> WeaponSwapAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|PlayerDefault", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> VisibleInventoryAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|PlayerDefault", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> JumpAction;
@@ -61,4 +67,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Weapon", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> SkillAction_04;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input|Debug", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> DebugAction_AddItem;
 };

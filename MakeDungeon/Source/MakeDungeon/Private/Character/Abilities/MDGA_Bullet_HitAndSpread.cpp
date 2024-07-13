@@ -15,6 +15,7 @@
 UMDGA_Bullet_HitAndSpread::UMDGA_Bullet_HitAndSpread()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+	DetectRadius = 500.f;
 }
 
 void UMDGA_Bullet_HitAndSpread::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -27,6 +28,7 @@ void UMDGA_Bullet_HitAndSpread::ActivateAbility(const FGameplayAbilitySpecHandle
 	AMDCharacterBase* SpawnInstigator = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
 
 	FRotator Direction = SpawnInstigator->GetAttackDirection();
+	Direction.Pitch += 5.f;
 
 	AMDProjectile* SpawnedProjectile = AMDProjectile::ShootProjectile(GetWorld(), ProjectileClass, GetOwningActorFromActorInfo(),
 		SpawnInstigator, SpawnInstigator->GetActorLocation(), Direction, 3000.f, EProjectileType::Spread);
@@ -100,9 +102,9 @@ void UMDGA_Bullet_HitAndSpread::OnBeginOverlap(UPrimitiveComponent* OverlappedCo
 
 				TArray<AActor*> ResultActors;
 
-				UKismetSystemLibrary::SphereOverlapActors(GetWorld(), StartLocation, 1000.f,
+				UKismetSystemLibrary::SphereOverlapActors(GetWorld(), StartLocation, DetectRadius,
 					ObjectTypes, ClassFilter, ActorToIgnore, ResultActors);
-				//DrawDebugSphere(GetWorld(), StartLocation, 700.f, 16, FColor::Blue, false, 2.f);
+				DrawDebugSphere(GetWorld(), StartLocation, DetectRadius, 16, FColor::Blue, false, 2.f);
 
 				AMDCharacterBase* SpawnInstigator = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
 				AMDProjectile* SpawnedProjectile = nullptr;

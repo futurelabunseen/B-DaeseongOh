@@ -30,6 +30,8 @@ public:
 	virtual bool PreGameplayEffectExecute(struct FGameplayEffectModCallbackData& Data) override;
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
+	virtual void PostAttributeBaseChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) const override;
+
 	void Revive();
 
 	ATTRIBUTE_ACCESSORS(UMDCharacterAttributeSet, AttackRange);

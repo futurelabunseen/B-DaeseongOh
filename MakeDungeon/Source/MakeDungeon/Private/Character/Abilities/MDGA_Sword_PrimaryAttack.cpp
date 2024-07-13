@@ -30,13 +30,17 @@ void UMDGA_Sword_PrimaryAttack::ActivateAbility(const FGameplayAbilitySpecHandle
 		StartComboTimer();
 
 		MDCharacter->StopMovement();
+		MDCharacter->SetActorRotation(MDCharacter->GetAttackDirection(true));
 	}
 }
 
 void UMDGA_Sword_PrimaryAttack::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
+	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
+
 	if (HasNextAttackInput && CurrentCombo < CurrentComboAttackData->MaxComboCount)
 	{
+		MDCharacter->SetActorRotation(MDCharacter->GetAttackDirection(true));
 		MontageJumpToSection(GetNextSection());
 		StartComboTimer();
 		HasNextAttackInput = false;

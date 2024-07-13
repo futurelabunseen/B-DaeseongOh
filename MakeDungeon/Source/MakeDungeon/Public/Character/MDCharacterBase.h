@@ -10,6 +10,7 @@
 
 class UAbilitySystemComponent;
 class UGameplayAbility;
+class UGameplayEffect;
 class UMDCharacterAttributeSet;
 class UMDWeaponBase;
 class UMotionWarpingComponent;
@@ -29,11 +30,10 @@ public:
 
 	virtual void PreInitializeComponents() override;
 	virtual void PostInitializeComponents() override;
+	virtual void PossessedBy(AController* NewController) override;
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
-	//FORCEINLINE virtual UAnimMontage* GetAttackMontage() const { return AttackMontage; }
-	//FORCEINLINE class UMDAttackMontageData* GetAttackMontageData() const { return AttackMontageData; }
 	FORCEINLINE UMDWeaponBase* GetWeapon() const { return Weapons[CurrentWeapon]; }
 	FORCEINLINE FGameplayTag GetWeaponType() const { return CurrentWeapon; }
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
@@ -42,7 +42,7 @@ public:
 	virtual FVector GetAttackLocation() const { return FVector(); }
 
 	UFUNCTION(BlueprintCallable)
-	virtual FRotator GetAttackDirection() const;
+	virtual FRotator GetAttackDirection(bool GetCursorDirection = false) const;
 	
 	FORCEINLINE bool IsTrackingTarget() const { return bIsTrackingTarget; }
 	UFUNCTION(BlueprintCallable)
@@ -50,9 +50,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE bool IsCharging() { return bIsCharging; }
-
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE void SetIsCharging(bool IsCharging) { bIsCharging = IsCharging; }
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE bool IsLooping() { return bIsLooping; }
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void SetIsLooping(bool IsLooping) { bIsLooping = IsLooping; }
+
+	FORCEINLINE bool IsDead() { return bIsDead; }
 
 	virtual void StopMovement() {}
 
@@ -71,6 +77,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TArray<TSubclassOf<UGameplayAbility>> CharacterAbilities;
 
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	TArray<TSubclassOf<UGameplayEffect>> PassiveEffects;
+
 	UPROPERTY()
 	TObjectPtr<UMDCharacterAttributeSet> AttributeSet;
 
@@ -83,10 +92,12 @@ protected:
 	TObjectPtr<UMotionWarpingComponent> MWC;
 
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UMDWidgetComponent> HpBar;
+	TObjectPtr<UMDWidgetComponent> StatusBar;
 
 private:
 	float TrackingSpeed;
 	uint8 bIsTrackingTarget : 1;
 	uint8 bIsCharging : 1;
+	uint8 bIsLooping : 1;
+	uint8 bIsDead : 1;
 };

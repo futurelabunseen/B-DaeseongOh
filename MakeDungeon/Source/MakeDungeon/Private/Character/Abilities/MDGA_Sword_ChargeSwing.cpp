@@ -63,28 +63,14 @@ void UMDGA_Sword_ChargeSwing::InputPressed(const FGameplayAbilitySpecHandle Hand
 		ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, SkillUpdateEffectHandle);
 	}
 
-	// For Attack
-	//Radius = FMath::Clamp(Radius + 1.f, Radius, 350.f);
-	//SpawnLocation = MDCharacter->GetActorLocation() + MDCharacter->GetActorForwardVector() * Radius * 0.8f;
-	//DrawDebugSphere(GetWorld(), SpawnLocation, Radius, 16, FColor::Cyan, false, 0.2f);
-	MD_LOG(LogMD, Log, TEXT("CurrentAngle : %f"), Radius);
 }
 
 void UMDGA_Sword_ChargeSwing::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
-	// For Anim
 
 	// For Attack
-	UAbilitySystemComponent* ASC = MDCharacter->GetAbilitySystemComponent();
-	const UMDCharacterSkillAttributeSet* SkillAttribute = ASC->GetSet<UMDCharacterSkillAttributeSet>();
-
-	Radius = SkillAttribute->GetSkillRange();
-
 	MDCharacter->SetIsTrackingTarget(false);
-	SpawnLocation = MDCharacter->GetActorLocation() + MDCharacter->GetActorForwardVector() * Radius * 0.8f;
-	//DrawDebugSphere(GetWorld(), SpawnLocation, Radius, 16, FColor::Green, false, 1.f);
-
 	MDCharacter->SetIsCharging(false);
 }
 
@@ -95,11 +81,12 @@ void UMDGA_Sword_ChargeSwing::CancelAbility(const FGameplayAbilitySpecHandle Han
 
 void UMDGA_Sword_ChargeSwing::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(CurrentActorInfo->AvatarActor.Get());
-
-	BP_RemoveGameplayEffectFromOwnerWithGrantedTags(MDTAG_EVENT_CHARACTER_TRACESKILL.GetSingleTagContainer());
-
-	MDCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	AMDCharacterBase* MDCharacter = Cast<AMDCharacterBase>(CurrentActorInfo->AvatarActor.Get());
+	if(MDCharacter)
+	{
+		BP_RemoveGameplayEffectFromOwnerWithGrantedTags(MDTAG_EVENT_CHARACTER_TRACESKILL.GetSingleTagContainer());
+		MDCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	}
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

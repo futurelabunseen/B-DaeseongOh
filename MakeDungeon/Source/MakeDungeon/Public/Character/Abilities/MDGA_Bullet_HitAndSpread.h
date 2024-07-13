@@ -43,6 +43,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	FGameplayTag HitEffectTag;
 
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	float DetectRadius;
+
 private:
 	uint8 bIsFirst : 1;
 };

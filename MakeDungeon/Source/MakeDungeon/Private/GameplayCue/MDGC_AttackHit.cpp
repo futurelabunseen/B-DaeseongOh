@@ -16,8 +16,7 @@ bool UMDGC_AttackHit::OnExecute_Implementation(AActor* Target, const FGameplayCu
 	if (HitResult)
 	{
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(Target, NiagaraFX, HitResult->ImpactPoint, FRotator::ZeroRotator);
-		//UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(Target, NiagaraFX, HitResult->ImpactPoint, FRotator::ZeroRotator);
-		//UGameplayStatics::SpawnEmitterAtLocation(Target, ParticleSystem, HitResult->ImpactPoint, FRotator::ZeroRotator, true);
+		//UGameplayStatics::PlaySoundAtLocation(Target, SoundFX, Target->GetActorLocation(), 0.2f);
 	}
 	else
 	{
@@ -25,10 +24,8 @@ bool UMDGC_AttackHit::OnExecute_Implementation(AActor* Target, const FGameplayCu
 		{
 			if (TargetActor.Get())
 			{
-				//Spawn || Activate
 				UNiagaraFunctionLibrary::SpawnSystemAtLocation(Target, NiagaraFX, TargetActor.Get()->GetActorLocation(), FRotator::ZeroRotator);
-				//UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(Target, NiagaraFX, TargetActor.Get()->GetActorLocation(), FRotator::ZeroRotator);
-				//UGameplayStatics::SpawnEmitterAtLocation(Target, ParticleSystem, TargetActor.Get()->GetActorLocation(), FRotator::ZeroRotator, true);
+				//UGameplayStatics::PlaySoundAtLocation(Target, SoundFX, TargetActor.Get()->GetActorLocation(), 0.2f);
 			}
 		}
 	}

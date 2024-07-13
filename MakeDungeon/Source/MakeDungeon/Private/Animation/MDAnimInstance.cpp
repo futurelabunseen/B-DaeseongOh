@@ -39,6 +39,7 @@ void UMDAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (Owner)
 	{
 		bIsCharging = Owner->IsCharging();
+		bIsLooping = Owner->IsLooping();
 		WeaponType = Owner->GetWeaponType();
 	}
 }

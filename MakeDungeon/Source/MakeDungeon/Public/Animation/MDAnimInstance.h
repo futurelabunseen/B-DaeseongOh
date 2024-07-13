@@ -63,5 +63,8 @@ protected:
 	uint8 bIsCharging : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
+	uint8 bIsLooping : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	float AnimPlaySpeed;
 };

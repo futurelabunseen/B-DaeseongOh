@@ -10,7 +10,7 @@
 DECLARE_MULTICAST_DELEGATE(FOnGameplayTagChanged);
 
 class USpringArmComponent;
-class UMDHUDWidget;
+class UEnhancedInputLocalPlayerSubsystem;
 
 /**
  * 
@@ -27,7 +27,7 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual FVector GetAttackLocation() const override;
-	virtual FRotator GetAttackDirection() const override;
+	virtual FRotator GetAttackDirection(bool GetCursorDirection = false) const override;
 
 	USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
@@ -35,7 +35,10 @@ public:
 
 	virtual void StopMovement() override;
 
-	void SwapWeapon(FGameplayTag Tag, class UEnhancedInputLocalPlayerSubsystem* SubSysyem);
+	void SwapWeapon(FGameplayTag Tag, UEnhancedInputLocalPlayerSubsystem* SubSystem);
+
+	void SetPierceCount(int32 Value);
+	void SetVisiblePierceCount(bool IsVisible);
 
 protected:
 	virtual void SetDead() override;
@@ -59,4 +62,10 @@ protected:
 // Input Section
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TMap<FGameplayTag, TSubclassOf<UGameplayAbility>> InputAbilities;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UMDWidgetComponent> PierceCount;
+
+private:
+	int32 DeathCount;
 };

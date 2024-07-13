@@ -46,6 +46,5 @@ private:
 	FTimerHandle AttackCheckTimerHandle;
 
 	// For Attack
-	float Radius;
 	FVector SpawnLocation;
 };

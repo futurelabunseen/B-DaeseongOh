@@ -8,7 +8,7 @@
 
 UMDCharacterAttributeSet::UMDCharacterAttributeSet() : 
 	AttackRange(100.f), MaxAttackRange(300.f), 
-	AttackRadius(50.f), MaxAttackRadius(150.f),
+	AttackRadius(100.f), MaxAttackRadius(200.f),
 	AttackRate(10.f), MaxAttackRate(100.f),
 	Health(0.f), MaxHealth(100.f),
 	Mana(0.f), MaxMana(100.f),
@@ -53,6 +53,7 @@ void UMDCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffectMo
 	Super::PostGameplayEffectExecute(Data);
 
 	float MinHealth = 0.f;
+	float MinMana = 0.f;
 
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
@@ -65,6 +66,10 @@ void UMDCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffectMo
 		SetHealth(FMath::Clamp(GetHealth() - GetDamage(), MinHealth, GetMaxHealth()));
 		SetDamage(0.f);
 	}
+	else if (Data.EvaluatedData.Attribute == GetManaAttribute())
+	{
+		SetMana(FMath::Clamp(GetMana(), MinMana, GetMaxMana()));
+	}
 
 	if ((GetHealth() <= 0.0f) && !bOutOfHealth)
 	{
@@ -75,8 +80,19 @@ void UMDCharacterAttributeSet::PostGameplayEffectExecute(const FGameplayEffectMo
 	bOutOfHealth = (GetHealth() <= 0.f);
 }
 
+void UMDCharacterAttributeSet::PostAttributeBaseChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) const
+{
+	float MinHealth = 0.f;
+	float MinMana = 0.f;
+
+	if (Attribute == GetHealthAttribute() && MaxHealth.GetBaseValue() < Health.GetBaseValue())
+	{
+	}
+}
+
 void UMDCharacterAttributeSet::Revive()
 {
 	bOutOfHealth = false;
 	SetHealth(GetMaxHealth());
+	SetMana(GetMaxMana());
 }

@@ -7,6 +7,8 @@
 #include "GameplayTagContainer.h"
 #include "AnimNotify_GASAttackHitCheck.generated.h"
 
+class UNiagaraSystem;
+
 /**
  * 
  */
@@ -22,6 +24,9 @@ protected:
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 
 protected:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UNiagaraSystem> VFX;
+
 	UPROPERTY(EditAnywhere)
 	FGameplayTag TriggerGameplayTag;
 

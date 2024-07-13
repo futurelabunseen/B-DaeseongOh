@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "UI/MDUserWidgetBase.h"
 #include "AbilitySystemInterface.h"
 #include "MDUserWidget.generated.h"
 
@@ -12,7 +12,7 @@ class UAbilitySystemComponent;
  * 
  */
 UCLASS()
-class MAKEDUNGEON_API UMDUserWidget : public UUserWidget, public IAbilitySystemInterface
+class MAKEDUNGEON_API UMDUserWidget : public UMDUserWidgetBase, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 	

@@ -33,6 +33,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TSubclassOf<UGameplayEffect> AttackBuffEffect;
 
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	TArray<TSubclassOf<UGameplayEffect>> SourceBuffEffects;
+
 	float CurrentLevel;
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
@@ -40,9 +43,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	TArray<TSubclassOf<UGameplayEffect>> TargetDebuffEffects;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GAS")
-	TObjectPtr<UNiagaraSystem> NiagaraFX;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
 	FVector SpawnLocation;
@@ -52,4 +52,13 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "GAS")
 	FGameplayTag HitEffectTag;
+
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	double ImpulsePower;
+
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	uint8 ApplyScale : 1;
+
+private:
+	TObjectPtr<UNiagaraSystem> NiagaraFX;
 };

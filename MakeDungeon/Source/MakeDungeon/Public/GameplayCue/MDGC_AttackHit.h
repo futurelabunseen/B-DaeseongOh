@@ -6,7 +6,7 @@
 #include "GameplayCueNotify_Static.h"
 #include "MDGC_AttackHit.generated.h"
 
-class UParticleSystem;
+class USoundBase;
 class UNiagaraSystem;
 
 /**
@@ -24,7 +24,7 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameplayCue")
-	TObjectPtr<UParticleSystem> ParticleSystem;
+	TObjectPtr<USoundBase> SoundFX;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameplayCue")
 	TObjectPtr<UNiagaraSystem> NiagaraFX;

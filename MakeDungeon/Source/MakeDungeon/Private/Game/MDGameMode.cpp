@@ -3,7 +3,9 @@
 
 #include "Game/MDGameMode.h"
 #include "Player/MDPlayerController.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/MDLogoWidget.h"
+#include "../MakeDungeon.h"
 
 AMDGameMode::AMDGameMode()
 {
@@ -25,6 +27,49 @@ AMDGameMode::AMDGameMode()
 	{
 		LogoWidgetClass = LogoWidgetRef.Class;
 	}
+
+	ClearScore = 0;
+	CurrentScore = 0;
+	bIsCleared = false;
+}
+
+void AMDGameMode::OnPlayerScoreChanged(int32 NewPlayerScore)
+{
+	CurrentScore += NewPlayerScore;
+
+	AMDPlayerController* MDPlayerController = 
+			Cast<AMDPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (MDPlayerController)
+	{
+		MDPlayerController->GameScoreChanged(CurrentScore);
+	}
+
+	if (ClearScore >= CurrentScore)
+	{
+		bIsCleared = true;
+
+
+
+		if (MDPlayerController)
+		{
+			MDPlayerController->GameClear();
+		}
+	}
+}
+
+void AMDGameMode::OnPlayerDead()
+{
+	AMDPlayerController* MDPlayerController = 
+			Cast<AMDPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (MDPlayerController)
+	{
+		MDPlayerController->GameOver();
+	}
+}
+
+bool AMDGameMode::IsGameCleared()
+{
+	return bIsCleared;
 }
 
 void AMDGameMode::BeginPlay()

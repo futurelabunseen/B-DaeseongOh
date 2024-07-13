@@ -17,7 +17,7 @@ void UMDWeaponBase::InitWeapon(AMDCharacterBase* InCharacter)
 {
 	UAbilitySystemComponent* ASC = InCharacter->GetAbilitySystemComponent();
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	AttachToComponent(InCharacter->GetMesh(), AttachmentRules, FName(TEXT("Weapon_R")));
+	AttachToComponent(InCharacter->GetMesh(), AttachmentRules, FName(TEXT("weapon_l")));
 
 	for (auto& WeaponAbility : WeaponAbilities)
 	{

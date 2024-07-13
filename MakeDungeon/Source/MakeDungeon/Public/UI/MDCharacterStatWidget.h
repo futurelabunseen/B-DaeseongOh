@@ -18,7 +18,7 @@ class MAKEDUNGEON_API UMDCharacterStatWidget : public UMDUserWidget
 	GENERATED_BODY()
 	
 public:
-	void UpdateStat();
+	virtual void UpdateWidget() override;
 
 	virtual void SetAbilitySystemComponent(AActor* InOwner) override;
 protected:

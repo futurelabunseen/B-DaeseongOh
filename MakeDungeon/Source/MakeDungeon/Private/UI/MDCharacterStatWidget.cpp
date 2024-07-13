@@ -8,7 +8,7 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 
-void UMDCharacterStatWidget::UpdateStat()
+void UMDCharacterStatWidget::UpdateWidget()
 {
 	if (TxtHpStat)
 	{
@@ -40,7 +40,7 @@ void UMDCharacterStatWidget::SetAbilitySystemComponent(AActor* InOwner)
 		ASC->GetGameplayAttributeValueChangeDelegate(UMDCharacterAttributeSet::GetManaAttribute()).AddUObject(this, &UMDCharacterStatWidget::OnManaChanged);
 		ASC->GetGameplayAttributeValueChangeDelegate(UMDCharacterAttributeSet::GetMaxManaAttribute()).AddUObject(this, &UMDCharacterStatWidget::OnMaxManaChanged);
 
-		MDPlayer->OnGameplayTagChanged.AddUObject(this, &UMDCharacterStatWidget::UpdateStat);
+		MDPlayer->OnGameplayTagChanged.AddUObject(this, &UMDCharacterStatWidget::UpdateWidget);
 
 		const UMDCharacterAttributeSet* CurrentAttributeSet = ASC->GetSet<UMDCharacterAttributeSet>();
 		if (CurrentAttributeSet)
@@ -50,7 +50,7 @@ void UMDCharacterStatWidget::SetAbilitySystemComponent(AActor* InOwner)
 			CurrentMana = CurrentAttributeSet->GetHealth();
 			CurrentMaxMana = CurrentAttributeSet->GetMaxHealth();
 
-			UpdateStat();
+			UpdateWidget();
 		}
 	}
 }
@@ -58,23 +58,23 @@ void UMDCharacterStatWidget::SetAbilitySystemComponent(AActor* InOwner)
 void UMDCharacterStatWidget::OnHealthChanged(const FOnAttributeChangeData& ChangeData)
 {
 	CurrentHealth = ChangeData.NewValue;
-	UpdateStat();
+	UpdateWidget();
 }
 
 void UMDCharacterStatWidget::OnMaxHealthChanged(const FOnAttributeChangeData& ChangeData)
 {
 	CurrentMaxHealth = ChangeData.NewValue;
-	UpdateStat();
+	UpdateWidget();
 }
 
 void UMDCharacterStatWidget::OnManaChanged(const FOnAttributeChangeData& ChangeData)
 {
 	CurrentMana = ChangeData.NewValue;
-	UpdateStat();
+	UpdateWidget();
 }
 
 void UMDCharacterStatWidget::OnMaxManaChanged(const FOnAttributeChangeData& ChangeData)
 {
 	CurrentMaxMana = ChangeData.NewValue;
-	UpdateStat();
+	UpdateWidget();
 }

@@ -10,6 +10,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Item/MDWeaponBow.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Tags/MDGameplayTag.h"
 #include "../MakeDungeon.h"
 
@@ -17,7 +18,7 @@ UMDGA_Bow_MultiShot::UMDGA_Bow_MultiShot()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	Range = 1000.f;
-	SocketName = FName("Weapon_R");
+	SocketName = FName("weapon_r");
 }
 
 void UMDGA_Bow_MultiShot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -40,6 +41,8 @@ void UMDGA_Bow_MultiShot::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 	// For Attack
 	OuterAngle = MDBow->GetMultiShotMaxAngle();
 	DecreaseAngle = OuterAngle * 0.02;
+
+	MDCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
 	MDCharacter->SetIsTrackingTarget(true);
 }
@@ -75,5 +78,11 @@ void UMDGA_Bow_MultiShot::CancelAbility(const FGameplayAbilitySpecHandle Handle,
 
 void UMDGA_Bow_MultiShot::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
+	AMDCharacterBase* MDCharacter = Cast<AMDCharacterBase>(CurrentActorInfo->AvatarActor.Get());
+	if(MDCharacter)
+	{
+		MDCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	}
+
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

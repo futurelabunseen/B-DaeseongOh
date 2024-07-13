@@ -7,7 +7,9 @@
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "AIController.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/BTTaskNode.h"
+#include "AI/MDAI.h"
 
 UMDGA_AI_Attack::UMDGA_AI_Attack()
 {
@@ -21,6 +23,22 @@ void UMDGA_AI_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 
 	AMDCharacterBase* MDCharacter = CastChecked<AMDCharacterBase>(ActorInfo->AvatarActor.Get());
 
+	FVector TargetLocation = FVector::ZeroVector;
+	FRotator TargetRotator = FRotator::ZeroRotator;
+
+	AAIController* AIController = Cast<AAIController>(MDCharacter->GetController());
+	if (AIController)
+	{
+		UBehaviorTreeComponent* AIBT = Cast<UBehaviorTreeComponent>(AIController->GetBrainComponent());
+		if (AIBT)
+		{
+			APawn* TargetPawn = Cast<APawn>(AIBT->GetBlackboardComponent()->GetValueAsObject(BBKEY_TARGET));
+			TargetLocation = TargetPawn->GetActorLocation();
+
+			TargetRotator = FRotationMatrix::MakeFromX(TargetLocation - MDCharacter->GetActorLocation()).Rotator();
+		}
+	}
+
 	MDCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
 	if (Montage)
@@ -31,6 +49,7 @@ void UMDGA_AI_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 		PlayAttackMontageTask->ReadyForActivation();
 
 		MDCharacter->StopMovement();
+		MDCharacter->SetActorRotation(TargetRotator);
 	}
 }
 

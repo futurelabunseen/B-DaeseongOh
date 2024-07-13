@@ -6,10 +6,12 @@
 #include "Character/Abilities/TargetActors/MDTA_Trace.h"
 #include "Character/Abilities/TargetActors/MDTA_Projectile.h"
 #include "Character/Abilities/AttributeSets/MDCharacterAttributeSet.h"
+#include "Character/MDCharacterBase.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "../MakeDungeon.h"
 #include "Tags/MDGameplayTag.h"
-
+#include "Character/Abilities/AttributeSets/MDCharacterSkillAttributeSet.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Character.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
@@ -17,6 +19,7 @@
 UMDGA_AttackHitCheck::UMDGA_AttackHitCheck()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+	ImpulsePower = 1000.0;
 }
 
 void UMDGA_AttackHitCheck::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -31,6 +34,11 @@ void UMDGA_AttackHitCheck::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 		SpawnLocation = TriggerEventData->ContextHandle.GetOrigin();
 	}
 
+	if (nullptr != TriggerEventData->OptionalObject)
+	{
+		NiagaraFX = Cast<UNiagaraSystem>(TriggerEventData->OptionalObject);
+	}
+
 	UMDAT_Trace* AttackTraceTask = UMDAT_Trace::CreateTask(this, TargetActorClass, SpawnLocation);
 	AttackTraceTask->OnComplete.AddDynamic(this, &UMDGA_AttackHitCheck::OnTraceResultCallback);
 	AttackTraceTask->ReadyForActivation();
@@ -39,10 +47,10 @@ void UMDGA_AttackHitCheck::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 
 void UMDGA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {
+	AMDCharacterBase* SourceMDCharacter = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
 	if(NiagaraFX)
 	{
-		ACharacter* Character = Cast<ACharacter>(GetAvatarActorFromActorInfo());
-		if(Character)
+		if(SourceMDCharacter)
 		{
 			FVector Origin;
 			if (!SpawnLocation.IsZero())
@@ -51,10 +59,20 @@ void UMDGA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 			}
 			else
 			{
-				Origin = Character->GetMesh()->GetSocketLocation(FName("weapon_r"));
+				Origin = SourceMDCharacter->GetMesh()->GetSocketLocation(FName("weapon_r"));
 			}
-			Origin.Z += 45.0;
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, NiagaraFX, Origin, FRotator::ZeroRotator, FVector(VFXScale));
+			//Origin.Z += 45.0;
+
+			if(ApplyScale)
+			{
+				const UMDCharacterSkillAttributeSet* MDChSKAtt = GetAbilitySystemComponentFromActorInfo()->GetSet<UMDCharacterSkillAttributeSet>();
+				VFXScale = MDChSKAtt->GetSkillRange() / 150.f;
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, NiagaraFX, Origin, FRotator::ZeroRotator, FVector(VFXScale));
+			}
+			else
+			{
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, NiagaraFX, Origin, FRotator::ZeroRotator, FVector(VFXScale));
+			}
 		}
 	}
 
@@ -62,6 +80,13 @@ void UMDGA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 	{
 		FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, 0);
 		MD_LOG(LogMD, Log, TEXT("Target %s Detected"), *(HitResult.GetActor()->GetName()));
+		AMDCharacterBase* TargetMDCharacter = Cast<AMDCharacterBase>(HitResult.GetActor());
+
+		if (SourceMDCharacter && TargetMDCharacter)
+		{
+			const FVector Direction = SourceMDCharacter->GetAttackDirection().Vector() * ImpulsePower;
+			TargetMDCharacter->GetCharacterMovement()->AddImpulse(Direction, true);
+		}
 
 		UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo_Checked();
 		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor());
@@ -92,7 +117,13 @@ void UMDGA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 			ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, BuffEffectSpecHandle);
 		}
 
-		for (auto TargetDebuffEffect : TargetDebuffEffects)
+		for (const auto& SourceBuffEffect : SourceBuffEffects)
+		{
+			FGameplayEffectSpecHandle SourceBuffEffectSpecHandle = MakeOutgoingGameplayEffectSpec(AttackBuffEffect);
+			ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, SourceBuffEffectSpecHandle);
+		}
+
+		for (const auto& TargetDebuffEffect : TargetDebuffEffects)
 		{
 			FGameplayEffectSpecHandle DebuffEffectSpecHandle = MakeOutgoingGameplayEffectSpec(TargetDebuffEffect);
 			if (DebuffEffectSpecHandle.IsValid())
@@ -105,6 +136,17 @@ void UMDGA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 	{
 		UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo_Checked();
 		//UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor());
+
+		for (const auto& HitActor : TargetDataHandle.Data[0].Get()->GetActors())
+		{
+			AMDCharacterBase* TargetMDCharacter = Cast<AMDCharacterBase>(HitActor.Get());
+
+			if (SourceMDCharacter && TargetMDCharacter)
+			{
+				const FVector Direction = SourceMDCharacter->GetAttackDirection().Vector() * ImpulsePower;
+				TargetMDCharacter->GetCharacterMovement()->AddImpulse(Direction, true);
+			}
+		}
 
 		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(AttackDamageEffect, CurrentLevel);
 		if (EffectSpecHandle.IsValid())
@@ -119,7 +161,13 @@ void UMDGA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 			SourceASC->ExecuteGameplayCue(HitEffectTag, CueParam);
 		}
 
-		for (auto TargetDebuffEffect : TargetDebuffEffects)
+		for (const auto& SourceBuffEffect : SourceBuffEffects)
+		{
+			FGameplayEffectSpecHandle SourceBuffEffectSpecHandle = MakeOutgoingGameplayEffectSpec(AttackBuffEffect);
+			ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, SourceBuffEffectSpecHandle);
+		}
+
+		for (const auto& TargetDebuffEffect : TargetDebuffEffects)
 		{
 			FGameplayEffectSpecHandle DebuffEffectSpecHandle = MakeOutgoingGameplayEffectSpec(TargetDebuffEffect);
 			if (DebuffEffectSpecHandle.IsValid())

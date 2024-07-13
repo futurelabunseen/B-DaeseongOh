@@ -16,7 +16,7 @@ UMDGA_Bullet_Normal::UMDGA_Bullet_Normal()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	Range = 1000.f;
-	SocketName = FName("Weapon_R");
+	SocketName = FName("weapon_r");
 }
 
 void UMDGA_Bullet_Normal::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -27,13 +27,13 @@ void UMDGA_Bullet_Normal::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 	AMDCharacterBase* SpawnInstigator = Cast<AMDCharacterBase>(GetAvatarActorFromActorInfo());
 
 	FRotator Direction = SpawnInstigator->GetAttackDirection();
-
+	Direction.Pitch += 5.f;
 	DirectionYaw = TriggerEventData->EventMagnitude;
 	Direction.Yaw += DirectionYaw;
 
 	AMDProjectile* SpawnProjectile = nullptr;
 	SpawnProjectile = AMDProjectile::ShootProjectile(GetWorld(), ProjectileClass, GetOwningActorFromActorInfo(),
-		SpawnInstigator, SpawnInstigator->GetActorLocation(), Direction, 3000.f, EProjectileType::Normal);
+		SpawnInstigator, SpawnInstigator->GetActorLocation(), Direction, 3000.f, ProjectileType);
 
 	if (SpawnProjectile)
 	{
