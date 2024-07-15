@@ -8,6 +8,7 @@
 
 class UTextBlock;
 class UTileView;
+class UMDItemBaseData;
 
 /**
  * 
@@ -18,10 +19,18 @@ class MAKEDUNGEON_API UMDInventory : public UMDUserWidgetBase
 	GENERATED_BODY()
 	
 public:
-	void UpdateItemTile();
+	UFUNCTION(BlueprintCallable)
+	void BuyItem(UMDItemBaseData* InItem);
 
 	UFUNCTION(BlueprintCallable)
-	void AddItem(UObject* Item);
+	void SellItem(UMDItemBaseData* InItem);
+
+	void UpdateItemTile();
+
+	const TArray<UObject*> GetAllItems();
+
+	UFUNCTION(BlueprintCallable)
+	void AddItem(UMDItemBaseData* InItem);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))

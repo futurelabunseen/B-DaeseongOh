@@ -35,14 +35,12 @@ void UMDHUDWidget::HideUI(EMDUIType UIType)
 	UIs[UIType]->SetVisibility(ESlateVisibility::Hidden);
 }
 
-void UMDHUDWidget::AddItem(EMDUIType UIType)
+void UMDHUDWidget::AddItem(UMDItemBaseData* InItem)
 {
-	UMDItemBaseData* NewItem = DuplicateObject<UMDItemBaseData>(ItemData, this);
-
-	UMDInventory* Inventory = Cast<UMDInventory>(UIs[UIType]);
+	UMDInventory* Inventory = Cast<UMDInventory>(UIs[EMDUIType::HUD_Inventory]);
 	if(Inventory)
 	{
-		Inventory->AddItem(NewItem);
+		Inventory->AddItem(InItem);
 	}
 }
 
@@ -54,22 +52,18 @@ void UMDHUDWidget::NativeConstruct()
 	ensure(Guide);
 	Guide->SetVisibility(ESlateVisibility::Hidden);
 
-	UIs.Add({ EMDUIType::HUD_StatusBar , Cast<UMDStatusBarUserWidget>(GetWidgetFromName(TEXT("WidgetStatusBar"))) });
+	UIs.Add({ EMDUIType::HUD_StatusBar, Cast<UMDStatusBarUserWidget>(GetWidgetFromName(TEXT("WidgetStatusBar"))) });
 	ensure(UIs[EMDUIType::HUD_StatusBar]);
 
-	UIs.Add({ EMDUIType::HUD_Stat , Cast<UMDCharacterStatWidget>(GetWidgetFromName(TEXT("WidgetCharacterStat"))) });
+	UIs.Add({ EMDUIType::HUD_Stat, Cast<UMDCharacterStatWidget>(GetWidgetFromName(TEXT("WidgetCharacterStat"))) });
 	ensure(UIs[EMDUIType::HUD_Stat]);
 
-	UIs.Add({ EMDUIType::HUD_GameScore , Cast<UMDGameScoreWidget>(GetWidgetFromName(TEXT("WidgetGameScore"))) });
+	UIs.Add({ EMDUIType::HUD_GameScore, Cast<UMDGameScoreWidget>(GetWidgetFromName(TEXT("WidgetGameScore"))) });
 	ensure(UIs[EMDUIType::HUD_GameScore]);
 
-	UIs.Add({ EMDUIType::HUD_Inventory , Cast<UMDInventory>(GetWidgetFromName(TEXT("WidgetInventory"))) });
+	UIs.Add({ EMDUIType::HUD_Inventory, Cast<UMDInventory>(GetWidgetFromName(TEXT("WidgetInventory"))) });
 	ensure(UIs[EMDUIType::HUD_Inventory]);
 	UIs[EMDUIType::HUD_Inventory]->SetVisibility(ESlateVisibility::Hidden);
-
-	UIs.Add({ EMDUIType::HUD_Shop , Cast<UMDInventory>(GetWidgetFromName(TEXT("WidgetShop"))) });
-	ensure(UIs[EMDUIType::HUD_Shop]);
-	UIs[EMDUIType::HUD_Shop]->SetVisibility(ESlateVisibility::Hidden);
 
 	AMDCharacterPlayer* MDPlayer = Cast<AMDCharacterPlayer>(GetOwningPlayerPawn());
 	if (MDPlayer)

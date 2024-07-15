@@ -34,19 +34,24 @@ void AMDCharacterVillager::BeginPlay()
 
 void AMDCharacterVillager::VisibleShop()
 {
+	AMDPlayerController* PlayerController = Cast<AMDPlayerController>(GetWorld()->GetFirstPlayerController());
+
 	if (!MDShopWidget->IsInViewport())
 	{
 		MDShopWidget->AddToPlayerScreen();
+		PlayerController->VisibleUI(EMDUIType::HUD_Inventory);
 	}
 	else
 	{
 		if (ESlateVisibility::Hidden != MDShopWidget->GetVisibility())
 		{
 			MDShopWidget->SetVisibility(ESlateVisibility::Hidden);
+			PlayerController->HideUI(EMDUIType::HUD_Inventory);
 		}
 		else
 		{
 			MDShopWidget->SetVisibility(ESlateVisibility::Visible);
+			PlayerController->VisibleUI(EMDUIType::HUD_Inventory);
 		}
 	}
 }
@@ -68,6 +73,7 @@ void AMDCharacterVillager::OnInteractionTriggerEndOverlap(UPrimitiveComponent* O
 	if (PlayerController) 
 	{
 		PlayerController->OnInteraction.Clear();
+		PlayerController->HideUI(EMDUIType::HUD_Inventory);
 		MDShopWidget->RemoveFromParent();
 	}
 }

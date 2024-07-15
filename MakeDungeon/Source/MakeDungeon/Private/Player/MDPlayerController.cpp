@@ -20,7 +20,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "../MakeDungeon.h"
 
-#include "UI/MDInventory_Item.h"
+#include "Game/MDGameInstance.h"
+#include "GameData/MDItemBaseData.h"
+#include "UI/MDInventory.h"
 
 //#include "Item/MDWeaponBase.h"
 
@@ -83,6 +85,14 @@ UMDUserWidgetBase* AMDPlayerController::GetUI(EMDUIType UIType)
 	return nullptr;
 }
 
+void AMDPlayerController::VisibleUI(EMDUIType UIType)
+{
+	if(MDHUDWidget)
+	{
+		MDHUDWidget->VisibleUI(UIType);
+	}
+}
+
 void AMDPlayerController::HideUI(EMDUIType UIType)
 {
 	if(MDHUDWidget)
@@ -91,11 +101,46 @@ void AMDPlayerController::HideUI(EMDUIType UIType)
 	}
 }
 
-void AMDPlayerController::VisibleShop()
+void AMDPlayerController::SavePlayerInfo()
 {
-	if(MDHUDWidget)
+	if (MDHUDWidget)
 	{
-		MDHUDWidget->VisibleUI(EMDUIType::HUD_Shop);
+		UMDInventory* PlayerInventory = Cast<UMDInventory>(MDHUDWidget->GetUI(EMDUIType::HUD_Inventory));
+		if (PlayerInventory)
+		{
+			TArray<UObject*> PlayerAllItems = PlayerInventory->GetAllItems();
+
+			UMDGameInstance* MDGameInstance = Cast<UMDGameInstance>(GetGameInstance());
+
+			if (MDGameInstance)
+			{
+				for (auto Item : PlayerAllItems)
+				{
+					UMDItemBaseData* NewItem = DuplicateObject<UMDItemBaseData>(Cast<UMDItemBaseData>(Item), MDGameInstance);
+
+					MDGameInstance->PlayerAllItems.Add(NewItem);
+				}
+			}
+		}
+	}
+}
+
+void AMDPlayerController::LoadPlayerInfo()
+{
+	if (MDHUDWidget)
+	{
+		UMDGameInstance* MDGameInstance = Cast<UMDGameInstance>(GetGameInstance());
+		UMDInventory* PlayerInventory = Cast<UMDInventory>(MDHUDWidget->GetUI(EMDUIType::HUD_Inventory));
+
+		if (MDGameInstance && PlayerInventory)
+		{
+			for (auto Item : MDGameInstance->PlayerAllItems)
+			{
+				PlayerInventory->AddItem(Item);
+			}
+
+			MDGameInstance->PlayerAllItems.Empty();
+		}
 	}
 }
 
@@ -147,7 +192,7 @@ void AMDPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(InputData->WeaponSwapAction, ETriggerEvent::Started, 
 									this, &AMDPlayerController::SwapWeapon);
 		EnhancedInputComponent->BindAction(InputData->VisibleInventoryAction, ETriggerEvent::Started,
-									this, &AMDPlayerController::VisibleInventory);
+									this, &AMDPlayerController::VisibleUI, EMDUIType::HUD_Inventory);
 		
 		EnhancedInputComponent->BindAction(InputData->DebugAction_AddItem, ETriggerEvent::Started,
 									this, &AMDPlayerController::AddItem_Test);
@@ -179,6 +224,8 @@ void AMDPlayerController::CreateHUD()
 		
 		MDGameScoreWidget = Cast<UMDGameScoreWidget>(MDHUDWidget->GetUI(EMDUIType::HUD_GameScore));
 	}
+
+	LoadPlayerInfo();
 
 	/*for (const auto& HUDWidgetClass : HUDWidgetClasses)
 	{
@@ -313,14 +360,9 @@ void AMDPlayerController::SwapWeapon()
 	}
 }
 
-void AMDPlayerController::VisibleInventory()
-{
-	MDHUDWidget->VisibleUI(EMDUIType::HUD_Inventory);
-}
-
 void AMDPlayerController::AddItem_Test()
 {
-	MDHUDWidget->AddItem(EMDUIType::HUD_Inventory);
+	//MDHUDWidget->AddItem(EMDUIType::HUD_Inventory);
 }
 
 void AMDPlayerController::GASInputStarted(FGameplayTag Tag)

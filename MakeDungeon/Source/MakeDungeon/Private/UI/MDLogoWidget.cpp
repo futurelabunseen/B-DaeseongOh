@@ -5,6 +5,7 @@
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Player/MDPlayerController.h"
 
 void UMDLogoWidget::NativeConstruct()
 {
@@ -22,6 +23,12 @@ void UMDLogoWidget::NativeConstruct()
 
 void UMDLogoWidget::StartButtonCallback()
 {
+	AMDPlayerController* PlayerController = Cast<AMDPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PlayerController)
+	{
+		PlayerController->SavePlayerInfo();
+	}
+
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Village"));
 }
 

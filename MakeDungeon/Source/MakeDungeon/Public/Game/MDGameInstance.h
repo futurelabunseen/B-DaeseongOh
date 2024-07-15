@@ -6,6 +6,8 @@
 #include "Engine/GameInstance.h"
 #include "MDGameInstance.generated.h"
 
+class UMDItemBaseData;
+
 /**
  * 
  */
@@ -17,8 +19,12 @@ class MAKEDUNGEON_API UMDGameInstance : public UGameInstance
 public:
 	UMDGameInstance();
 
+	//virtual void OnWorldChanged(UWorld* OldWorld, UWorld* NewWorld) override;
 	//FORCEINLINE FMDItemBaseData GetCharacterStat(int32 InLevel) const { return ItemTable.IsValidIndex(InLevel - 1) ? ItemTable[InLevel - 1] : FMDItemBaseData(); }
 
 protected:
-	//TArray<FMDItemBaseData> ItemTable;
+
+public:
+	UPROPERTY()
+	TArray<UMDItemBaseData*> PlayerAllItems;
 };

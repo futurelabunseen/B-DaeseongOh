@@ -5,6 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "Physics/MDCollision.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/MDPlayerController.h"
 
 AMDLevelTeleporter::AMDLevelTeleporter()
 {
@@ -27,6 +28,12 @@ void AMDLevelTeleporter::BeginPlay()
 
 void AMDLevelTeleporter::OnTeleportTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	AMDPlayerController* PlayerController = Cast<AMDPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PlayerController)
+	{
+		PlayerController->SavePlayerInfo();
+	}
+
 	UGameplayStatics::OpenLevel(GetWorld(), TEXT("Stage01"));
 }
 

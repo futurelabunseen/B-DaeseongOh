@@ -27,7 +27,7 @@ public:
 
 	void VisibleUI(EMDUIType UIType);
 	void HideUI(EMDUIType UIType);
-	void AddItem(EMDUIType UIType);
+	void AddItem(UMDItemBaseData* InItem);
 
 protected:
 	virtual void NativeConstruct() override;

@@ -45,10 +45,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	UMDUserWidgetBase* GetUI(EMDUIType UIType);
 
+	UFUNCTION(BlueprintCallable)
+	void VisibleUI(EMDUIType UIType);
+
+	UFUNCTION(BlueprintCallable)
 	void HideUI(EMDUIType UIType);
 
-	UFUNCTION()
-	void VisibleShop();
+	UFUNCTION(BlueprintCallable)
+	void SavePlayerInfo();
+
+	UFUNCTION(BlueprintCallable)
+	void LoadPlayerInfo();
 
 protected:
 	virtual void BeginPlay() override;
@@ -68,7 +75,6 @@ protected:
 
 	void Interaction();
 	void SwapWeapon();
-	void VisibleInventory();
 
 	void AddItem_Test();
 
